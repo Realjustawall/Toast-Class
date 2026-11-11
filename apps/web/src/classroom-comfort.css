@@ -1,0 +1,416 @@
+/* Readable classroom controls and user-owned panel sizes. */
+.landing-brand-scene {
+  width: 100%;
+  height: 280px;
+  border: 0;
+  border-radius: 20px;
+  background: #06172a;
+  margin-top: 24px;
+}
+.classroom-inline-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  font-size: 16px;
+}
+.classroom-inline-state p {
+  margin: 0;
+}
+.classroom-inline-state > div {
+  display: flex;
+  gap: 8px;
+}
+.media-connection-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  font-size: 14px;
+}
+.media-connection-inline > span {
+  max-width: 340px;
+}
+.media-connection-inline button {
+  flex: none;
+  min-height: 40px;
+}
+.classroom-shell {
+  font-size: var(--classroom-font-size, 16px);
+}
+.classroom-shell[data-theme] .classroom-session-state {
+  display: none;
+}
+.classroom-layout-preferences summary > span {
+  display: none;
+}
+.classroom-shell[data-theme] .classroom-header-actions button {
+  font-size: 14px;
+}
+.classroom-shell[data-theme] .board-status {
+  font-size: 13px;
+}
+.classroom-shell[data-theme] .board-presence {
+  font-size: 12px;
+}
+.classroom-shell[data-theme] .classroom-stage > .classroom-panel-heading {
+  background: #fff;
+  color: #24374d;
+  border-radius: 8px 8px 0 0;
+}
+.classroom-shell[data-theme='immersive-glass'] .classroom-stage > .classroom-panel-heading {
+  background: #151821;
+  color: #f5f6fb;
+}
+.classroom-shell[data-theme] .teaching-media > .classroom-panel-heading {
+  color: #e1eaf4;
+}
+.classroom-shell[data-theme='modular-skyroom'] .teaching-media > .classroom-panel-heading {
+  color: #24374d;
+}
+.classroom-shell[data-theme] .media-status {
+  height: auto;
+  min-height: 30px;
+  flex-wrap: wrap;
+  column-gap: 12px;
+  row-gap: 4px;
+}
+.classroom-shell .teaching-media {
+  display: flex;
+  flex-direction: column;
+}
+.classroom-shell .teaching-media > .classroom-panel-heading {
+  height: auto;
+  min-height: 38px;
+  flex: none;
+}
+.classroom-shell .teaching-media > [data-lk-theme] {
+  height: auto;
+  flex: 1;
+  min-height: 0;
+}
+.classroom-shell .teaching-media > .classroom-panel-resizer {
+  height: auto;
+}
+.classroom-shell .teaching-media > .classroom-panel-resizer:is(.is-top, .is-bottom) {
+  height: 8px;
+}
+.classroom-shell .classroom-sidepanel > header {
+  gap: 6px;
+  min-height: 58px;
+  padding: 10px;
+}
+.classroom-shell .classroom-sidepanel > header h2 {
+  flex: 1;
+  min-width: 0;
+  font-size: calc(var(--classroom-font-size, 16px) * 1.05);
+}
+.classroom-shell[data-theme] .classroom-meeting-name h1 {
+  font-size: calc(var(--classroom-font-size, 16px) * 1.1);
+}
+.classroom-shell[data-theme] .classroom-people strong,
+.classroom-shell[data-theme] .chat-font-size,
+.classroom-shell[data-theme] .chat-filter-tab,
+.classroom-shell[data-theme] .chat-title-row button,
+.classroom-shell[data-theme] .chat-message-actions button,
+.classroom-shell[data-theme] .classroom-header-tabs button,
+.classroom-shell[data-theme] .media-idle-tile strong,
+.classroom-shell[data-theme] .media-tile-label > span:not(.media-mic-state),
+.classroom-shell[data-theme] .classroom-people-filters button,
+.classroom-shell[data-theme] .classroom-moderator-bar button,
+.classroom-shell[data-theme] .classroom-document-bar button,
+.classroom-shell[data-theme] .classroom-moderation summary,
+.classroom-shell[data-theme] .classroom-session-state h2,
+.classroom-shell[data-theme] .classroom-topbar [data-testid='classroom-connection'],
+.classroom-shell[data-theme] .media-status,
+.classroom-shell[data-theme] .media-devices label,
+.classroom-shell[data-theme] .media-devices summary,
+.classroom-shell[data-theme] .classroom-actions button,
+.classroom-shell[data-theme] .classroom-stage .board-toolbar button,
+.classroom-shell[data-theme] .classroom-stage .document-editor > header button,
+.classroom-shell[data-theme] .classroom-stage .document-editor > header h2,
+.classroom-shell[data-theme] .classroom-stage .board-status button {
+  font-size: calc(var(--classroom-font-size, 16px) * 0.875);
+}
+.classroom-shell[data-theme] .classroom-people small,
+.classroom-shell[data-theme] .classroom-sidebar-label,
+.classroom-shell[data-theme] .classroom-stage .document-editor > header span {
+  font-size: calc(var(--classroom-font-size, 16px) * 0.8125);
+}
+.classroom-shell[data-theme] .chat-composer textarea,
+.classroom-shell[data-theme] .classroom-people input,
+.classroom-shell[data-theme] .shared-notes {
+  font-size: var(--classroom-font-size, 16px);
+}
+.classroom-shell[data-theme] .classroom-moderator-bar button {
+  min-height: 42px;
+  line-height: 1.7;
+}
+.classroom-shell[data-theme] .classroom-people-filters {
+  flex-wrap: wrap;
+}
+.classroom-shell[data-theme] .classroom-people-filters button {
+  min-height: 38px;
+  line-height: 1.6;
+}
+.classroom-shell[data-theme] .classroom-people-filters button span {
+  font-size: inherit;
+}
+.classroom-shell[data-theme] .chat-composer textarea {
+  min-height: 48px;
+  height: 48px;
+}
+.classroom-shell .classroom-panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  min-height: 38px;
+  padding: 4px 8px;
+  font-size: 14px;
+  color: inherit;
+}
+.classroom-panel-tools {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: none;
+}
+.classroom-shell .classroom-panel-tools button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 32px;
+  min-height: 32px;
+  padding: 3px;
+  font-size: 18px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+.classroom-shell .classroom-panel-tools button:hover,
+.classroom-shell .classroom-panel-tools button[aria-pressed='true'] {
+  background: #0f70d718;
+  border-color: #0f70d7;
+}
+.classroom-shell .classroom-panel-tools svg {
+  width: 16px;
+  height: 16px;
+}
+[data-layout-panel] {
+  position: relative;
+}
+.classroom-panel-resizer {
+  position: absolute;
+  z-index: 48;
+  touch-action: none;
+  border-radius: 4px;
+}
+.classroom-panel-resizer:hover,
+.classroom-panel-resizer:focus-visible {
+  background: #0f70d780;
+  outline: 2px solid #0f70d7;
+}
+.classroom-panel-resizer.is-left,
+.classroom-panel-resizer.is-right {
+  width: 8px;
+  top: 58px;
+  bottom: 0;
+  cursor: col-resize;
+}
+.classroom-panel-resizer.is-left {
+  left: 0;
+}
+.classroom-panel-resizer.is-right {
+  right: 0;
+}
+.classroom-panel-resizer.is-top,
+.classroom-panel-resizer.is-bottom {
+  height: 8px;
+  left: 0;
+  right: 0;
+  cursor: row-resize;
+}
+.classroom-panel-resizer.is-top {
+  top: 0;
+}
+.classroom-panel-resizer.is-bottom {
+  bottom: 0;
+}
+.classroom-layout-preferences {
+  position: relative;
+  color: inherit;
+}
+.classroom-layout-preferences summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 4px 8px;
+  border: 1px solid #8798ac66;
+  border-radius: 8px;
+  list-style: none;
+}
+.classroom-layout-preferences summary::-webkit-details-marker {
+  display: none;
+}
+.classroom-layout-preferences > div {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  width: 260px;
+  z-index: 85;
+  padding: 16px;
+  background: #fff;
+  color: #172b43;
+  border: 1px solid #d5dfe9;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px #00112444;
+}
+.classroom-layout-preferences label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+}
+.classroom-layout-preferences select {
+  width: 76px;
+  font-size: 16px;
+  margin: 0;
+}
+.classroom-layout-preferences > div button {
+  margin-top: 12px;
+  width: 100%;
+  font-size: 14px;
+}
+.classroom-shell[data-expanded-panel='chat'] [data-layout-panel='chat'],
+.classroom-shell[data-expanded-panel='people'] [data-layout-panel='people'],
+.classroom-shell[data-expanded-panel='media'] [data-layout-panel='media'],
+.classroom-shell[data-expanded-panel='stage'] [data-layout-panel='stage'] {
+  display: flex !important;
+  flex-direction: column;
+  position: fixed !important;
+  inset: 78px 16px 92px !important;
+  width: auto !important;
+  height: auto !important;
+  max-height: none !important;
+  z-index: 60;
+  margin: 0 !important;
+  padding: 8px;
+  border: 1px solid #71869c66;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px #0008;
+  background: var(--layout-surface, #fff);
+  overflow: auto;
+  min-width: 0;
+  min-height: 0;
+}
+.classroom-shell[data-expanded-panel='chat'] [data-layout-panel]:not([data-layout-panel='chat']),
+.classroom-shell[data-expanded-panel='people']
+  [data-layout-panel]:not([data-layout-panel='people']),
+.classroom-shell[data-expanded-panel='media'] [data-layout-panel]:not([data-layout-panel='media']),
+.classroom-shell[data-expanded-panel='stage'] [data-layout-panel]:not([data-layout-panel='stage']) {
+  visibility: hidden;
+  pointer-events: none;
+}
+@media (min-width: 1100px) {
+  .classroom-shell {
+    grid-template-rows: 68px var(--preferred-media-height, 160px) minmax(0, 1fr) 82px;
+  }
+  .classroom-shell[data-theme='studio-hybrid'] {
+    grid-template-rows: 68px minmax(0, 1fr) var(--preferred-media-height, 160px) 82px;
+  }
+  .classroom-shell[data-theme='modular-skyroom'] {
+    grid-template-columns: var(--preferred-people, 280px) minmax(0, 1fr) var(
+        --preferred-media-width,
+        240px
+      );
+  }
+  .classroom-shell[data-theme='modular-skyroom'][data-hide-chat='true'][data-hide-people='true'] {
+    grid-template-columns: 0 minmax(0, 1fr) var(--preferred-media-width, 240px);
+  }
+  .classroom-shell[data-theme='immersive-glass'] {
+    grid-template-columns: minmax(0, 1fr) var(--preferred-media-width, 240px);
+  }
+  .classroom-shell[data-theme='immersive-glass'] .classroom-chat-panel {
+    width: var(--preferred-chat, 320px);
+  }
+  .classroom-shell[data-theme='immersive-glass'] .classroom-people-panel {
+    width: var(--preferred-people, 280px);
+  }
+}
+@media (max-width: 1099px) {
+  .classroom-sidepanel .classroom-panel-tools button:not(:last-child) {
+    display: none;
+  }
+  .classroom-shell[data-theme] {
+    grid-template-rows:
+      60px clamp(80px, var(--preferred-media-height, 120px), 32dvh) minmax(0, 1fr)
+      74px;
+  }
+  .classroom-layout-preferences summary > span {
+    display: none;
+  }
+  .classroom-layout-preferences summary {
+    padding: 5px;
+  }
+  .classroom-panel-resizer.is-left,
+  .classroom-panel-resizer.is-right {
+    display: none;
+  }
+  .classroom-shell .classroom-sidepanel > header {
+    padding: 8px;
+    gap: 4px;
+  }
+  .classroom-shell[data-theme] .classroom-sidepanel {
+    top: 60px;
+    bottom: 74px;
+  }
+  .classroom-shell[data-theme] .classroom-header-actions .classroom-layout-preferences {
+    display: block;
+  }
+  .classroom-shell[data-theme] .classroom-actions button {
+    font-size: 14px;
+  }
+  .media-connection-inline {
+    gap: 4px;
+    font-size: 12px;
+  }
+  .media-connection-inline > span {
+    max-width: 150px;
+  }
+}
+@media (max-width: 600px) {
+  .auth-story > div {
+    display: block;
+  }
+  .auth-story > div > .eyebrow,
+  .auth-story > div > h1,
+  .auth-story > div > p {
+    display: none;
+  }
+  .auth-story {
+    padding: 16px;
+  }
+  .landing-brand-scene {
+    height: 220px;
+  }
+  .classroom-shell[data-theme] .classroom-sidepanel > header h2 {
+    font-size: 15px;
+  }
+  .classroom-shell[data-theme] .classroom-panel-tools button {
+    min-height: 36px;
+    height: 36px;
+  }
+  .classroom-layout-preferences > div {
+    position: fixed;
+    top: 66px;
+    inset-inline-end: 12px;
+    width: min(280px, calc(100vw - 24px));
+  }
+}

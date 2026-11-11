@@ -1,0 +1,120 @@
+﻿/* Shared base for classroom UI mockups (placeholder only, not used by the app) */
+@import url('../../../node_modules/@fontsource/vazirmatn/400.css');
+@import url('../../../node_modules/@fontsource/vazirmatn/500.css');
+@import url('../../../node_modules/@fontsource/vazirmatn/600.css');
+@import url('../../../node_modules/@fontsource/vazirmatn/700.css');
+@import url('../../../node_modules/@fontsource/vazirmatn/800.css');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: 'Vazirmatn', 'Segoe UI', Tahoma, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+}
+svg.i {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.35);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Back-to-gallery chip shown on every mockup */
+.mock-back {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  writing-mode: vertical-rl;
+  z-index: 9999;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 10px 3px;
+  border-radius: 0 8px 8px 0;
+  text-decoration: none;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+}
+.mock-back:hover {
+  opacity: 1;
+}
+
+/* Fake camera feed placeholder: blurred room + silhouette, tinted by --h */
+.fakecam {
+  --h: 210;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 20% 10%, hsl(var(--h) 45% 62% / 0.9), transparent 60%),
+    radial-gradient(90% 80% at 90% 100%, hsl(calc(var(--h) + 40) 40% 35%), transparent 70%),
+    linear-gradient(160deg, hsl(var(--h) 30% 30%), hsl(calc(var(--h) + 20) 35% 16%));
+}
+.fakecam::before {
+  /* head */
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 26%;
+  aspect-ratio: 1;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: linear-gradient(180deg, hsl(28 45% 72%), hsl(24 40% 60%));
+  box-shadow: 0 -6px 0 2px hsl(var(--h) 20% 18%) inset;
+}
+.fakecam::after {
+  /* shoulders */
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -18%;
+  width: 62%;
+  height: 46%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 0 0;
+  background: linear-gradient(180deg, hsl(calc(var(--h) + 180) 30% 40%), hsl(calc(var(--h) + 180) 30% 26%));
+}

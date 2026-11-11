@@ -32,7 +32,7 @@ Office conversion is optional (`--documents`), so the default installation does 
 - Shared notes, polls, hand queue, timers, attendance, breakout rooms and platform administration.
 - Self-hosted GeoGebra on an isolated origin. Review [attribution and upstream licensing](docs/ATTRIBUTION.md), including GeoGebra licensing, before commercial use.
 
-This is an independent application. Full BigBlueButton/PDF Annotator parity and 800 simultaneous media users are not certified. See [security boundaries](docs/SECURITY.md) and [feature status](docs/FEATURE_PARITY.md).
+This is an independent application. Full BigBlueButton/PDF Annotator parity and 800 simultaneous media users are not certified. See [security boundaries and verification limits](docs/SECURITY.md).
 
 ## Development and verification
 

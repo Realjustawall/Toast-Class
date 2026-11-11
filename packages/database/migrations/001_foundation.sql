@@ -1,0 +1,10 @@
+CREATE TABLE users (id uuid PRIMARY KEY, email text NOT NULL UNIQUE, name text NOT NULL, password_hash text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE auth_sessions (token_hash text PRIMARY KEY, user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE, expires_at timestamptz NOT NULL);
+CREATE TABLE organizations (id uuid PRIMARY KEY, name text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE memberships (organization_id uuid REFERENCES organizations(id) ON DELETE CASCADE, user_id uuid REFERENCES users(id) ON DELETE CASCADE, role text NOT NULL CHECK(role IN ('owner','teacher','student')), PRIMARY KEY(organization_id,user_id));
+CREATE TABLE classrooms (id uuid PRIMARY KEY, organization_id uuid NOT NULL REFERENCES organizations(id), name text NOT NULL, created_by uuid NOT NULL REFERENCES users(id), created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE messages (id uuid PRIMARY KEY, classroom_id uuid NOT NULL REFERENCES classrooms(id), user_id uuid NOT NULL REFERENCES users(id), body text NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX messages_room_time ON messages(classroom_id,created_at);
+CREATE TABLE audit_logs (id uuid PRIMARY KEY, actor_id uuid NOT NULL REFERENCES users(id), organization_id uuid REFERENCES organizations(id), action text NOT NULL, resource_id uuid, created_at timestamptz NOT NULL DEFAULT now());
+CREATE INDEX memberships_user ON memberships(user_id);
+CREATE INDEX classrooms_org ON classrooms(organization_id);

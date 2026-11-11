@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>گزینه ۴: استودیو آموزشی (Studio Hybrid)</title>
+  <link rel="stylesheet" href="./shared/common.css" />
+  <style>
+    :root {
+      --bg-app: #0f172a;
+      --bg-panel: #1e293b;
+      --bg-card: #263349;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent: #f59e0b;
+      --primary: #3b82f6;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+    }
+    body {
+      background: var(--bg-app);
+      color: var(--text-main);
+      display: grid;
+      grid-template-rows: 54px 1fr 64px;
+      height: 100vh;
+    }
+    .studio-top {
+      background: #090e1a;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+    .studio-brand { display: flex; align-items: center; gap: 12px; }
+    .studio-badge {
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      color: #fff;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .studio-main {
+      display: grid;
+      grid-template-columns: 280px 1fr 320px;
+      gap: 12px;
+      padding: 12px;
+      min-height: 0;
+    }
+    .studio-col {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .col-head {
+      padding: 12px 14px;
+      background: rgba(0,0,0,0.2);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .stage-wrap {
+      display: grid;
+      grid-template-rows: 1fr 118px;
+      gap: 12px;
+      min-height: 0;
+    }
+    .board-card {
+      background: #fff;
+      border-radius: 14px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid rgba(59, 130, 246, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cam-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .cam-tile {
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      border: 1px solid var(--border);
+    }
+    .studio-foot {
+      background: #090e1a;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .btn-row { display: flex; align-items: center; gap: 8px; }
+    .s-btn {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .s-btn.active { background: var(--primary); border-color: var(--primary); }
+    .s-btn.danger { background: var(--rose); border-color: var(--rose); }
+  </style>
+</head>
+<body>
+  <header class="studio-top">
+    <div class="studio-brand">
+      <span class="studio-badge">STUDIO PRO</span>
+      <strong>فیزیک کوانتوم و نسبیت — جلسه ۱۱</strong>
+    </div>
+    <div class="btn-row">
+      <span class="s-btn" style="height:32px;font-size:11px;color:#10b981;">● امنیت کلاس فعال (RBAC)</span>
+      <span class="s-btn" style="height:32px;font-size:11px;">۰۰:۵۲:۱۸</span>
+    </div>
+  </header>
+
+  <main class="studio-main">
+    <aside class="studio-col">
+      <div class="col-head">
+        <span>شرکت‌کنندگان و دسترسی‌ها (۲۶)</span>
+      </div>
+      <div style="padding:12px;display:flex;flex-direction:column;gap:8px;overflow:auto;">
+        <div style="padding:10px;background:var(--bg-card);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;">دکتر بهرام رادان</div>
+            <div style="font-size:11px;color:#38bdf8;">مدرس و مدیر جلسه</div>
+          </div>
+          <span style="color:#10b981;font-size:11px;font-weight:700;">میکروفون باز</span>
+        </div>
+        <div style="padding:10px;background:var(--bg-card);border-radius:10px;display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:700;">سارا احمدی ✋</div>
+            <div style="font-size:11px;color:#f59e0b;">دانشجو • اجازه صحبت دارد</div>
+          </div>
+          <span style="color:#94a3b8;font-size:11px;">تایید شده</span>
+        </div>
+      </div>
+    </aside>
+
+    <section class="stage-wrap">
+      <div class="board-card">
+        <svg viewBox="0 0 800 420" style="width:92%;height:90%" direction="ltr">
+          <rect x="20" y="20" width="760" height="380" rx="16" fill="#f8fafc" stroke="#cbd5e1" />
+          <g direction="rtl" text-anchor="start">
+            <text x="740" y="70" fill="#0f172a" font-size="22" font-weight="800" font-family="Vazirmatn">استودیو هیبریدی — تخته تعاملی و اسلاید همزمان</text>
+            <text x="740" y="110" fill="#475569" font-size="14" font-family="Vazirmatn">ترکیب تخته سفید روشن با پنل‌های کنترلی تیره برای تمرکز حداکثری</text>
+          </g>
+          <path d="M 100 280 Q 260 120 420 280 T 700 240" fill="none" stroke="#2563eb" stroke-width="5" />
+        </svg>
+      </div>
+      <div class="cam-strip">
+        <div class="cam-tile fakecam fakecam-1"><span class="fakecam-avatar"></span></div>
+        <div class="cam-tile fakecam fakecam-2"><span class="fakecam-avatar"></span></div>
+        <div class="cam-tile fakecam fakecam-3"><span class="fakecam-avatar"></span></div>
+        <div class="cam-tile fakecam fakecam-4"><span class="fakecam-avatar"></span></div>
+      </div>
+    </section>
+
+    <aside class="studio-col">
+      <div class="col-head"><span>گفتگوی زنده و نظرسنجی</span></div>
+      <div style="padding:12px;display:flex;flex-direction:column;gap:10px;flex:1;">
+        <div style="background:var(--bg-card);padding:10px;border-radius:10px;font-size:12px;">
+          <strong style="color:#38bdf8;">دکتر رادان:</strong> اسلاید چهارم را بررسی کنید.
+        </div>
+        <div style="background:var(--bg-card);padding:10px;border-radius:10px;font-size:12px;">
+          <strong style="color:#f59e0b;">سارا احمدی:</strong> استاد سوال در مورد معادله شرودینگر داشتم.
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="studio-foot">
+    <div class="btn-row">
+      <button class="s-btn active"><span data-icon="mic"></span> میکروفون</button>
+      <button class="s-btn active"><span data-icon="video"></span> وب‌کم</button>
+      <button class="s-btn"><span data-icon="monitor"></span> اشتراک صفحه</button>
+      <button class="s-btn"><span data-icon="hand"></span> اجازه صحبت</button>
+    </div>
+    <div class="btn-row">
+      <button class="s-btn danger"><span data-icon="phone-off"></span> پایان کلاس</button>
+    </div>
+  </footer>
+
+  <a href="./index.html" class="mock-back">
+    <span data-icon="layout"></span>
+    <span>گالری طرح‌ها • گزینه ۴: Studio Hybrid</span>
+  </a>
+  <script src="./shared/icons.js"></script>
+</body>
+</html>

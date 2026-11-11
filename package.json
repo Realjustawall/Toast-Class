@@ -1,0 +1,51 @@
+{
+  "name": "toaster",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w apps/api\" \"npm run dev -w apps/web\"",
+    "build": "npm run build -w apps/web",
+    "build:server": "tsc -p tsconfig.server.json",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test --test-concurrency=2 tests/*.test.ts",
+    "test:media": "tsx scripts/run-browser-tests.ts media",
+    "test:e2e": "tsx scripts/run-browser-tests.ts e2e",
+    "migrate": "tsx scripts/migrate.ts",
+    "migrate:mysql": "tsx scripts/migrate-mysql.ts",
+    "admin:grant": "tsx scripts/platform-admin.ts",
+    "format": "prettier --write apps scripts tests packages docs infrastructure .github *.ts *.json *.md",
+    "format:check": "prettier --check apps scripts tests packages docs infrastructure .github *.ts *.json *.md"
+  },
+  "overrides": {
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "lodash-es": "^4.18.1",
+    "katex": "^0.18.2",
+    "@excalidraw/excalidraw": {
+      "nanoid": "^3.3.20"
+    },
+    "@excalidraw/mermaid-to-excalidraw": {
+      "nanoid": "^5.1.16"
+    }
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "^24",
+    "@types/pg": "^8",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/ws": "^8.18.2",
+    "@types/yauzl": "^3.4.0",
+    "@types/yazl": "^3.3.1",
+    "concurrently": "^9",
+    "pg-mem": "^3",
+    "prettier": "^3.9.10",
+    "tsx": "^4",
+    "typescript": "^5",
+    "yazl": "^3.3.1"
+  }
+}

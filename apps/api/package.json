@@ -1,0 +1,28 @@
+{
+  "name": "@toaster/api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/main.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1162.0",
+    "@fastify/cookie": "^11",
+    "@fastify/helmet": "^13",
+    "@fastify/multipart": "^10.1.7",
+    "@fastify/rate-limit": "^10",
+    "@fastify/websocket": "^11.3.7",
+    "@redis/client": "6.3.1",
+    "content-disposition": "^3.0.0",
+    "dotenv": "^17",
+    "fastify": "^5",
+    "image-size": "^2.0.4",
+    "livekit-server-sdk": "^2",
+    "mysql2": "^3.24.6",
+    "pg": "^8",
+    "ws": "^8.22.1",
+    "yauzl": "^3.4.0",
+    "yjs": "^13.6.33",
+    "zod": "^4"
+  }
+}

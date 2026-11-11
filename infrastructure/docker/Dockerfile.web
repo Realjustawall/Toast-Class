@@ -1,0 +1,26 @@
+ARG NODE_IMAGE=node:24-bookworm-slim
+ARG CADDY_IMAGE=caddy:2-alpine
+FROM ${NODE_IMAGE} AS build
+ARG VITE_GEOGEBRA_ORIGIN
+ENV VITE_GEOGEBRA_ORIGIN=${VITE_GEOGEBRA_ORIGIN}
+WORKDIR /work
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+COPY apps/worker/package.json apps/worker/package.json
+RUN --mount=type=cache,target=/root/.npm npm ci
+COPY apps/web apps/web
+COPY packages packages
+COPY scripts/prepare-offline-assets.mjs scripts/prepare-offline-assets.mjs
+COPY scripts/prepare-geogebra.mjs scripts/prepare-geogebra.mjs
+COPY scripts/prepare-login-design.mjs scripts/prepare-login-design.mjs
+COPY ["LOGIN DESIGN/toaster-3d.js", "LOGIN DESIGN/toaster-3d.js"]
+COPY scripts/collect-notices.mjs scripts/collect-notices.mjs
+COPY toaster-works.html ./
+RUN npm run build -w apps/web
+RUN node scripts/collect-notices.mjs
+FROM ${CADDY_IMAGE}
+COPY --from=build /work/apps/web/dist /srv/toaster
+COPY LICENSE /srv/toaster/licenses/TOASTER-LICENSE
+COPY third_party/bigbluebutton /srv/toaster/licenses/bigbluebutton
+COPY apps/web/src/classroom-shell.css /srv/toaster/licenses/bigbluebutton/toaster-classroom-shell.css

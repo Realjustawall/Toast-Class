@@ -1,0 +1,39 @@
+/* Local Vazirmatn & Manrope Fonts for TOASTER Auth */
+@import url('../../node_modules/@fontsource/vazirmatn/400.css');
+@import url('../../node_modules/@fontsource/vazirmatn/500.css');
+@import url('../../node_modules/@fontsource/vazirmatn/600.css');
+@import url('../../node_modules/@fontsource/vazirmatn/700.css');
+@import url('../../node_modules/@fontsource/vazirmatn/800.css');
+@import url('../../node_modules/@fontsource/vazirmatn/900.css');
+@import url('../../node_modules/@fontsource/manrope/400.css');
+@import url('../../node_modules/@fontsource/manrope/600.css');
+@import url('../../node_modules/@fontsource/manrope/700.css');
+@import url('../../node_modules/@fontsource/manrope/800.css');
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+  font-family: 'Vazirmatn', 'Manrope', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}

@@ -1,0 +1,17 @@
+{
+  "model": {
+    "url": "https://storage.googleapis.com/mediapipe-models/image_segmenter/selfie_segmenter/float16/1/selfie_segmenter.tflite",
+    "sha256": "191ac9529ae506ee0beefa6b2c945a172dab9d07d1e802a290a4e4038226658b",
+    "bytes": 249537
+  },
+  "runtime": {
+    "package": "@mediapipe/tasks-vision",
+    "version": "0.10.14",
+    "license": "Apache-2.0"
+  },
+  "processor": {
+    "package": "@livekit/track-processors",
+    "version": "0.8.2",
+    "license": "Apache-2.0"
+  }
+}

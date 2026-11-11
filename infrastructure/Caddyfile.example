@@ -1,0 +1,32 @@
+# API and web must share an origin. Build apps/web and copy dist to /srv/toaster.
+learn.example.org {
+  @mathAssets path /geogebra/* /vendor/geogebra/*
+  handle @mathAssets {
+    respond "Not found" 404
+  }
+  handle /api/* {
+    reverse_proxy 127.0.0.1:3001
+  }
+  handle {
+    root * /srv/toaster
+    try_files {path} /index.html
+    file_server
+  }
+}
+# Build with VITE_GEOGEBRA_ORIGIN=https://math.learn.example.org.
+# The math origin serves static assets only, never the application API.
+math.learn.example.org {
+  root * /srv/toaster
+  @mathAssets path /geogebra/* /vendor/geogebra/*
+  handle @mathAssets {
+    header Access-Control-Allow-Origin "*"
+    file_server
+  }
+  handle {
+    respond "Not found" 404
+  }
+}
+# SFU signaling port 7880 MUST stay private. The authenticated /api/v1/media/signal
+# gateway above is the only public signaling entry. Do not proxy a public media
+# hostname directly to the SFU: doing so bypasses session/permission revocation.
+# Media transport still needs direct UDP/TCP ICE access as configured separately.

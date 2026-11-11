@@ -1,0 +1,11 @@
+FROM ubuntu:24.04
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 poppler-utils libreoffice-core libreoffice-writer libreoffice-impress \
+    libreoffice-draw fonts-dejavu-core fonts-liberation fonts-noto-core \
+    && rm -rf /var/lib/apt/lists/* \
+    && mkdir /input /output && chmod 755 /input /output
+COPY apps/worker/src/convert_document.py /opt/toaster/convert_document.py
+USER 65532:65532
+WORKDIR /tmp
+ENTRYPOINT ["python3", "/opt/toaster/convert_document.py"]

@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": ".",
+    "outDir": "build/server",
+    "sourceMap": true
+  },
+  "include": [
+    "apps/api/src/**/*.ts",
+    "apps/worker/src/**/*.ts",
+    "scripts/migrate.ts",
+    "scripts/migrate-mysql.ts",
+    "scripts/platform-admin.ts",
+    "scripts/bootstrap-admin.ts"
+  ],
+  "exclude": ["node_modules", "build"]
+}

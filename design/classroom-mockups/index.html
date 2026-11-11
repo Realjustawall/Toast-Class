@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>گالری تم‌های کلاس آنلاین TOASTER</title>
+  <link rel="stylesheet" href="./shared/common.css" />
+  <style>
+    body {
+      background: #0b1120;
+      color: #f8fafc;
+      padding: 40px 24px;
+      overflow: auto;
+    }
+    .container { max-width: 1120px; margin: 0 auto; }
+    h1 { font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+    p.lead { color: #94a3b8; font-size: 14px; margin-bottom: 28px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .card:hover { transform: translateY(-3px); border-color: #38bdf8; }
+    .badge {
+      align-self: flex-start;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(37, 99, 235, 0.2);
+      color: #60a5fa;
+    }
+    .badge.default { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .card h2 { font-size: 17px; font-weight: 800; }
+    .card p { font-size: 13px; color: #94a3b8; line-height: 1.65; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>گالری تم‌های کلاس آنلاین TOASTER</h1>
+    <p class="lead">تم شماره ۱ (Classic BBB) به عنوان تم پیش‌فرض پلتفرم تنظیم شده و در پنل ادمین و هنگام ساخت کلاس قابل تغییر و پیش‌نمایش زنده است.</p>
+    <div class="grid">
+      <a class="card" href="./1-classic-bbb.html">
+        <span class="badge default">پیش‌فرض سیستم • گزینه ۱</span>
+        <h2>۱. کلاسیک حرفه‌ای (BigBlueButton 4.0)</h2>
+        <p>صحنه تیره تمرکز بالا، نوار ابزار کناری دوگانه روشن، نوار ویدیوهای بالا و کنترل‌های پایین به سبک BigBlueButton.</p>
+      </a>
+      <a class="card" href="./2-modular-skyroom.html">
+        <span class="badge">گزینه ۲</span>
+        <h2>۲. ماژولار اسکای‌روم (Modular Skyroom)</h2>
+        <p>چیدمان سه‌ستونه روشن با کارت‌های ماژولار، پنل دسترسی سریع دانشجو و تخته چندزبانه به سبک اسکای‌روم.</p>
+      </a>
+      <a class="card" href="./3-immersive-glass.html">
+        <span class="badge">گزینه ۳</span>
+        <h2>۳. استودیو شیشه‌ای مدرن (Immersive Glass)</h2>
+        <p>بوم تمام‌صفحه با داک شناور شیشه‌ای، کشوی کناری شفاف و نوار فیلم‌استریپ شناور.</p>
+      </a>
+      <a class="card" href="./4-studio-hybrid.html">
+        <span class="badge">گزینه ۴</span>
+        <h2>۴. استودیو آموزشی هیبرید (Studio Hybrid)</h2>
+        <p>ترکیب پنل‌های کنترلی تیره کنتراست بالا با تخته سفید مرکزی و نوار دوربین چهارستونه در پایین صحنه.</p>
+      </a>
+    </div>
+  </div>
+</body>
+</html>

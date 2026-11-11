@@ -1,0 +1,1351 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>طرح ۳ — استیج تمام‌صفحه شیشه‌ای (مدرن)</title>
+    <link rel="stylesheet" href="shared/common.css" />
+    <style>
+      :root {
+        --bg: #0a0c12;
+        --glass: rgba(26, 30, 42, 0.72);
+        --glass-2: rgba(255, 255, 255, 0.06);
+        --stroke: rgba(255, 255, 255, 0.09);
+        --txt: #eef1f7;
+        --muted: #8d95a8;
+        --acc: #7c5cff;
+        --acc-2: #22d3ee;
+        --ok: #34d399;
+        --bad: #f43f5e;
+        --warn: #fbbf24;
+      }
+      body {
+        background:
+          radial-gradient(1200px 600px at 85% -10%, rgba(124, 92, 255, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 0% 110%, rgba(34, 211, 238, 0.12), transparent 60%),
+          var(--bg);
+        color: var(--txt);
+        font-size: 13.5px;
+      }
+      .glass {
+        background: var(--glass);
+        backdrop-filter: blur(18px) saturate(140%);
+        -webkit-backdrop-filter: blur(18px) saturate(140%);
+        border: 1px solid var(--stroke);
+      }
+      .app {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        grid-template-rows: 64px 1fr 92px;
+        grid-template-columns: 1fr 200px;
+        gap: 0 14px;
+        padding: 0 18px;
+      }
+
+      /* ---------- top bar ---------- */
+      .top {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .logo {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, var(--acc), var(--acc-2));
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        box-shadow: 0 6px 20px rgba(124, 92, 255, 0.4);
+      }
+      .ttl b {
+        font-size: 15px;
+      }
+      .ttl small {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .live {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: var(--bad);
+        font-weight: 700;
+      }
+      .live::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--bad);
+        box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.2);
+        animation: blink 1.6s infinite;
+      }
+      @keyframes blink {
+        50% {
+          box-shadow: 0 0 0 7px rgba(244, 63, 94, 0);
+        }
+      }
+      .seg {
+        margin-inline: auto;
+        display: flex;
+        padding: 4px;
+        border-radius: 14px;
+        gap: 2px;
+      }
+      .seg button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 14px;
+        border-radius: 10px;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 12.5px;
+        transition: 0.2s;
+      }
+      .seg button .i {
+        width: 17px;
+        height: 17px;
+      }
+      .seg button:hover {
+        color: var(--txt);
+      }
+      .seg button.on {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        box-shadow: inset 0 0 0 1px var(--stroke);
+      }
+      .stack {
+        display: flex;
+        align-items: center;
+        padding: 4px 4px 4px 12px;
+        border-radius: 99px;
+        gap: 8px;
+        cursor: pointer;
+      }
+      .stack .avs {
+        display: flex;
+      }
+      .stack .avs span {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        border: 2px solid #1a1e2a;
+        margin-inline-start: -8px;
+        display: grid;
+        place-items: center;
+        font-size: 10.5px;
+        font-weight: 700;
+      }
+      .stack .avs span:first-child {
+        margin: 0;
+      }
+      .stack b {
+        font-size: 12.5px;
+      }
+      .tbtn {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        color: #c9cfdc;
+      }
+      .tbtn:hover {
+        background: var(--glass-2);
+        color: #fff;
+      }
+      .net {
+        display: flex;
+        gap: 2px;
+        align-items: flex-end;
+        height: 14px;
+        padding: 0 6px;
+      }
+      .net i {
+        width: 3px;
+        border-radius: 2px;
+        background: var(--ok);
+      }
+
+      /* ---------- stage ---------- */
+      .stage {
+        position: relative;
+        min-height: 0;
+        border-radius: 22px;
+        overflow: hidden;
+        background: #12151f;
+        border: 1px solid var(--stroke);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      }
+      .view {
+        position: absolute;
+        inset: 0;
+        display: none;
+      }
+      .view.on {
+        display: block;
+        animation: fade 0.3s;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: scale(0.99);
+        }
+      }
+      .board {
+        background: #fbfbfd;
+        background-image:
+          linear-gradient(rgba(20, 24, 40, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(20, 24, 40, 0.05) 1px, transparent 1px);
+        background-size: 32px 32px;
+      }
+      .board > svg {
+        width: 100%;
+        height: 100%;
+        direction: ltr;
+      }
+      .tool-float {
+        position: absolute;
+        top: 50%;
+        inset-inline-end: 14px;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 6px;
+        border-radius: 16px;
+        background: rgba(18, 21, 31, 0.86);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--stroke);
+      }
+      .tool-float button {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        color: #c9cfdc;
+      }
+      .tool-float button:hover {
+        background: var(--glass-2);
+      }
+      .tool-float button.on {
+        background: linear-gradient(135deg, var(--acc), #9b7bff);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(124, 92, 255, 0.45);
+      }
+      .tool-float hr {
+        width: 22px;
+        border: 0;
+        border-top: 1px solid var(--stroke);
+        margin: 2px auto;
+      }
+      .tool-float .c {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        margin: 3px auto;
+        cursor: pointer;
+      }
+      .pagectl {
+        position: absolute;
+        bottom: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px;
+        border-radius: 14px;
+        background: rgba(18, 21, 31, 0.86);
+        border: 1px solid var(--stroke);
+        color: #c9cfdc;
+        font-size: 12.5px;
+      }
+      .pagectl button {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+      }
+      .pagectl button:hover {
+        background: var(--glass-2);
+      }
+      .pagectl .thumbs {
+        display: flex;
+        gap: 4px;
+        padding: 0 4px;
+      }
+      .pagectl .thumbs span {
+        width: 34px;
+        height: 22px;
+        border-radius: 5px;
+        background: #e9ebf2;
+        opacity: 0.45;
+        cursor: pointer;
+      }
+      .pagectl .thumbs span.on {
+        opacity: 1;
+        outline: 2px solid var(--acc);
+        outline-offset: 1px;
+      }
+
+      .pip {
+        position: absolute;
+        bottom: 14px;
+        inset-inline-start: 14px;
+        width: 240px;
+        aspect-ratio: 16/10;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+        border: 2px solid var(--ok);
+        cursor: grab;
+        z-index: 5;
+      }
+      .pip .fakecam {
+        position: absolute;
+        inset: 0;
+      }
+      .tag {
+        position: absolute;
+        bottom: 8px;
+        inset-inline-start: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 3px 9px;
+        border-radius: 8px;
+        background: rgba(10, 12, 18, 0.6);
+        backdrop-filter: blur(8px);
+        font-size: 11.5px;
+        font-weight: 600;
+      }
+      .tag .i {
+        width: 14px;
+        height: 14px;
+      }
+      .wave {
+        display: inline-flex;
+        gap: 2px;
+        align-items: center;
+        height: 12px;
+      }
+      .wave i {
+        width: 3px;
+        border-radius: 3px;
+        background: var(--ok);
+        animation: w 0.9s infinite ease-in-out;
+      }
+      .wave i:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .wave i:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      @keyframes w {
+        0%,
+        100% {
+          height: 4px;
+        }
+        50% {
+          height: 12px;
+        }
+      }
+
+      /* grid view */
+      .grid {
+        padding: 14px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: 1fr;
+        gap: 10px;
+        background: #0e1119;
+      }
+      .gt {
+        position: relative;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #1a1e2a;
+        display: grid;
+        place-items: center;
+      }
+      .gt .fakecam {
+        position: absolute;
+        inset: 0;
+      }
+      .gt .bigav {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 20px;
+      }
+      .gt.spk {
+        outline: 2px solid var(--ok);
+        outline-offset: -2px;
+      }
+      .gt .hand {
+        position: absolute;
+        top: 8px;
+        inset-inline-end: 8px;
+        background: var(--warn);
+        color: #1a1200;
+        width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+      }
+
+      /* ---------- filmstrip ---------- */
+      .film {
+        min-height: 0;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-bottom: 4px;
+      }
+      .film .ft {
+        position: relative;
+        flex: none;
+        aspect-ratio: 4/3;
+        border-radius: 14px;
+        overflow: hidden;
+        background: #1a1e2a;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--stroke);
+      }
+      .film .ft .fakecam {
+        position: absolute;
+        inset: 0;
+      }
+      .film .ft .bigav {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+      }
+      .film .ft.spk {
+        border-color: var(--ok);
+        box-shadow: 0 0 0 1px var(--ok);
+      }
+      .film .ft .hand {
+        position: absolute;
+        top: 6px;
+        inset-inline-end: 6px;
+        background: var(--warn);
+        color: #1a1200;
+        width: 24px;
+        height: 24px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+      }
+      .film .ft .hand .i {
+        width: 15px;
+      }
+      .film .more {
+        flex: none;
+        padding: 10px;
+        border-radius: 12px;
+        text-align: center;
+        color: var(--muted);
+        font-weight: 600;
+        background: var(--glass-2);
+        border: 1px dashed var(--stroke);
+      }
+
+      /* ---------- dock ---------- */
+      .dockwrap {
+        grid-column: 1 / -1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+      .dock {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px;
+        border-radius: 22px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      }
+      .db {
+        position: relative;
+        width: 50px;
+        height: 50px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        color: #e6e9f2;
+        background: var(--glass-2);
+        transition: 0.15s;
+      }
+      .db:hover {
+        background: rgba(255, 255, 255, 0.12);
+        transform: translateY(-2px);
+      }
+      .db .i {
+        width: 22px;
+        height: 22px;
+      }
+      .db.off {
+        background: rgba(244, 63, 94, 0.16);
+        color: #ff8aa0;
+      }
+      .db.on {
+        background: linear-gradient(135deg, var(--acc), #9b7bff);
+        color: #fff;
+      }
+      .db.hand.on {
+        background: var(--warn);
+        color: #1a1200;
+      }
+      .db .lbl {
+        position: absolute;
+        bottom: calc(100% + 10px);
+        left: 50%;
+        transform: translateX(-50%) translateY(4px);
+        background: #fff;
+        color: #0a0c12;
+        white-space: nowrap;
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 8px;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.15s;
+      }
+      .db:hover .lbl {
+        opacity: 1;
+        transform: translateX(-50%);
+      }
+      .db .bdg {
+        position: absolute;
+        top: -4px;
+        inset-inline-end: -4px;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 9px;
+        background: var(--bad);
+        font-size: 10px;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+        padding: 0 4px;
+        border: 2px solid #1a1e2a;
+      }
+      .dock .sp {
+        width: 1px;
+        height: 28px;
+        background: var(--stroke);
+        margin: 0 4px;
+      }
+      .leave {
+        height: 50px;
+        padding: 0 20px;
+        border-radius: 16px;
+        background: var(--bad);
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 8px 24px rgba(244, 63, 94, 0.35);
+      }
+      .side-l,
+      .side-r {
+        position: absolute;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .side-r {
+        inset-inline-start: 0;
+      }
+      .side-l {
+        inset-inline-end: 0;
+      }
+      .side-r b {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+        font-size: 14px;
+      }
+      .hint {
+        padding: 6px 12px;
+        border-radius: 12px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      kbd {
+        font-family: inherit;
+        font-size: 10.5px;
+        padding: 1px 6px;
+        border-radius: 5px;
+        background: var(--glass-2);
+        border: 1px solid var(--stroke);
+        color: #c9cfdc;
+      }
+
+      /* ---------- drawer ---------- */
+      .drawer {
+        position: fixed;
+        top: 76px;
+        bottom: 104px;
+        inset-inline-start: 18px;
+        width: 360px;
+        border-radius: 22px;
+        display: flex;
+        flex-direction: column;
+        z-index: 20;
+        transform: translateX(110%);
+        opacity: 0;
+        transition:
+          transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1),
+          opacity 0.25s;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+        background: rgba(20, 23, 33, 0.9);
+      }
+      .drawer.open {
+        transform: none;
+        opacity: 1;
+      }
+      .dh {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 12px 8px;
+      }
+      .dtabs {
+        flex: 1;
+        display: flex;
+        gap: 2px;
+        padding: 4px;
+        border-radius: 12px;
+        background: var(--glass-2);
+      }
+      .dtabs button {
+        flex: 1;
+        padding: 7px 0;
+        border-radius: 9px;
+        font-weight: 600;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .dtabs button.on {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+      .pane {
+        display: none;
+        flex: 1;
+        min-height: 0;
+        flex-direction: column;
+      }
+      .pane.on {
+        display: flex;
+      }
+      .cmsgs {
+        flex: 1;
+        overflow: auto;
+        padding: 6px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .cm {
+        display: flex;
+        gap: 10px;
+      }
+      .cm .a {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+        flex: none;
+        display: grid;
+        place-items: center;
+        font-size: 11px;
+        font-weight: 800;
+      }
+      .cm .m b {
+        font-size: 12.5px;
+      }
+      .cm .m time {
+        color: var(--muted);
+        font-size: 10.5px;
+        margin-inline-start: 6px;
+      }
+      .cm .m p {
+        margin: 3px 0 0;
+        background: var(--glass-2);
+        border: 1px solid var(--stroke);
+        padding: 7px 11px;
+        border-radius: 12px;
+        border-start-start-radius: 4px;
+        line-height: 1.75;
+        color: #dfe3ec;
+      }
+      .cm.me {
+        flex-direction: row-reverse;
+      }
+      .cm.me .m {
+        text-align: end;
+      }
+      .cm.me .m p {
+        background: linear-gradient(135deg, var(--acc), #9b7bff);
+        border: 0;
+        color: #fff;
+        border-radius: 12px;
+        border-start-end-radius: 4px;
+        text-align: start;
+      }
+      .cin {
+        margin: 10px 12px 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--glass-2);
+        border: 1px solid var(--stroke);
+        border-radius: 14px;
+        padding: 5px;
+      }
+      .cin:focus-within {
+        border-color: rgba(124, 92, 255, 0.6);
+      }
+      .cin input {
+        flex: 1;
+        background: none;
+        border: 0;
+        outline: none;
+        padding: 0 8px;
+        height: 36px;
+      }
+      .cin button {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .cin .go {
+        background: var(--acc);
+        color: #fff;
+      }
+      .cin .go .i {
+        transform: scaleX(-1);
+      }
+      .plist {
+        overflow: auto;
+        padding: 4px 10px 12px;
+      }
+      .plist h4 {
+        margin: 10px 6px 6px;
+        font-size: 11.5px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+      .pp {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 6px;
+        border-radius: 12px;
+      }
+      .pp:hover {
+        background: var(--glass-2);
+      }
+      .pp .a {
+        width: 34px;
+        height: 34px;
+        border-radius: 11px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 12px;
+      }
+      .pp .n {
+        flex: 1;
+        line-height: 1.35;
+      }
+      .pp .n small {
+        display: block;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .pp .s {
+        display: flex;
+        gap: 4px;
+        color: var(--muted);
+      }
+      .pp .s .i {
+        width: 16px;
+        height: 16px;
+      }
+      .pp .s .r {
+        color: #ff8aa0;
+      }
+      .pp .s .y {
+        color: var(--warn);
+      }
+      .pp .s .g {
+        color: var(--ok);
+      }
+      .pp .act {
+        display: flex;
+        gap: 4px;
+      }
+      .pp .act button {
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 9px;
+        border-radius: 8px;
+        background: rgba(52, 211, 153, 0.14);
+        color: var(--ok);
+      }
+      .acts {
+        overflow: auto;
+        padding: 4px 12px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .card {
+        background: var(--glass-2);
+        border: 1px solid var(--stroke);
+        border-radius: 16px;
+        padding: 12px;
+      }
+      .card h5 {
+        margin: 0 0 10px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .card h5 .i {
+        color: var(--acc-2);
+      }
+      .card h5 small {
+        margin-inline-start: auto;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .bar {
+        margin: 7px 0;
+      }
+      .bar .t {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        margin-bottom: 4px;
+      }
+      .bar .tr {
+        height: 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.07);
+        overflow: hidden;
+      }
+      .bar .tr i {
+        display: block;
+        height: 100%;
+        border-radius: 8px;
+        background: linear-gradient(90deg, var(--acc), var(--acc-2));
+      }
+      .ring {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .ring svg {
+        width: 74px;
+        height: 74px;
+        transform: rotate(-90deg);
+      }
+      .ring b {
+        font-size: 26px;
+        font-variant-numeric: tabular-nums;
+      }
+      .ring .btns {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+      }
+      .ring .btns button {
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 5px 10px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      /* ---------- toasts & reactions ---------- */
+      .toasts {
+        position: fixed;
+        top: 76px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        z-index: 30;
+        align-items: center;
+      }
+      .toast {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        border-radius: 14px;
+        font-weight: 500;
+        animation: drop 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+        background: rgba(20, 23, 33, 0.92);
+      }
+      .toast .i {
+        color: var(--warn);
+      }
+      .toast button {
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 8px;
+        background: rgba(124, 92, 255, 0.2);
+        color: #c4b5fd;
+      }
+      @keyframes drop {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+      .rx {
+        position: absolute;
+        bottom: calc(100% + 12px);
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 6px;
+        border-radius: 16px;
+        display: none;
+        gap: 2px;
+      }
+      .rx.open {
+        display: flex;
+      }
+      .rx button {
+        font-size: 22px;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+      }
+      .rx button:hover {
+        background: var(--glass-2);
+        transform: scale(1.15);
+      }
+      .fly {
+        position: fixed;
+        bottom: 110px;
+        font-size: 34px;
+        pointer-events: none;
+        z-index: 40;
+        animation: fly 2.6s ease-out forwards;
+      }
+      @keyframes fly {
+        to {
+          transform: translateY(-340px) translateX(var(--dx));
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- top -->
+      <header class="top">
+        <div class="logo">T</div>
+        <div class="ttl">
+          <b>ریاضی پایه دهم — جلسه ۱۲</b>
+          <small><span class="live">زنده</span> · <span id="el">۴۲:۱۵</span> · دکتر سارا محمدی</small>
+        </div>
+        <nav class="seg glass" id="seg">
+          <button class="on" data-v="board"><i data-i="board"></i> تخته</button>
+          <button data-v="slides"><i data-i="slides"></i> اسلاید</button>
+          <button data-v="grid"><i data-i="grid"></i> گالری تصاویر</button>
+          <button data-v="board"><i data-i="notes"></i> یادداشت</button>
+        </nav>
+        <div class="net" title="کیفیت اتصال"><i style="height: 5px"></i><i style="height: 8px"></i><i style="height: 11px"></i><i style="height: 14px"></i></div>
+        <div class="stack glass" onclick="openDrawer('people')">
+          <b>۱۲ نفر</b>
+          <div class="avs">
+            <span style="background: #f97316">س</span><span style="background: #8b5cf6">ع</span><span style="background: #10b981">م</span
+            ><span style="background: #ef4444">ن</span>
+          </div>
+        </div>
+        <button class="tbtn" title="زبان"><i data-i="globe"></i></button>
+        <button class="tbtn" title="تنظیمات"><i data-i="settings"></i></button>
+      </header>
+
+      <!-- stage -->
+      <main class="stage">
+        <div class="view board on" id="v-board">
+          <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet">
+            <g font-family="Vazirmatn" direction="rtl" text-anchor="start">
+              <text x="1120" y="90" font-size="40" font-weight="800" fill="#141828">روش دلتا — گام به گام</text>
+              <text x="1120" y="130" font-size="20" fill="#7a8199">معادلات درجه دوم · فصل ۲</text>
+            </g>
+            <g font-family="Cambria Math, serif" font-style="italic" font-size="40">
+              <text x="640" y="220" fill="#7c5cff">2x² + 3x − 2 = 0</text>
+              <text x="640" y="300" fill="#141828">a = 2,  b = 3,  c = −2</text>
+              <text x="640" y="380" fill="#141828">Δ = 9 + 16 = 25</text>
+              <text x="640" y="470" fill="#0e9f6e">x = (−3 ± 5) / 4</text>
+            </g>
+            <rect x="630" y="425" width="420" height="66" rx="12" fill="none" stroke="#0e9f6e" stroke-width="3" stroke-dasharray="8 6" />
+            <g font-family="Cambria Math, serif" font-style="italic" font-size="34" fill="#0e9f6e">
+              <text x="660" y="560">x₁ = 1/2      x₂ = −2</text>
+            </g>
+            <path d="M600 210 q -30 90 0 180" stroke="#f43f5e" stroke-width="4" fill="none" stroke-linecap="round" />
+            <g font-family="Vazirmatn" direction="rtl" text-anchor="start" font-size="20" fill="#f43f5e">
+              <text x="590" y="300">ضرایب را</text>
+              <text x="590" y="326">جدا کنید</text>
+            </g>
+            <g transform="translate(90 170)">
+              <rect width="380" height="360" rx="18" fill="#fff" stroke="#e6e8f0" />
+              <path d="M30 260 H 350 M 230 30 V 330" stroke="#a3a9bb" stroke-width="2" />
+              <path d="M50 40 Q 165 470 330 40" stroke="#7c5cff" stroke-width="5" fill="none" />
+              <circle cx="110" cy="260" r="8" fill="#f43f5e" /><circle cx="255" cy="260" r="8" fill="#f43f5e" />
+            </g>
+          </svg>
+          <div class="tool-float" id="tf">
+            <button data-t title="انتخاب"><i data-i="pointer"></i></button>
+            <button data-t class="on" title="قلم"><i data-i="pen"></i></button>
+            <button data-t title="شکل"><i data-i="shape"></i></button>
+            <button data-t title="متن"><i data-i="text"></i></button>
+            <button data-t title="لیزر"><i data-i="laser"></i></button>
+            <button data-t title="پاک‌کن"><i data-i="eraser"></i></button>
+            <hr />
+            <span class="c" style="background: #7c5cff"></span>
+            <span class="c" style="background: #f43f5e"></span>
+            <span class="c" style="background: #0e9f6e"></span>
+            <hr />
+            <button title="برگشت"><i data-i="undo"></i></button>
+          </div>
+          <div class="pagectl">
+            <button title="قبلی"><i data-i="chevR"></i></button>
+            <div class="thumbs"><span></span><span class="on"></span><span></span><span></span><span></span></div>
+            <button title="بعدی"><i data-i="chevL"></i></button>
+            <span style="padding: 0 6px">۲ / ۵</span>
+            <button title="بزرگ‌نمایی"><i data-i="zoomIn"></i></button>
+            <button title="تمام صفحه"><i data-i="expand"></i></button>
+          </div>
+        </div>
+
+        <div class="view board" id="v-slides" style="background: #fff">
+          <svg viewBox="0 0 1200 640" preserveAspectRatio="xMidYMid meet">
+            <rect width="1200" height="640" fill="url(#gr)" />
+            <defs>
+              <linearGradient id="gr" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#1b1640" /><stop offset="1" stop-color="#0d2a3a" /></linearGradient>
+            </defs>
+            <g font-family="Vazirmatn" direction="rtl" text-anchor="start" fill="#fff">
+              <text x="1100" y="250" font-size="64" font-weight="800">معادلات درجه دوم</text>
+              <text x="1100" y="310" font-size="26" fill="#a5b4fc">فصل ۲ · اسلاید ۱ از ۲۴</text>
+            </g>
+            <text x="300" y="420" font-family="Cambria Math, serif" font-style="italic" font-size="54" fill="#22d3ee" text-anchor="middle">ax² + bx + c = 0</text>
+          </svg>
+        </div>
+
+        <div class="view grid" id="v-grid"></div>
+
+        <div class="pip" id="pip">
+          <div class="fakecam" style="--h: 20"></div>
+          <span class="tag"><span class="wave"><i></i><i></i><i></i></span> دکتر سارا محمدی</span>
+        </div>
+      </main>
+
+      <!-- filmstrip -->
+      <aside class="film" id="film"></aside>
+
+      <!-- dock -->
+      <div class="dockwrap">
+        <div class="side-r">
+          <div class="hint glass"><i data-i="rec" style="color: var(--bad)"></i> ضبط <b id="rec">۴۲:۱۵</b></div>
+        </div>
+        <div class="dock glass">
+          <button class="db off" id="mic" onclick="tg(this,'mic')"><i data-i="micOff"></i><span class="lbl">میکروفون <kbd>M</kbd></span></button>
+          <button class="db" id="cam" onclick="tg(this,'cam')"><i data-i="cam"></i><span class="lbl">دوربین <kbd>V</kbd></span></button>
+          <button class="db" onclick="this.classList.toggle('on')"><i data-i="screen"></i><span class="lbl">اشتراک صفحه</span></button>
+          <span class="sp"></span>
+          <button class="db hand" onclick="this.classList.toggle('on')"><i data-i="hand"></i><span class="lbl">بالا بردن دست <kbd>H</kbd></span></button>
+          <div style="position: relative">
+            <button class="db" onclick="document.getElementById('rx').classList.toggle('open')"><i data-i="smile"></i><span class="lbl">واکنش</span></button>
+            <div class="rx glass" id="rx">
+              <button>👍</button><button>👏</button><button>😂</button><button>🤔</button><button>❤️</button><button>🎉</button>
+            </div>
+          </div>
+          <span class="sp"></span>
+          <button class="db" onclick="openDrawer('chat')"><i data-i="chat"></i><span class="bdg">۳</span><span class="lbl">گفتگو</span></button>
+          <button class="db" onclick="openDrawer('people')"><i data-i="users"></i><span class="lbl">شرکت‌کنندگان</span></button>
+          <button class="db" onclick="openDrawer('acts')"><i data-i="apps"></i><span class="bdg" style="background: var(--acc)">۱</span><span class="lbl">فعالیت‌ها</span></button>
+          <span class="sp"></span>
+          <button class="leave"><i data-i="leave"></i> ترک کلاس</button>
+        </div>
+        <div class="side-l">
+          <div class="hint glass">میانبرها <kbd>M</kbd> <kbd>V</kbd> <kbd>H</kbd></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- drawer -->
+    <aside class="drawer glass" id="drawer">
+      <div class="dh">
+        <div class="dtabs" id="dtabs">
+          <button data-p="chat" class="on">گفتگو</button>
+          <button data-p="people">افراد ۱۲</button>
+          <button data-p="acts">فعالیت‌ها</button>
+        </div>
+        <button class="tbtn" onclick="closeDrawer()" title="بستن"><i data-i="close"></i></button>
+      </div>
+      <div class="pane on" id="p-chat">
+        <div class="cmsgs" id="cmsgs">
+          <div class="cm">
+            <div class="a" style="background: #f97316">س‌م</div>
+            <div class="m"><b>دکتر سارا محمدی</b><time>۱۸:۰۲</time><p>سلام 👋 همه صدا رو دارن؟</p></div>
+          </div>
+          <div class="cm">
+            <div class="a" style="background: #10b981">م‌ا</div>
+            <div class="m"><b>مریم احمدی</b><time>۱۸:۰۳</time><p>بله استاد واضحه</p></div>
+          </div>
+          <div class="cm me">
+            <div class="a" style="background: #8b5cf6">ع‌ر</div>
+            <div class="m"><b>شما</b><time>۱۸:۰۴</time><p>عالیه، مرسی 🙏</p></div>
+          </div>
+          <div class="cm">
+            <div class="a" style="background: #ef4444">ن‌ح</div>
+            <div class="m"><b>نگار حسینی</b><time>۱۸:۰۶</time><p>می‌شه مثال دوم رو دوباره توضیح بدید؟</p></div>
+          </div>
+        </div>
+        <form class="cin" id="cform">
+          <button type="button"><i data-i="smile"></i></button>
+          <input id="cinput" placeholder="پیامی بنویسید…" />
+          <button class="go"><i data-i="send"></i></button>
+        </form>
+      </div>
+      <div class="pane" id="p-people">
+        <div class="plist" id="plist"></div>
+      </div>
+      <div class="pane" id="p-acts">
+        <div class="acts">
+          <div class="card">
+            <h5><i data-i="poll"></i> نظرسنجی زنده <small>۹ از ۱۲ پاسخ</small></h5>
+            <div style="margin-bottom: 8px; font-weight: 600">اگر Δ &lt; ۰ باشد، چند ریشهٔ حقیقی داریم؟</div>
+            <div class="bar"><div class="t"><span>صفر</span><span>۶۷٪</span></div><div class="tr"><i style="width: 67%"></i></div></div>
+            <div class="bar"><div class="t"><span>یک</span><span>۱۱٪</span></div><div class="tr"><i style="width: 11%"></i></div></div>
+            <div class="bar"><div class="t"><span>دو</span><span>۲۲٪</span></div><div class="tr"><i style="width: 22%"></i></div></div>
+          </div>
+          <div class="card">
+            <h5><i data-i="timer"></i> تایمر تمرین</h5>
+            <div class="ring">
+              <svg viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.08)" stroke-width="7" fill="none" />
+                <circle id="rg" cx="40" cy="40" r="34" stroke="url(#rgg)" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="60" />
+                <defs><linearGradient id="rgg"><stop offset="0" stop-color="#7c5cff" /><stop offset="1" stop-color="#22d3ee" /></linearGradient></defs>
+              </svg>
+              <div>
+                <b id="tm">۰۳:۳۰</b>
+                <div class="btns"><button>توقف</button><button>+۱ دقیقه</button><button>بازنشانی</button></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h5><i data-i="hand"></i> صف دست‌های بالا <small>۲ نفر</small></h5>
+            <div class="pp"><div class="a" style="background: #10b981">م‌ا</div><div class="n">مریم احمدی<small>۱ دقیقه پیش</small></div><div class="act"><button>اجازه صحبت</button></div></div>
+            <div class="pp"><div class="a" style="background: #f59e0b">ر‌ک</div><div class="n">رضا کریمی<small>همین الان</small></div><div class="act"><button>اجازه صحبت</button></div></div>
+          </div>
+          <div class="card">
+            <h5><i data-i="breakout"></i> اتاق‌های گروهی <small>غیرفعال</small></h5>
+            <div style="color: var(--muted); font-size: 12px; line-height: 1.8">کلاس را به گروه‌های کوچک‌تر تقسیم کنید. ۴ اتاق × ۳ نفر</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <div class="toasts" id="toasts"></div>
+    <a class="mock-back" href="index.html">بازگشت به گالری طرح‌ها</a>
+
+    <script src="shared/icons.js"></script>
+    <script>
+      const P = [
+        ['دکتر سارا محمدی', 'مدرس · ارائه‌دهنده', '#f97316', 20, 'mic', 1, 0],
+        ['علی رضایی', 'شما', '#8b5cf6', 270, '', 0, 0],
+        ['مریم احمدی', 'دانش‌آموز', '#10b981', 160, '', 0, 1],
+        ['نگار حسینی', 'دانش‌آموز', '#ef4444', 0, 'mic', 0, 0],
+        ['رضا کریمی', 'دانش‌آموز', '#f59e0b', 0, '', 0, 1],
+        ['امیر جعفری', 'دانش‌آموز', '#22c55e', 110, '', 0, 0],
+        ['زهرا موسوی', 'دانش‌آموز', '#ec4899', 0, '', 0, 0],
+        ['حسین نوری', 'موبایل', '#3b82f6', 0, '', 0, 0],
+        ['فاطمه صادقی', 'دانش‌آموز', '#a855f7', 320, '', 0, 0],
+        ['پارسا عباسی', 'دانش‌آموز', '#14b8a6', 0, '', 0, 0],
+        ['سپیده رحیمی', 'دانش‌آموز', '#e11d48', 0, '', 0, 0],
+        ['کامران نیک‌پور', 'دستیار', '#0ea5e9', 200, '', 0, 0],
+      ];
+      const ini = (n) =>
+        n
+          .replace('دکتر ', '')
+          .split(' ')
+          .map((p) => p[0])
+          .join('‌');
+      const tile = (p, cls) => {
+        const [n, , c, h, m, , hand] = p;
+        const speak = m === 'mic';
+        return `<div class="${cls} ${speak ? 'spk' : ''}">
+          ${h ? `<div class="fakecam" style="--h:${h}"></div>` : `<div class="bigav" style="background:${c}">${ini(n)}</div>`}
+          ${hand ? `<span class="hand">${icon('hand')}</span>` : ''}
+          <span class="tag">${speak ? '<span class="wave"><i></i><i></i><i></i></span>' : icon('micOff')} ${n.split(' ').slice(-2).join(' ')}</span>
+        </div>`;
+      };
+      document.getElementById('film').innerHTML = P.slice(1, 6).map((p) => tile(p, 'ft')).join('') + '<div class="more">+۷ نفر دیگر</div>';
+      document.getElementById('v-grid').innerHTML = P.map((p) => tile(p, 'gt')).join('');
+      document.getElementById('plist').innerHTML =
+        '<h4>مدرسان (۲)</h4>' +
+        [P[0], P[11]].map(pp).join('') +
+        '<h4>دست بالا (۲)</h4>' +
+        P.filter((p) => p[6]).map(pp).join('') +
+        '<h4>دانش‌آموزان (۸)</h4>' +
+        P.filter((p, i) => i && i !== 11 && !p[6]).map(pp).join('');
+      function pp([n, r, c, h, m, , hand]) {
+        return `<div class="pp"><div class="a" style="background:${c}">${ini(n)}</div><div class="n">${n}<small>${r}</small></div>
+          <div class="s">${hand ? icon('hand', 'y') : ''}${m ? icon('mic', 'g') : icon('micOff', 'r')}${h ? icon('cam') : icon('camOff')}</div></div>`;
+      }
+
+      // views
+      document.querySelectorAll('#seg button').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('#seg button').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+            document.querySelectorAll('.view').forEach((v) => v.classList.remove('on'));
+            document.getElementById('v-' + b.dataset.v).classList.add('on');
+            document.getElementById('pip').style.display = b.dataset.v === 'grid' ? 'none' : '';
+          }),
+      );
+      // drawer
+      const drawer = document.getElementById('drawer');
+      function openDrawer(p) {
+        const same = drawer.classList.contains('open') && document.getElementById('p-' + p).classList.contains('on');
+        if (same) return closeDrawer();
+        drawer.classList.add('open');
+        document.querySelectorAll('.pane').forEach((x) => x.classList.toggle('on', x.id === 'p-' + p));
+        document.querySelectorAll('#dtabs button').forEach((x) => x.classList.toggle('on', x.dataset.p === p));
+      }
+      function closeDrawer() {
+        drawer.classList.remove('open');
+      }
+      document.querySelectorAll('#dtabs button').forEach((b) => (b.onclick = () => openDrawer(b.dataset.p)));
+      // tools
+      document.querySelectorAll('#tf [data-t]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('#tf [data-t]').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+          }),
+      );
+      function tg(b, k) {
+        const off = !b.classList.contains('off');
+        b.classList.toggle('off', off);
+        b.querySelector('svg').outerHTML = icon(off ? k + 'Off' : k);
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT') return;
+        if (e.key === 'm') tg(document.getElementById('mic'), 'mic');
+        if (e.key === 'v') tg(document.getElementById('cam'), 'cam');
+      });
+      // reactions
+      document.querySelectorAll('#rx button').forEach(
+        (b) =>
+          (b.onclick = () => {
+            for (let i = 0; i < 3; i++) {
+              const f = document.createElement('div');
+              f.className = 'fly';
+              f.textContent = b.textContent;
+              f.style.left = 45 + Math.random() * 10 + '%';
+              f.style.setProperty('--dx', (Math.random() * 120 - 60).toFixed(0) + 'px');
+              f.style.animationDelay = i * 0.15 + 's';
+              document.body.appendChild(f);
+              setTimeout(() => f.remove(), 3000);
+            }
+          }),
+      );
+      // chat
+      document.getElementById('cform').onsubmit = (e) => {
+        e.preventDefault();
+        const i = document.getElementById('cinput');
+        if (!i.value.trim()) return;
+        const d = document.createElement('div');
+        d.className = 'cm me';
+        d.innerHTML = `<div class="a" style="background:#8b5cf6">ع‌ر</div><div class="m"><b>شما</b><time>اکنون</time><p></p></div>`;
+        d.querySelector('p').textContent = i.value;
+        const box = document.getElementById('cmsgs');
+        box.appendChild(d);
+        box.scrollTop = box.scrollHeight;
+        i.value = '';
+      };
+      // toasts
+      function toast(html, ms = 4200) {
+        const t = document.createElement('div');
+        t.className = 'toast glass';
+        t.innerHTML = html;
+        document.getElementById('toasts').appendChild(t);
+        setTimeout(() => t.remove(), ms);
+      }
+      setTimeout(() => toast(icon('hand') + ' مریم احمدی دستش را بالا برد <button>اجازه صحبت</button>'), 1200);
+      setTimeout(() => toast(icon('poll') + ' نظرسنجی جدید: «اگر Δ < ۰ باشد…» <button onclick="openDrawer(\'acts\')">شرکت</button>'), 3800);
+      // clocks
+      const fa = (n) => n.toLocaleString('fa-IR', { minimumIntegerDigits: 2, useGrouping: false });
+      let s = 42 * 60 + 15,
+        t = 210;
+      setInterval(() => {
+        s++;
+        t = Math.max(0, t - 1);
+        const v = fa(Math.floor(s / 60)) + ':' + fa(s % 60);
+        document.getElementById('el').textContent = v;
+        document.getElementById('rec').textContent = v;
+        document.getElementById('tm').textContent = fa(Math.floor(t / 60)) + ':' + fa(t % 60);
+        document.getElementById('rg').style.strokeDashoffset = 213.6 * (1 - t / 300);
+      }, 1000);
+      // draggable pip
+      const pip = document.getElementById('pip');
+      pip.onpointerdown = (e) => {
+        const r = pip.getBoundingClientRect(),
+          st = pip.parentElement.getBoundingClientRect();
+        const ox = e.clientX - r.left,
+          oy = e.clientY - r.top;
+        pip.setPointerCapture(e.pointerId);
+        pip.onpointermove = (m) => {
+          pip.style.insetInlineStart = 'auto';
+          pip.style.bottom = 'auto';
+          pip.style.left = Math.max(8, Math.min(st.width - r.width - 8, m.clientX - st.left - ox)) + 'px';
+          pip.style.top = Math.max(8, Math.min(st.height - r.height - 8, m.clientY - st.top - oy)) + 'px';
+        };
+        pip.onpointerup = () => (pip.onpointermove = null);
+      };
+    </script>
+  </body>
+</html>

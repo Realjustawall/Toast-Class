@@ -1,0 +1,29 @@
+services:
+  mysql:
+    image: mysql:8.4@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
+    environment:
+      MYSQL_USER: toaster
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set a separate MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: toaster
+    ports: ['127.0.0.1:3306:3306']
+    volumes: ['mysql:/var/lib/mysql']
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'MYSQL_PWD="$$MYSQL_PASSWORD" mysql --protocol=TCP -h 127.0.0.1 -u "$$MYSQL_USER" -D "$$MYSQL_DATABASE" -e "SELECT 1"',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  livekit:
+    image: livekit/livekit-server:v1.13.11
+    command: ['--config', '/etc/livekit.yaml']
+    volumes: ['./livekit.yaml:/etc/livekit.yaml:ro']
+    ports:
+      - '127.0.0.1:7880:7880'
+      - '7881:7881'
+      - '50000-50100:50000-50100/udp'
+volumes:
+  mysql:

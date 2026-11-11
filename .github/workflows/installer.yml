@@ -1,0 +1,42 @@
+name: Production installer
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  installer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Generate configuration and validate Compose
+        run: |
+          node scripts/install.mjs configure --directory "$RUNNER_TEMP/toaster-instance" --domain class.example.test --media-ip 192.0.2.5 --email admin@example.test
+          docker compose --env-file "$RUNNER_TEMP/toaster-instance/.env" -f "$RUNNER_TEMP/toaster-instance/compose.yaml" config --quiet
+      - name: Build clean runtime images
+        run: docker compose --env-file "$RUNNER_TEMP/toaster-instance/.env" -f "$RUNNER_TEMP/toaster-instance/compose.yaml" build api web
+      - name: Validate Caddy and bootstrap a real database twice
+        run: |
+          COMPOSE_FILE="$RUNNER_TEMP/toaster-instance/compose.yaml"
+          COMPOSE_ENV="$RUNNER_TEMP/toaster-instance/.env"
+          docker compose --env-file "$COMPOSE_ENV" -f "$COMPOSE_FILE" run --rm --no-deps web caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+          docker compose --env-file "$COMPOSE_ENV" -f "$COMPOSE_FILE" up -d --wait --wait-timeout 180 mysql
+          docker compose --env-file "$COMPOSE_ENV" -f "$COMPOSE_FILE" run --rm migrate
+          docker compose --env-file "$COMPOSE_ENV" -f "$COMPOSE_FILE" --profile setup run --rm bootstrap
+          docker compose --env-file "$COMPOSE_ENV" -f "$COMPOSE_FILE" --profile setup run --rm bootstrap
+      - name: Start and verify protected upload scanner and API
+        run: |
+          docker compose --env-file "$RUNNER_TEMP/toaster-instance/.env" -f "$RUNNER_TEMP/toaster-instance/compose.yaml" up -d --wait --wait-timeout 600 scanner signatures livekit api
+          curl --fail --retry 10 --retry-delay 2 http://127.0.0.1:3001/ready
+          node scripts/verify-installed-api.mjs --directory "$RUNNER_TEMP/toaster-instance"
+      - name: Verify thin source release
+        run: node scripts/pack-release.mjs
+      - name: Stop owned test services
+        if: always()
+        run: docker compose --env-file "$RUNNER_TEMP/toaster-instance/.env" -f "$RUNNER_TEMP/toaster-instance/compose.yaml" down --remove-orphans

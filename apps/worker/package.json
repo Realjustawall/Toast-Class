@@ -1,0 +1,13 @@
+{
+  "name": "@toaster/worker",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/main.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17",
+    "pg": "^8",
+    "zod": "^4"
+  }
+}

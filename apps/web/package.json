@@ -1,0 +1,36 @@
+{
+  "name": "@toaster/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "predev": "node ../../scripts/prepare-offline-assets.mjs",
+    "dev": "vite --host 0.0.0.0",
+    "prebuild": "node ../../scripts/prepare-offline-assets.mjs",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@fontsource/manrope": "^5.3.0",
+    "@fontsource/vazirmatn": "^5.3.0",
+    "@livekit/components-core": "0.12.15",
+    "@livekit/components-react": "2.9.24",
+    "@livekit/components-styles": "^1",
+    "@livekit/track-processors": "0.8.2",
+    "@tiptap/markdown": "3.33.0",
+    "@tiptap/react": "3.33.0",
+    "@tiptap/starter-kit": "3.33.0",
+    "i18next": "^25",
+    "katex": "0.18.10",
+    "livekit-client": "^2",
+    "marked": "16.4.2",
+    "pdf-lib": "1.17.1",
+    "pdfjs-dist": "6.5.438",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-i18next": "^16",
+    "yjs": "^13.6.33"
+  },
+  "devDependencies": {
+    "vite": "^7"
+  }
+}

@@ -1,0 +1,41 @@
+{
+  admin off
+  auto_https disable_redirects
+  skip_install_trust
+  servers {
+    protocols h1 h2
+  }
+}
+https://{$APP_HOST}:{$HTTPS_PORT} {
+  @mathAssets path /geogebra/* /vendor/geogebra/*
+  handle @mathAssets {
+    respond "Not found" 404
+  }
+  tls internal
+  header {
+    X-Content-Type-Options nosniff
+    Referrer-Policy same-origin
+    X-Frame-Options SAMEORIGIN
+    -Server
+  }
+  handle /api/* {
+    reverse_proxy 127.0.0.1:{$API_PORT}
+  }
+  handle {
+    root * /srv/toaster
+    try_files {path} /index.html
+    file_server
+  }
+}
+https://geogebra.{$APP_HOST}:{$HTTPS_PORT} {
+  tls internal
+  root * /srv/toaster
+  @mathAssets path /geogebra/* /vendor/geogebra/*
+  handle @mathAssets {
+    header Access-Control-Allow-Origin "*"
+    file_server
+  }
+  handle {
+    respond "Not found" 404
+  }
+}

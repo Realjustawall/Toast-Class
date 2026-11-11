@@ -1,0 +1,148 @@
+# DRAFT: all-service disconnected execution and clean installation are pending.
+name: ${COMPOSE_PROJECT_NAME:-toaster}
+services:
+  mysql:
+    image: ${MYSQL_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    command: ['mysqld', '--bind-address=127.0.0.1', '--port=${DB_PORT}', '--mysqlx=OFF']
+    environment:
+      MYSQL_DATABASE: toaster
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Generate a separate root password}
+      MYSQL_TCP_PORT: ${DB_PORT}
+    volumes:
+      - 'mysql:/var/lib/mysql'
+      - './installation/mysql-init.sql:/docker-entrypoint-initdb.d/01-toaster.sql:ro'
+      - './installation/mysql-client.cnf:/etc/toaster/mysql-client.cnf:ro'
+    healthcheck:
+      test: ['CMD-SHELL', 'mysql --defaults-extra-file=/etc/toaster/mysql-client.cnf -e "SELECT 1"']
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+    logging: &logs
+      driver: json-file
+      options: { max-size: '10m', max-file: '3' }
+  scanner:
+    image: ${CLAMAV_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    user: clamav
+    entrypoint: ['clamd', '--foreground=true', '--config-file=/etc/toaster/clamd.conf']
+    volumes: ['./installation/clamd.conf:/etc/toaster/clamd.conf:ro']
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=268435456,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    mem_limit: 4g
+    pids_limit: 128
+    healthcheck:
+      test: ['CMD', 'clamdscan', '--config-file=/etc/toaster/clamd.conf', '--ping=1']
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 30
+    restart: unless-stopped
+    logging: *logs
+  migrate:
+    image: ${APP_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    command: ['node', 'scripts/migrate.js']
+    environment: { DATABASE_URL: '${MIGRATION_DATABASE_URL}' }
+    depends_on: { mysql: { condition: service_healthy } }
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    logging: *logs
+  livekit:
+    image: ${LIVEKIT_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    command: ['--config', '/etc/toaster/livekit.yaml']
+    volumes: ['./installation/livekit.yaml:/etc/toaster/livekit.yaml:ro']
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=67108864,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    restart: unless-stopped
+    logging: *logs
+  api:
+    image: ${APP_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    environment: &app-env
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      APP_ORIGIN: ${APP_ORIGIN}
+      API_BIND_ADDRESS: 127.0.0.1
+      PORT: ${API_PORT}
+      TRUST_LOCAL_PROXY: 'true'
+      LIVEKIT_URL: ws://127.0.0.1:${SFU_PORT}
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET}
+      FILE_STORAGE_DRIVER: filesystem
+      FILE_STORAGE_DIR: /var/lib/toaster/storage
+      CLAMAV_HOST: 127.0.0.1
+      CLAMAV_PORT: ${SCANNER_PORT}
+      PRESENTATIONS_ENABLED: 'true'
+    volumes: ['files:/var/lib/toaster/storage']
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+      scanner: { condition: service_healthy }
+      livekit: { condition: service_started }
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=268435456,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          'fetch("http://127.0.0.1:"+process.env.PORT+"/ready").then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+    logging: *logs
+  worker:
+    image: ${WORKER_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    command: ['node', 'apps/worker/src/main.js']
+    group_add: ['${DOCKER_GID}', '65532']
+    environment:
+      <<: *app-env
+      CONVERSION_IMAGE: ${CONVERTER_IMAGE}
+      CONVERSION_WORK_DIR: ${JOBS_DIR}
+    volumes:
+      - 'files:/var/lib/toaster/storage'
+      - '/var/run/docker.sock:/var/run/docker.sock'
+      - '${JOBS_DIR}:${JOBS_DIR}'
+    depends_on: { api: { condition: service_healthy } }
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=268435456,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    restart: unless-stopped
+    logging: *logs
+  web:
+    image: ${WEB_IMAGE:?Load the verified bundle first}
+    pull_policy: never
+    network_mode: host
+    environment: { APP_HOST: '${APP_HOST}', HTTPS_PORT: '${HTTPS_PORT}', API_PORT: '${API_PORT}' }
+    volumes:
+      - './Caddyfile:/etc/caddy/Caddyfile:ro'
+      - 'caddy-data:/data'
+      - 'caddy-config:/config'
+    depends_on: { api: { condition: service_healthy } }
+    restart: unless-stopped
+    logging: *logs
+volumes:
+  mysql:
+  files:
+  caddy-data:
+  caddy-config:

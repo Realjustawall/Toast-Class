@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ورود و ثبت‌نام — TOASTER</title>
+  <link rel="stylesheet" href="./shared/auth-common.css" />
+  <style>
+    :root {
+      --bg-page: #050811;
+      --bg-shell: #0c1222;
+      --bg-input: #070b14;
+      --bg-input-focus: #0b1120;
+      --bg-pill: #070b14;
+      --bg-pill-active: #1e293b;
+      --ink-900: #f8fafc;
+      --ink-700: #cbd5e1;
+      --ink-500: #94a3b8;
+      --ink-400: #64748b;
+      --border-shell: rgba(255, 255, 255, 0.1);
+      --border-input: rgba(148, 163, 184, 0.2);
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59, 130, 246, 0.28);
+      --shadow-shell:
+        0 35px 90px -20px rgba(0, 0, 0, 0.8),
+        0 0 60px -20px rgba(37, 99, 235, 0.25);
+    }
+
+    html[data-theme='light'] {
+      --bg-page: #eef2f7;
+      --bg-shell: #ffffff;
+      --bg-input: #f8fafc;
+      --bg-input-focus: #ffffff;
+      --bg-pill: #f1f5f9;
+      --bg-pill-active: #ffffff;
+      --ink-900: #0f172a;
+      --ink-700: #334155;
+      --ink-500: #64748b;
+      --ink-400: #94a3b8;
+      --border-shell: rgba(226, 232, 240, 0.95);
+      --border-input: #cbd5e1;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-glow: rgba(37, 99, 235, 0.16);
+      --shadow-shell:
+        0 32px 80px -20px rgba(15, 23, 42, 0.12),
+        0 4px 20px -4px rgba(15, 23, 42, 0.05);
+    }
+
+    body.is-register {
+      --accent: #10b981;
+      --accent-hover: #059669;
+      --accent-glow: rgba(16, 185, 129, 0.26);
+    }
+    html[data-theme='light'] body.is-register {
+      --accent: #059669;
+      --accent-hover: #047857;
+      --accent-glow: rgba(16, 185, 129, 0.16);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 85% 12%, var(--accent-glow) 0%, transparent 45%),
+        radial-gradient(circle at 15% 88%, rgba(99, 102, 241, 0.1) 0%, transparent 45%),
+        var(--bg-page);
+      color: var(--ink-900);
+      min-height: 100dvh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.45s ease, color 0.3s ease;
+    }
+
+    /* Kinetic Editorial Shell */
+    .portal-shell {
+      width: min(1360px, 100%);
+      min-height: min(720px, calc(100dvh - 40px));
+      background: var(--bg-shell);
+      border: 1px solid var(--border-shell);
+      border-radius: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-shell);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      direction: ltr; /* Fixed stage coordinates for curtain sliding smoothly */
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.45s ease;
+    }
+
+    /* Form Panes */
+    .form-pane {
+      padding: 36px 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 2;
+      transition:
+        opacity 0.42s ease,
+        transform 0.52s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    html[dir='rtl'] .form-pane {
+      direction: rtl;
+    }
+    html[dir='ltr'] .form-pane {
+      direction: ltr;
+    }
+
+    /* Visibility states during kinetic slide */
+    .portal-shell:not(.is-register) .pane-register {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+    .portal-shell.is-register .pane-login {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+
+    /* Top utility bar inside active form pane */
+    .pane-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .connection-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 5px 12px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      color: #34d399;
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    html[data-theme='light'] .connection-pill {
+      color: #059669;
+    }
+    .connection-pill i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+    }
+
+    .utility-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .util-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-input);
+      background: var(--bg-input);
+      color: var(--ink-700);
+      font-size: 11.5px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+    }
+    .util-btn:hover {
+      border-color: var(--accent);
+      color: var(--ink-900);
+    }
+
+    /* Form Box Centered */
+    .form-center {
+      width: min(100%, 410px);
+      margin: auto;
+    }
+
+    /* Segmented Pill Switcher */
+    .mode-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--bg-pill);
+      padding: 4px;
+      border-radius: 13px;
+      border: 1px solid var(--border-shell);
+      margin-bottom: 24px;
+    }
+    .mode-pill {
+      padding: 9px 12px;
+      border-radius: 9px;
+      border: 0;
+      background: transparent;
+      color: var(--ink-500);
+      font-size: 13px;
+      font-weight: 700;
+      transition: all 0.18s ease;
+    }
+    .mode-pill.active {
+      background: var(--bg-pill-active);
+      color: var(--ink-900);
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+    }
+
+    .form-head {
+      margin-bottom: 22px;
+    }
+    .form-head .eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .form-head h1 {
+      font-size: 26px;
+      font-weight: 900;
+      margin: 0;
+      color: var(--ink-900);
+      letter-spacing: -0.02em;
+    }
+
+    /* Inputs */
+    .field {
+      margin-bottom: 14px;
+    }
+    .field-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .field label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--ink-700);
+      margin-bottom: 6px;
+    }
+    .input-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-box input {
+      width: 100%;
+      padding: 11.5px 14px;
+      border: 1.5px solid var(--border-input);
+      border-radius: 12px;
+      background: var(--bg-input);
+      color: var(--ink-900);
+      font-size: 14px;
+      transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+    }
+    .input-box input::placeholder {
+      color: var(--ink-400);
+      opacity: 0.7;
+      font-size: 13px;
+    }
+    .input-box input:focus {
+      outline: none;
+      background: var(--bg-input-focus);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-glow);
+    }
+    .input-box input[aria-invalid='true'] {
+      border-color: #dc2626;
+    }
+    .input-box .field-ico {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-400);
+      pointer-events: none;
+      transition: color 0.16s ease;
+    }
+    .input-box:focus-within .field-ico {
+      color: var(--accent);
+    }
+
+    /* RTL specific input padding & alignment */
+    html[dir='rtl'] .input-box .field-ico {
+      right: 13px;
+      left: auto;
+    }
+    html[dir='rtl'] .input-box input {
+      padding-right: 42px;
+      padding-left: 14px;
+      text-align: right;
+      direction: rtl;
+    }
+    html[dir='rtl'] .input-box input[type='email'],
+    html[dir='rtl'] .input-box input[type='password'] {
+      direction: ltr;
+      text-align: left;
+      padding-right: 42px;
+      padding-left: 14px;
+    }
+    html[dir='rtl'] .input-box input[type='email']::placeholder,
+    html[dir='rtl'] .input-box input[type='password']::placeholder {
+      text-align: right;
+      direction: rtl;
+    }
+    html[dir='rtl'] .field label {
+      direction: rtl;
+      text-align: right;
+    }
+    html[dir='rtl'] .field-error {
+      direction: rtl;
+      text-align: right;
+    }
+
+    /* LTR specific input padding & alignment */
+    html[dir='ltr'] .input-box .field-ico {
+      left: 13px;
+      right: auto;
+    }
+    html[dir='ltr'] .input-box input {
+      padding-left: 42px;
+      padding-right: 14px;
+      text-align: left;
+      direction: ltr;
+    }
+    html[dir='ltr'] .input-box input[type='email'],
+    html[dir='ltr'] .input-box input[type='password'] {
+      direction: ltr;
+      text-align: left;
+      padding-left: 42px;
+      padding-right: 14px;
+    }
+    html[dir='ltr'] .input-box input[type='email']::placeholder,
+    html[dir='ltr'] .input-box input[type='password']::placeholder {
+      text-align: left;
+      direction: ltr;
+    }
+    html[dir='ltr'] .field label {
+      direction: ltr;
+      text-align: left;
+    }
+    html[dir='ltr'] .field-error {
+      direction: ltr;
+      text-align: left;
+    }
+
+    /* Password Strength Meter */
+    .pwd-strength-wrap {
+      margin-top: 8px;
+      margin-bottom: 6px;
+      display: none;
+      animation: fadeIn 0.22s ease;
+    }
+    .pwd-strength-wrap.active {
+      display: block;
+    }
+    .strength-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11.5px;
+      margin-bottom: 5px;
+      color: var(--ink-500);
+    }
+    .strength-val {
+      font-weight: 800;
+      transition: color 0.2s ease;
+    }
+    .strength-meter {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+      height: 4px;
+      margin-bottom: 5px;
+    }
+    .meter-seg {
+      height: 100%;
+      border-radius: 99px;
+      background: var(--border-input);
+      opacity: 0.45;
+      transition: background 0.25s ease, opacity 0.25s ease;
+    }
+    .strength-hint {
+      font-size: 11px;
+      color: var(--ink-400);
+      margin: 0;
+      line-height: 1.4;
+    }
+    .strength-1 .meter-seg:nth-child(1) { background: #ef4444; opacity: 1; }
+    .strength-1 .strength-val { color: #ef4444; }
+
+    .strength-2 .meter-seg:nth-child(-n+2) { background: #f59e0b; opacity: 1; }
+    .strength-2 .strength-val { color: #f59e0b; }
+
+    .strength-3 .meter-seg:nth-child(-n+3) { background: #3b82f6; opacity: 1; }
+    .strength-3 .strength-val { color: #3b82f6; }
+
+    .strength-4 .meter-seg:nth-child(-n+4) { background: #10b981; opacity: 1; }
+    .strength-4 .strength-val { color: #10b981; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .pwd-toggle {
+      background: none;
+      border: 0;
+      padding: 0;
+      color: var(--accent);
+      font-size: 11.5px;
+      font-weight: 700;
+    }
+    .pwd-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .field-error {
+      display: none;
+      color: #dc2626;
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-top: 5px;
+    }
+    .field-error.show {
+      display: block;
+    }
+
+    .notice-box {
+      display: none;
+      padding: 10px 13px;
+      border-radius: 11px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #34d399;
+      font-size: 12.5px;
+      font-weight: 600;
+      margin-bottom: 14px;
+    }
+    html[data-theme='light'] .notice-box {
+      color: #059669;
+    }
+    .notice-box.show {
+      display: block;
+    }
+
+    /* Remember checkbox */
+    .remember-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 14px 0 18px;
+      font-size: 13px;
+      color: var(--ink-700);
+    }
+    .remember-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+    .remember-row input[type='checkbox'] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--accent);
+      margin: 0;
+    }
+
+    /* Primary Submit Button */
+    .primary-submit {
+      width: 100%;
+      padding: 13.5px 20px;
+      border-radius: 13px;
+      border: 0;
+      background: var(--accent);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 12px 26px -8px var(--accent-glow);
+      transition: background 0.16s ease, transform 0.14s ease, box-shadow 0.16s ease;
+    }
+    .primary-submit:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .switch-prompt {
+      text-align: center;
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-shell);
+      font-size: 13px;
+      color: var(--ink-500);
+    }
+    .switch-prompt button {
+      background: none;
+      border: 0;
+      color: var(--accent);
+      font-weight: 800;
+      padding: 2px 6px;
+    }
+    .switch-prompt button:hover {
+      text-decoration: underline;
+    }
+
+    /* Sliding 3D TOASTER Stage Curtain */
+    .kinetic-stage-curtain {
+      position: absolute;
+      top: 12px;
+      bottom: 12px;
+      left: 12px;
+      width: calc(50% - 12px);
+      border-radius: 22px;
+      z-index: 10;
+      overflow: hidden;
+      background: #080d1a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 24px 60px -15px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.68s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+    html[dir='rtl'] .kinetic-stage-curtain {
+      direction: rtl;
+    }
+    html[dir='ltr'] .kinetic-stage-curtain {
+      direction: ltr;
+    }
+
+    .portal-shell.is-register .kinetic-stage-curtain {
+      transform: translateX(100%);
+    }
+
+    /* Live 3D WebGL Scene Mount */
+    .stage-3d-mount {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .stage-3d-mount canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: manipulation;
+    }
+
+    html[data-theme='light'] .kinetic-stage-curtain {
+      background: #cfdeea;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 24px 60px -15px rgba(15, 23, 42, 0.16);
+    }
+    html[data-theme='light'] .brand-glass-pill {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: #0f172a;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    }
+    html[data-theme='light'] .brand-glass-pill svg {
+      color: #0284c7;
+    }
+    html[data-theme='light'] .curtain-slide-btn {
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      color: #0f172a;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.1);
+    }
+    html[data-theme='light'] .curtain-slide-btn:hover {
+      background: #ffffff;
+      border-color: var(--accent);
+    }
+
+    /* Minimal Glass Header on 3D Curtain */
+    .curtain-top-bar {
+      position: relative;
+      z-index: 3;
+      margin: 20px 22px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .brand-glass-pill {
+      pointer-events: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(8, 13, 26, 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0.6px;
+      direction: ltr;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+    .brand-glass-pill svg {
+      color: #38bdf8;
+    }
+
+    /* Minimal Sliding Switch Button on Curtain */
+    .curtain-bottom-bar {
+      position: relative;
+      z-index: 3;
+      margin: auto 22px 22px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .curtain-slide-btn {
+      padding: 11px 20px;
+      border-radius: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(12, 18, 34, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: #ffffff;
+      font-size: 13.5px;
+      font-weight: 800;
+      white-space: nowrap;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    }
+    .curtain-slide-btn:hover {
+      transform: translateY(-2px);
+      background: rgba(30, 41, 59, 0.95);
+      border-color: var(--accent);
+    }
+
+    @media (max-width: 980px) {
+      body {
+        padding: 10px;
+        align-items: flex-start;
+      }
+      .portal-shell {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        border-radius: 20px;
+      }
+      .kinetic-stage-curtain {
+        position: relative;
+        width: calc(100% - 20px);
+        height: 320px;
+        top: 0;
+        left: 0;
+        margin: 10px;
+        transform: none !important;
+        order: -1;
+      }
+      .portal-shell:not(.is-register) .pane-register {
+        display: none;
+      }
+      .portal-shell.is-register .pane-login {
+        display: none;
+      }
+      .portal-shell:not(.is-register) .pane-login,
+      .portal-shell.is-register .pane-register {
+        opacity: 1 !important;
+        transform: none !important;
+        pointer-events: auto !important;
+      }
+      .form-pane {
+        padding: 24px 20px 32px;
+      }
+      .curtain-bottom-bar {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 580px) {
+      body {
+        padding: 6px;
+      }
+      .portal-shell {
+        border-radius: 16px;
+      }
+      .kinetic-stage-curtain {
+        height: 250px;
+        margin: 8px;
+        width: calc(100% - 16px);
+        border-radius: 14px;
+      }
+      .form-pane {
+        padding: 16px 14px 24px;
+      }
+      .field-row-2 {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+      .pane-topbar {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .brand-glass-pill {
+        font-size: 15px;
+        padding: 6px 12px;
+      }
+      .curtain-slide-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+      .form-head h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="portal-shell" id="portal-shell">
+    <!-- LEFT PANE: Register Form (Revealed when 3D curtain slides right) -->
+    <section class="form-pane pane-register" aria-label="ثبت‌نام">
+      <div class="pane-topbar">
+        <span class="connection-pill">
+          <i></i>
+          <span data-i18n="connection_server">اتصال به سرور برقرار است</span>
+        </span>
+        <div class="utility-actions">
+          <button type="button" class="util-btn" onclick="toggleTheme()">
+            <span class="theme-label">◐ تم تیره / روشن</span>
+          </button>
+          <button type="button" class="util-btn" onclick="toggleLang()">
+            <span class="lang-label">EN / فارسی</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-center">
+        <div class="mode-pills">
+          <button type="button" class="mode-pill" onclick="setMode(false)" data-i18n="signIn">ورود به حساب</button>
+          <button type="button" class="mode-pill active" onclick="setMode(true)" data-i18n="register">ثبت‌نام</button>
+        </div>
+
+        <header class="form-head">
+          <span class="eyebrow" data-i18n="account">حساب شما</span>
+          <h1 data-i18n="register">ثبت‌نام</h1>
+        </header>
+
+        <form id="register-form" noValidate>
+          <div class="field">
+            <label for="reg-name" data-i18n="name">نام نمایشی</label>
+            <div class="input-box">
+              <svg class="field-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <input id="reg-name" name="name" type="text" required minlength="2" maxlength="120" autocomplete="name" placeholder="مثال: علی رضایی" />
+            </div>
+            <span class="field-error" id="err-reg-name" data-i18n="authNameHelp">نام نمایشی باید بین ۲ تا ۱۲۰ نویسه باشد.</span>
+          </div>
+
+          <div class="field">
+            <label for="reg-email" data-i18n="email">ایمیل</label>
+            <div class="input-box">
+              <svg class="field-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <input id="reg-email" name="email" type="email" required maxlength="254" autocomplete="email" placeholder="name@example.com" />
+            </div>
+            <span class="field-error" id="err-reg-email" data-i18n="authEmailHelp">یک نشانی ایمیل معتبر وارد کنید.</span>
+          </div>
+
+          <div class="field-row-2">
+            <div class="field">
+              <label for="reg-pwd">
+                <span data-i18n="password">رمز عبور</span>
+                <button type="button" class="pwd-toggle" onclick="togglePasswordVisibility()" data-i18n="authShowPassword">نمایش رمز</button>
+              </label>
+              <div class="input-box">
+                <svg class="field-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                <input id="reg-pwd" name="password" type="password" required minlength="6" maxlength="128" autocomplete="new-password" placeholder="••••••••" oninput="checkPasswordStrength(this.value)" />
+              </div>
+              <span class="field-error" id="err-reg-pwd" data-i18n="authPasswordLength">رمز عبور باید حداقل ۶ نویسه داشته باشد.</span>
+            </div>
+
+            <div class="field">
+              <label for="reg-conf" data-i18n="authConfirmPassword">تکرار رمز عبور</label>
+              <div class="input-box">
+                <svg class="field-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <input id="reg-conf" name="passwordConfirmation" type="password" required maxlength="128" autocomplete="new-password" placeholder="••••••••" />
+              </div>
+              <span class="field-error" id="err-reg-conf" data-i18n="authPasswordMismatch">رمز عبور و تکرار آن یکسان نیستند.</span>
+            </div>
+          </div>
+
+          <!-- Password strength meter -->
+          <div class="pwd-strength-wrap" id="reg-pwd-strength">
+            <div class="strength-header">
+              <span><span data-i18n="pwdStrength">قدرت رمز عبور</span>: <strong class="strength-val" id="strength-val-text">ضعیف</strong></span>
+            </div>
+            <div class="strength-meter">
+              <div class="meter-seg"></div>
+              <div class="meter-seg"></div>
+              <div class="meter-seg"></div>
+              <div class="meter-seg"></div>
+            </div>
+            <p class="strength-hint" id="strength-hint-text" data-i18n="pwdHint">از ترکیب حروف بزرگ و کوچک، اعداد و نمادها استفاده کنید.</p>
+          </div>
+
+          <div class="remember-row">
+            <label>
+              <input type="checkbox" name="remember" checked />
+              <span data-i18n="authRemember">تا ۷ روز وارد حساب بمانم</span>
+            </label>
+          </div>
+
+          <button type="submit" class="primary-submit">
+            <span data-i18n="register">ثبت‌نام</span>
+          </button>
+        </form>
+
+        <div class="switch-prompt">
+          <span data-i18n="authHaveAccount">از قبل حساب دارید؟</span>
+          <button type="button" onclick="setMode(false)" data-i18n="signIn">ورود به حساب</button>
+        </div>
+      </div>
+
+      <div></div>
+    </section>
+
+    <!-- RIGHT PANE: Sign In Form (Default visible) -->
+    <section class="form-pane pane-login" aria-label="ورود به حساب">
+      <div class="pane-topbar">
+        <span class="connection-pill">
+          <i></i>
+          <span data-i18n="connection_server">اتصال به سرور برقرار است</span>
+        </span>
+        <div class="utility-actions">
+          <button type="button" class="util-btn" onclick="toggleTheme()">
+            <span class="theme-label">◐ تم تیره / روشن</span>
+          </button>
+          <button type="button" class="util-btn" onclick="toggleLang()">
+            <span class="lang-label">EN / فارسی</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-center">
+        <div class="mode-pills">
+          <button type="button" class="mode-pill active" onclick="setMode(false)" data-i18n="signIn">ورود به حساب</button>
+          <button type="button" class="mode-pill" onclick="setMode(true)" data-i18n="register">ثبت‌نام</button>
+        </div>
+
+        <header class="form-head">
+          <span class="eyebrow" data-i18n="account">حساب شما</span>
+          <h1 data-i18n="signIn">ورود به حساب</h1>
+        </header>
+
+        <div class="notice-box" id="created-notice" role="status" data-i18n="authAccountCreated">
+          حساب ساخته شد. اکنون می‌توانید وارد شوید.
+        </div>
+
+        <form id="login-form" noValidate>
+          <div class="field">
+            <label for="login-email" data-i18n="email">ایمیل</label>
+            <div class="input-box">
+              <svg class="field-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              <input id="login-email" name="email" type="email" required maxlength="254" autocomplete="email" placeholder="name@example.com" />
+            </div>
+            <span class="field-error" id="err-login-email" data-i18n="authEmailHelp">یک نشانی ایمیل معتبر وارد کنید.</span>
+          </div>
+
+          <div class="field">
+            <label for="login-pwd">
+              <span data-i18n="password">رمز عبور</span>
+              <button type="button" class="pwd-toggle" onclick="togglePasswordVisibility()" data-i18n="authShowPassword">نمایش رمز</button>
+            </label>
+            <div class="input-box">
+              <svg class="field-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <input id="login-pwd" name="password" type="password" required minlength="6" maxlength="128" autocomplete="current-password" placeholder="••••••••" />
+            </div>
+            <span class="field-error" id="err-login-pwd" data-i18n="authPasswordLength">رمز عبور باید حداقل ۶ نویسه داشته باشد.</span>
+          </div>
+
+          <div class="remember-row">
+            <label>
+              <input type="checkbox" name="remember" checked />
+              <span data-i18n="authRemember">تا ۷ روز وارد حساب بمانم</span>
+            </label>
+          </div>
+
+          <button type="submit" class="primary-submit">
+            <span data-i18n="signIn">ورود به حساب</span>
+          </button>
+        </form>
+
+        <div class="switch-prompt">
+          <span data-i18n="authNeedAccount">تازه به توستر آمده‌اید؟</span>
+          <button type="button" onclick="setMode(true)" data-i18n="register">ثبت‌نام</button>
+        </div>
+      </div>
+
+      <div></div>
+    </section>
+
+    <!-- SLIDING 3D TOASTER STAGE CURTAIN -->
+    <aside class="kinetic-stage-curtain" aria-label="TOASTER 3D">
+      <div id="toaster-3d-mount" class="stage-3d-mount"></div>
+
+      <div class="curtain-top-bar">
+        <span class="brand-glass-pill">
+          <svg viewBox="0 0 32 32" width="24" height="24" aria-hidden="true">
+            <rect x="3" y="9" width="26" height="20" rx="6" fill="currentColor" />
+            <path
+              d="M9 9V6a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3M11 17h10M12 22h8"
+              stroke="#0f172a"
+              stroke-width="2.5"
+              fill="none"
+              stroke-linecap="round"
+            />
+          </svg>
+          TOASTER
+        </span>
+      </div>
+
+      <div class="curtain-bottom-bar">
+        <button type="button" class="curtain-slide-btn" id="curtain-switch-btn" onclick="setMode(!isRegister)">
+          ثبت‌نام ⇄
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    const DICT = {
+      fa: {
+        account: 'حساب شما',
+        signIn: 'ورود به حساب',
+        register: 'ثبت‌نام',
+        name: 'نام نمایشی',
+        email: 'ایمیل',
+        password: 'رمز عبور',
+        authConfirmPassword: 'تکرار رمز عبور',
+        authShowPassword: 'نمایش رمز',
+        authHidePassword: 'پنهان کردن رمز',
+        authRemember: 'تا ۷ روز وارد حساب بمانم',
+        authNeedAccount: 'تازه به توستر آمده‌اید؟',
+        authHaveAccount: 'از قبل حساب دارید؟',
+        authNameHelp: 'نام نمایشی باید بین ۲ تا ۱۲۰ نویسه باشد.',
+        authEmailHelp: 'یک نشانی ایمیل معتبر وارد کنید.',
+        authPasswordLength: 'رمز عبور باید حداقل ۶ نویسه داشته باشد.',
+        authPasswordMismatch: 'رمز عبور و تکرار آن یکسان نیستند.',
+        authAccountCreated: 'حساب ساخته شد. اکنون می‌توانید وارد شوید.',
+        connection_server: 'اتصال به سرور برقرار است',
+        pwdStrength: 'قدرت رمز عبور',
+        pwdWeak: 'ضعیف',
+        pwdMedium: 'متوسط',
+        pwdGood: 'خوب',
+        pwdStrong: 'بسیار قوی',
+        pwdHint: 'از ترکیب حروف بزرگ و کوچک، اعداد و نمادها استفاده کنید.',
+        phName: 'مثال: علی رضایی',
+      },
+      en: {
+        account: 'Your account',
+        signIn: 'Sign in',
+        register: 'Create account',
+        name: 'Display name',
+        email: 'Email',
+        password: 'Password',
+        authConfirmPassword: 'Confirm password',
+        authShowPassword: 'Show password',
+        authHidePassword: 'Hide password',
+        authRemember: 'Keep me signed in for 7 days',
+        authNeedAccount: 'New to TOASTER?',
+        authHaveAccount: 'Already have an account?',
+        authNameHelp: 'Display name must be between 2 and 120 characters.',
+        authEmailHelp: 'Enter a valid email address.',
+        authPasswordLength: 'Password must be at least 6 characters.',
+        authPasswordMismatch: 'Passwords do not match.',
+        authAccountCreated: 'Account created. You can now sign in.',
+        connection_server: 'Connected to server',
+        pwdStrength: 'Password strength',
+        pwdWeak: 'Weak',
+        pwdMedium: 'Medium',
+        pwdGood: 'Good',
+        pwdStrong: 'Very strong',
+        pwdHint: 'Use uppercase & lowercase letters, numbers, and symbols.',
+        phName: 'e.g. John Doe',
+      },
+    };
+
+    let isRegister = false;
+    let pwdVisible = false;
+    let currentLang = 'fa';
+    let currentStrengthScore = 0;
+
+    function checkPasswordStrength(val) {
+      const wrap = document.getElementById('reg-pwd-strength');
+      if (!val || val.length === 0) {
+        currentStrengthScore = 0;
+        wrap.classList.remove('active', 'strength-1', 'strength-2', 'strength-3', 'strength-4');
+        return;
+      }
+      wrap.classList.add('active');
+
+      let score = 0;
+      if (val.length >= 6) score++;
+      if (val.length >= 9) score++;
+      if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
+      if (/[0-9]/.test(val) || /[^A-Za-z0-9]/.test(val)) score++;
+
+      if (score === 0) score = 1;
+      currentStrengthScore = score;
+
+      wrap.classList.remove('strength-1', 'strength-2', 'strength-3', 'strength-4');
+      wrap.classList.add('strength-' + score);
+
+      updateStrengthLabel();
+    }
+
+    function updateStrengthLabel() {
+      if (!currentStrengthScore) return;
+      const t = DICT[currentLang];
+      const valText = document.getElementById('strength-val-text');
+      const labels = {
+        1: t.pwdWeak,
+        2: t.pwdMedium,
+        3: t.pwdGood,
+        4: t.pwdStrong,
+      };
+      if (valText && labels[currentStrengthScore]) {
+        valText.textContent = labels[currentStrengthScore];
+      }
+    }
+
+    function setMode(reg) {
+      isRegister = reg;
+      document.getElementById('portal-shell').classList.toggle('is-register', isRegister);
+      document.body.classList.toggle('is-register', isRegister);
+      updateCurtainButton();
+    }
+
+    function updateCurtainButton() {
+      const t = DICT[currentLang];
+      const btn = document.getElementById('curtain-switch-btn');
+      btn.textContent = (isRegister ? t.signIn : t.register) + ' ⇄';
+    }
+
+    function togglePasswordVisibility() {
+      pwdVisible = !pwdVisible;
+      const type = pwdVisible ? 'text' : 'password';
+      ['login-pwd', 'reg-pwd', 'reg-conf'].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.type = type;
+      });
+      const t = DICT[currentLang];
+      document.querySelectorAll('.pwd-toggle').forEach((btn) => {
+        btn.textContent = pwdVisible ? t.authHidePassword : t.authShowPassword;
+      });
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      if (typeof window.updateToaster3DTheme === 'function') {
+        window.updateToaster3DTheme(next);
+      }
+    }
+
+    function toggleLang() {
+      currentLang = currentLang === 'fa' ? 'en' : 'fa';
+      const html = document.documentElement;
+      html.lang = currentLang;
+      html.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+      const t = DICT[currentLang];
+      document.querySelectorAll('[data-i18n]').forEach((node) => {
+        const key = node.getAttribute('data-i18n');
+        if (t[key]) node.textContent = t[key];
+      });
+      document.querySelectorAll('.pwd-toggle').forEach((btn) => {
+        btn.textContent = pwdVisible ? t.authHidePassword : t.authShowPassword;
+      });
+      const regName = document.getElementById('reg-name');
+      if (regName) regName.placeholder = t.phName;
+      updateStrengthLabel();
+      updateCurtainButton();
+    }
+
+    // Validation for Login Form
+    document.getElementById('login-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('login-email');
+      const pwd = document.getElementById('login-pwd');
+      const emailErr = !email.value.trim() || !email.validity.valid;
+      const pwdErr = pwd.value.length < 6;
+
+      email.setAttribute('aria-invalid', String(emailErr));
+      pwd.setAttribute('aria-invalid', String(pwdErr));
+      document.getElementById('err-login-email').classList.toggle('show', emailErr);
+      document.getElementById('err-login-pwd').classList.toggle('show', pwdErr);
+    });
+
+    // Validation for Register Form
+    document.getElementById('register-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('reg-name');
+      const email = document.getElementById('reg-email');
+      const pwd = document.getElementById('reg-pwd');
+      const conf = document.getElementById('reg-conf');
+
+      const nameErr = name.value.trim().length < 2 || name.value.trim().length > 120;
+      const emailErr = !email.value.trim() || !email.validity.valid;
+      const pwdErr = pwd.value.length < 6;
+      const confErr = conf.value !== pwd.value || !conf.value;
+
+      name.setAttribute('aria-invalid', String(nameErr));
+      email.setAttribute('aria-invalid', String(emailErr));
+      pwd.setAttribute('aria-invalid', String(pwdErr));
+      conf.setAttribute('aria-invalid', String(confErr));
+
+      document.getElementById('err-reg-name').classList.toggle('show', nameErr);
+      document.getElementById('err-reg-email').classList.toggle('show', emailErr);
+      document.getElementById('err-reg-pwd').classList.toggle('show', pwdErr);
+      document.getElementById('err-reg-conf').classList.toggle('show', confErr);
+
+      if (!nameErr && !emailErr && !pwdErr && !confErr) {
+        document.getElementById('login-email').value = email.value.trim();
+        document.getElementById('created-notice').classList.add('show');
+        setMode(false);
+      }
+    });
+  </script>
+  <script src="./toaster-3d.js"></script>
+</body>
+</html>

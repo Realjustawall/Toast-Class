@@ -1,0 +1,420 @@
+/* Compact defaults leave space for conversation and the shared workspace.
+   Panel resizing and explicit text-size preferences remain available. */
+.classroom-shell[data-theme] .classroom-sidepanel {
+  container: classroom-panel / inline-size;
+}
+.classroom-shell[data-theme] .classroom-sidepanel > header {
+  min-height: 42px;
+  padding: 5px 8px;
+  gap: 4px;
+}
+.classroom-shell[data-theme] .classroom-sidepanel > header h2 {
+  margin: 0;
+  font-size: clamp(12px, var(--classroom-font-size, 14px), 18px);
+}
+.classroom-shell[data-theme] .classroom-sidepanel > header > button,
+.classroom-shell[data-theme] .classroom-panel-tools button {
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  min-width: 28px;
+  padding: 3px;
+}
+.classroom-shell[data-theme] .classroom-sidepanel > header > button .class-icon {
+  width: 17px;
+  height: 17px;
+}
+.classroom-shell .classroom-panel-resizer:is(.is-left, .is-right) {
+  top: 42px;
+}
+.classroom-shell[data-theme] .chat-title-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 4px;
+  padding: 5px 8px;
+  min-width: 0;
+  border-bottom: 1px solid var(--layout-line);
+}
+.classroom-shell[data-theme] .chat-filter-tabs {
+  flex: 1;
+  min-width: 0;
+  padding: 2px;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.classroom-shell[data-theme] .chat-filter-tab {
+  flex: 1 0 64px;
+  max-width: none;
+  min-width: 0;
+  padding: 5px;
+  min-height: 28px;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.classroom-shell[data-theme] .chat-category-manage {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  min-width: 28px;
+  height: 32px;
+  min-height: 32px;
+  padding: 4px;
+}
+.classroom-shell[data-theme] .chat-category-manage .class-icon {
+  width: 16px;
+  height: 16px;
+}
+.chat-categories-dialog {
+  width: min(420px, calc(100vw - 24px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border: 1px solid #dfe7ef;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
+  color: #24374d;
+  box-shadow: 0 16px 48px #00112444;
+}
+.chat-categories-dialog::backdrop {
+  background: #06172a88;
+}
+.chat-categories-dialog > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.chat-categories-dialog h2 {
+  margin: 0;
+  font-size: 16px;
+}
+.chat-categories-dialog p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.chat-categories-dialog ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  max-height: min(320px, 45dvh);
+  overflow: auto;
+}
+.chat-categories-dialog li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 38px;
+  gap: 8px;
+  border-bottom: 1px solid #e8edf3;
+}
+.chat-categories-dialog li strong {
+  min-width: 0;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.chat-categories-dialog small {
+  font-size: 12px;
+  color: #64748b;
+}
+.classroom-shell .chat-categories-dialog button.quiet {
+  display: grid;
+  place-items: center;
+  padding: 5px;
+  width: 30px;
+  min-width: 30px;
+  min-height: 32px;
+  color: #526579;
+  background: transparent;
+}
+.classroom-shell .chat .chat-categories-dialog form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+  border: 0;
+  padding: 4px 0;
+}
+.classroom-shell .chat .chat-categories-dialog form label {
+  font-size: 13px;
+}
+.chat-categories-dialog input {
+  margin: 4px 0 0;
+  min-height: 38px;
+  font-size: 16px;
+  padding: 6px 8px;
+}
+.classroom-shell .chat .chat-categories-dialog form > button {
+  width: auto;
+  min-height: 38px;
+  padding: 8px;
+  font-size: 13px;
+}
+.classroom-shell[data-theme] .chat-font-size {
+  flex: none;
+  padding: 0;
+  margin: 0;
+}
+.classroom-shell[data-theme] .chat-font-size select {
+  width: 46px;
+  height: 32px;
+  min-height: 32px;
+  margin: 0;
+  padding: 2px;
+  border-radius: 5px;
+  font-size: 12px;
+}
+.classroom-shell[data-theme] .chat-clear-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  min-width: 28px;
+  height: 32px;
+  min-height: 32px;
+  padding: 4px;
+}
+.chat-clear-confirm {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  gap: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+}
+.classroom-shell[data-theme] .messages {
+  padding: 10px;
+  scrollbar-gutter: stable;
+}
+.classroom-shell[data-theme] .messages article {
+  margin-block: 0 10px;
+  min-height: 30px;
+}
+.classroom-shell[data-theme] .messages article:last-child {
+  margin-bottom: 0;
+}
+.classroom-shell[data-theme] .messages .formatted-text {
+  margin-top: 2px;
+  line-height: 1.65;
+}
+.classroom-shell[data-theme] .messages .formatted-text p {
+  margin: 0 0 0.25em;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+.classroom-shell[data-theme] .messages .formatted-text strong {
+  font-size: inherit;
+}
+.classroom-shell[data-theme] .messages article > strong {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.classroom-shell[data-theme] .chat-message-actions {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  gap: 4px;
+  margin: 0;
+}
+.classroom-shell[data-theme] .chat-message-actions button {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 4px;
+  font-size: 11px;
+}
+.classroom-shell[data-theme] .chat-message-actions .class-icon {
+  width: 14px;
+  height: 14px;
+}
+.classroom-shell[data-theme] .messages article:is(:hover, :focus-within) > time {
+  opacity: 0;
+}
+.classroom-shell:is([data-theme='modular-skyroom'], [data-theme='studio-hybrid'])
+  .chat-message-actions {
+  inset-block-start: 6px;
+  inset-inline-end: 6px;
+}
+.classroom-shell:is([data-theme='immersive-glass'], [data-theme='studio-hybrid'])
+  .messages
+  .formatted-text {
+  color: #e3eaf4;
+}
+.classroom-shell:is([data-theme='immersive-glass'], [data-theme='studio-hybrid'])
+  .chat-filter-tab:not(.is-active) {
+  color: #cbd5e1;
+}
+.classroom-shell[data-theme] .chat form.chat-composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: end;
+  gap: 6px;
+  padding: 8px;
+}
+.classroom-shell[data-theme] .chat-composer > .rich-text-editor {
+  width: 100%;
+  min-width: 0;
+  border-radius: 6px;
+}
+.classroom-shell[data-theme] .chat form.chat-composer > button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  margin: 0 0 4px;
+  padding: 6px;
+  border-radius: 6px;
+}
+.classroom-shell[data-theme] .chat .rich-text-editor .tiptap {
+  min-height: 42px;
+  max-height: min(120px, 22dvh);
+  padding: 8px;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.classroom-shell[data-theme] .rich-text-editor[data-compact='true'] .rich-text-toolbar {
+  position: relative;
+  flex-wrap: nowrap;
+  gap: 2px;
+  padding: 3px;
+}
+.classroom-shell[data-theme] .rich-text-editor[data-compact='true'] .rich-text-toolbar button {
+  width: 28px;
+  min-width: 28px;
+  max-width: 28px;
+  height: 28px;
+  min-height: 28px;
+  font-size: 13px;
+}
+.rich-text-editor[data-compact='true'] .rich-text-more {
+  position: static;
+}
+.rich-text-editor[data-compact='true'] .rich-text-more > summary {
+  min-width: 28px;
+  min-height: 28px;
+  font-size: 21px;
+}
+.rich-text-editor[data-compact='true'] .rich-text-more > div {
+  top: auto;
+  bottom: calc(100% + 5px);
+  inset-inline-end: 0;
+  grid-template-columns: repeat(4, 28px);
+  gap: 4px;
+  min-width: 140px;
+  max-height: min(240px, 50dvh);
+  overflow: auto;
+}
+.classroom-shell[data-theme] .classroom-people {
+  padding: 8px;
+}
+.classroom-shell[data-theme] .people-search-box {
+  padding: 4px 7px;
+}
+.classroom-shell[data-theme] .people-search-box input {
+  min-height: 28px;
+  font-size: 13px;
+}
+.classroom-shell[data-theme] .people-filter-tabs button {
+  min-width: 0;
+  min-height: 32px;
+  padding: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.classroom-shell[data-theme] .classroom-moderator-bar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding-bottom: 6px;
+}
+.classroom-shell[data-theme] .classroom-moderator-bar button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.classroom-shell[data-theme] .classroom-moderator-bar button > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.classroom-shell[data-theme] .classroom-moderator-bar button .class-icon {
+  width: 16px;
+  height: 16px;
+}
+.classroom-shell[data-theme] .classroom-people .participant-item {
+  padding-block: 6px;
+}
+.classroom-shell[data-theme] .classroom-moderation {
+  padding-top: 8px;
+  margin-top: 8px;
+}
+.classroom-shell[data-theme] .classroom-document-bar {
+  min-height: 38px;
+  padding: 3px 8px;
+  gap: 6px;
+}
+.classroom-shell[data-theme] .classroom-document-bar button {
+  padding: 5px 8px;
+}
+@container classroom-panel (max-width: 260px) {
+  .classroom-shell[data-theme] .classroom-sidepanel > header h2 {
+    font-size: 12px;
+  }
+  .classroom-shell[data-theme] .chat-filter-tab {
+    padding-inline: 3px;
+    font-size: 11px;
+  }
+  .classroom-shell[data-theme] .chat-title-row {
+    padding-inline: 6px;
+    gap: 3px;
+  }
+}
+@media (pointer: coarse) {
+  .classroom-shell[data-theme] .chat-message-actions {
+    position: static;
+    margin-top: 4px;
+  }
+  .classroom-shell[data-theme] .chat-message-actions button {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+  }
+  .classroom-shell[data-theme] .messages article > time {
+    opacity: 1;
+  }
+}
+@media (max-height: 500px) and (max-width: 1099px) {
+  .classroom-shell[data-theme] {
+    grid-template-rows:
+      48px clamp(60px, var(--preferred-media-height, 90px), 25dvh) minmax(0, 1fr)
+      54px;
+  }
+  .classroom-shell[data-theme] .classroom-sidepanel {
+    top: 48px;
+    bottom: 54px;
+  }
+  .classroom-shell[data-expanded-panel]:not([data-expanded-panel='none']) [data-layout-panel] {
+    inset: 54px 8px 60px !important;
+  }
+}

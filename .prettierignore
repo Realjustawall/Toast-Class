@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.local/
+test-results/
+playwright-report/
+Saved/
+package-lock.json
+apps/web/public/media-effects/wasm/
+apps/web/public/vendor/
+apps/web/public/intro/
+apps/web/public/excalidraw/
+apps/web/public/pdfjs/

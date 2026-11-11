@@ -1,0 +1,1292 @@
+﻿<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>طرح ۲ — ماژولار روشن (الهام از اسکای‌روم)</title>
+    <link rel="stylesheet" href="shared/common.css" />
+    <style>
+      :root {
+        --pri: #1e88e5;
+        --pri-d: #1565c0;
+        --pri-l: #e3f0fd;
+        --acc: #ff8f00;
+        --ok: #2bb673;
+        --bad: #e53935;
+        --bg: #edf1f6;
+        --card: #fff;
+        --line: #e4e9f0;
+        --txt: #1f2a37;
+        --muted: #7a8899;
+      }
+      body {
+        background: var(--bg);
+        color: var(--txt);
+        font-size: 13.5px;
+      }
+      .app {
+        height: 100vh;
+        display: grid;
+        grid-template-rows: 58px 1fr 68px;
+      }
+
+      /* ---------- header ---------- */
+      .hdr {
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 16px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 800;
+        font-size: 17px;
+        color: var(--pri-d);
+      }
+      .brand .lg {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: conic-gradient(from 200deg, var(--pri), #42a5f5, var(--acc), var(--pri));
+        display: grid;
+        place-items: center;
+      }
+      .brand .lg span {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        color: var(--pri);
+        font-size: 12px;
+      }
+      .vsep {
+        width: 1px;
+        height: 26px;
+        background: var(--line);
+      }
+      .room b {
+        font-size: 14.5px;
+      }
+      .room small {
+        display: block;
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 99px;
+        padding: 5px 12px;
+        font-size: 12.5px;
+        font-weight: 600;
+        background: var(--bg);
+      }
+      .chip.live {
+        background: #fdecea;
+        color: var(--bad);
+      }
+      .chip.live::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--bad);
+        animation: blink 1.4s infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0.25;
+        }
+      }
+      .chip.time {
+        font-variant-numeric: tabular-nums;
+      }
+      .chip.net {
+        background: #e7f7ef;
+        color: var(--ok);
+      }
+      .grow {
+        flex: 1;
+      }
+      .hbtn {
+        height: 36px;
+        min-width: 36px;
+        padding: 0 10px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        color: #4a5868;
+        font-weight: 500;
+      }
+      .hbtn:hover {
+        background: var(--bg);
+      }
+      .me {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 4px 4px 10px;
+        border-radius: 99px;
+        border: 1px solid var(--line);
+      }
+      .me .av {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+      }
+      .me small {
+        color: var(--muted);
+        display: block;
+        font-size: 11px;
+        line-height: 1.2;
+      }
+      .me b {
+        font-size: 12.5px;
+        line-height: 1.2;
+      }
+
+      /* ---------- body grid ---------- */
+      .body {
+        display: grid;
+        grid-template-columns: 300px 1fr 280px;
+        gap: 10px;
+        padding: 10px;
+        min-height: 0;
+      }
+      .col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 0;
+      }
+      .mod {
+        background: var(--card);
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+        box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+      }
+      .mod.flex {
+        flex: 1;
+      }
+      .mod > header {
+        height: 42px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--line);
+        flex: none;
+      }
+      .mod > header .i {
+        color: var(--pri);
+      }
+      .mod > header h3 {
+        margin: 0;
+        font-size: 13.5px;
+        font-weight: 700;
+        flex: 1;
+      }
+      .mod > header .cnt {
+        background: var(--pri-l);
+        color: var(--pri-d);
+        border-radius: 99px;
+        padding: 0 8px;
+        font-size: 11.5px;
+        font-weight: 700;
+      }
+      .mod > header .ctl {
+        display: flex;
+        gap: 2px;
+      }
+      .mod > header .ctl button {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .mod > header .ctl button:hover {
+        background: var(--bg);
+      }
+      .mod > header .ctl .i {
+        width: 16px;
+        height: 16px;
+        color: var(--muted);
+      }
+      .mod.min > :not(header) {
+        display: none;
+      }
+      .mod.min {
+        flex: none !important;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 4px;
+        padding: 8px 10px 0;
+        flex: none;
+      }
+      .tabs button {
+        flex: 1;
+        padding: 6px 0;
+        border-radius: 8px;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--muted);
+        background: var(--bg);
+        position: relative;
+      }
+      .tabs button.on {
+        background: var(--pri);
+        color: #fff;
+      }
+      .tabs button em {
+        font-style: normal;
+        background: var(--acc);
+        color: #fff;
+        border-radius: 99px;
+        padding: 0 6px;
+        font-size: 10.5px;
+        margin-inline-start: 4px;
+      }
+
+      /* users */
+      .search {
+        margin: 8px 10px 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 0 10px;
+        color: var(--muted);
+        flex: none;
+      }
+      .search input {
+        border: 0;
+        background: none;
+        outline: none;
+        padding: 7px 0;
+        flex: 1;
+        font-size: 12.5px;
+      }
+      .ulist {
+        overflow: auto;
+        padding: 4px 6px 8px;
+        flex: 1;
+      }
+      .u {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 6px 6px;
+        border-radius: 8px;
+      }
+      .u:hover {
+        background: #f5f8fb;
+      }
+      .av {
+        position: relative;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 12px;
+        flex: none;
+      }
+      .av .on {
+        position: absolute;
+        bottom: -1px;
+        inset-inline-start: -1px;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--ok);
+        border: 2px solid #fff;
+      }
+      .u .nm {
+        flex: 1;
+        min-width: 0;
+        line-height: 1.3;
+      }
+      .u .nm b {
+        font-weight: 600;
+        font-size: 13px;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .u .nm small {
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .role {
+        font-size: 10px;
+        font-weight: 700;
+        border-radius: 4px;
+        padding: 0 5px;
+      }
+      .role.t {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .role.a {
+        background: var(--pri-l);
+        color: var(--pri-d);
+      }
+      .perm {
+        display: flex;
+        gap: 2px;
+      }
+      .perm button {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: #b4bfcb;
+      }
+      .perm button.y {
+        color: var(--ok);
+        background: #e7f7ef;
+      }
+      .perm button.h {
+        color: var(--acc);
+        background: #fff3e0;
+      }
+      .perm .i {
+        width: 15px;
+        height: 15px;
+      }
+
+      /* chat */
+      .msgs {
+        flex: 1;
+        overflow: auto;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .bub {
+        max-width: 88%;
+        background: var(--bg);
+        border-radius: 12px;
+        border-start-start-radius: 4px;
+        padding: 7px 11px;
+        line-height: 1.75;
+        align-self: flex-start;
+      }
+      .bub b {
+        display: block;
+        font-size: 11.5px;
+        color: var(--pri-d);
+      }
+      .bub time {
+        font-size: 10.5px;
+        color: var(--muted);
+        float: left;
+        margin-top: 4px;
+        margin-inline-start: 10px;
+      }
+      .bub.t {
+        background: #fff3e0;
+      }
+      .bub.t b {
+        color: #e65100;
+      }
+      .bub.me {
+        align-self: flex-end;
+        background: var(--pri);
+        color: #fff;
+        border-radius: 12px;
+        border-start-end-radius: 4px;
+      }
+      .bub.me time {
+        color: #d4e6fb;
+      }
+      .bub.q {
+        border: 1px dashed var(--acc);
+        background: #fffaf2;
+      }
+      .send {
+        display: flex;
+        gap: 6px;
+        padding: 8px 10px 10px;
+        border-top: 1px solid var(--line);
+        flex: none;
+      }
+      .send input {
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 0 12px;
+        outline: none;
+        height: 38px;
+      }
+      .send input:focus {
+        border-color: var(--pri);
+      }
+      .send button {
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .send button.go {
+        background: var(--pri);
+        color: #fff;
+      }
+      .send button.go .i {
+        transform: scaleX(-1);
+      }
+
+      /* ---------- board ---------- */
+      .doc-tabs {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        padding: 8px 10px 0;
+        background: #f6f8fb;
+        border-bottom: 1px solid var(--line);
+        flex: none;
+      }
+      .doc-tabs button {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 9px 9px 0 0;
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 12.5px;
+        border: 1px solid transparent;
+        border-bottom: 0;
+        margin-bottom: -1px;
+      }
+      .doc-tabs button.on {
+        background: #fff;
+        color: var(--txt);
+        border-color: var(--line);
+      }
+      .doc-tabs button .i {
+        width: 16px;
+        height: 16px;
+      }
+      .doc-tabs .x {
+        opacity: 0.5;
+      }
+      .doc-tabs .add {
+        color: var(--pri);
+        padding: 7px 8px;
+      }
+      .doc-tabs .sync {
+        margin-inline-start: auto;
+        align-self: center;
+        font-size: 11.5px;
+        color: var(--ok);
+        display: flex;
+        gap: 4px;
+        align-items: center;
+        padding-bottom: 6px;
+      }
+      .doc-tabs .sync .i {
+        width: 15px;
+        height: 15px;
+      }
+      .wb-bar {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 6px 10px;
+        border-bottom: 1px solid var(--line);
+        flex: none;
+        flex-wrap: wrap;
+      }
+      .wb-bar button {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: #4a5868;
+      }
+      .wb-bar button:hover {
+        background: var(--bg);
+      }
+      .wb-bar button.on {
+        background: var(--pri-l);
+        color: var(--pri-d);
+      }
+      .wb-bar .sep {
+        width: 1px;
+        height: 22px;
+        background: var(--line);
+        margin: 0 4px;
+      }
+      .wb-bar .col-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #fff;
+        box-shadow: 0 0 0 1px var(--line);
+      }
+      .wb-bar .col-dot.on {
+        box-shadow: 0 0 0 2px var(--pri);
+      }
+      .wb-bar input[type='range'] {
+        width: 80px;
+        accent-color: var(--pri);
+      }
+      .wb-bar .pg {
+        margin-inline-start: auto;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .canvas {
+        flex: 1;
+        min-height: 0;
+        position: relative;
+        background-color: #fff;
+        background-image: radial-gradient(#d5dde7 1.2px, transparent 1.2px);
+        background-size: 22px 22px;
+        overflow: hidden;
+      }
+      .canvas > svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        direction: ltr;
+      }
+      .cursor {
+        position: absolute;
+        display: flex;
+        align-items: flex-start;
+        gap: 2px;
+        pointer-events: none;
+        transition:
+          left 1.2s ease-in-out,
+          top 1.2s ease-in-out;
+      }
+      .cursor span {
+        background: var(--acc);
+        color: #fff;
+        font-size: 11px;
+        padding: 1px 7px;
+        border-radius: 6px;
+        margin-top: 14px;
+        white-space: nowrap;
+      }
+      .cursor .i {
+        fill: var(--acc);
+        stroke: #fff;
+        width: 18px;
+        height: 18px;
+      }
+      .zoomer {
+        position: absolute;
+        bottom: 12px;
+        inset-inline-end: 12px;
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 3px;
+        box-shadow: 0 4px 12px rgba(16, 24, 40, 0.08);
+        font-size: 12px;
+      }
+      .zoomer button {
+        width: 28px;
+        height: 28px;
+        border-radius: 7px;
+        display: grid;
+        place-items: center;
+        color: #4a5868;
+      }
+      .zoomer button:hover {
+        background: var(--bg);
+      }
+      .zoomer span {
+        min-width: 44px;
+        text-align: center;
+      }
+      .presenter {
+        position: absolute;
+        top: 12px;
+        inset-inline-start: 12px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid var(--line);
+        border-radius: 99px;
+        padding: 4px 12px 4px 6px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 12px;
+        backdrop-filter: blur(4px);
+      }
+      .presenter .av {
+        width: 24px;
+        height: 24px;
+        font-size: 10px;
+      }
+
+      /* ---------- videos ---------- */
+      .vids {
+        padding: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        overflow: auto;
+      }
+      .v {
+        position: relative;
+        aspect-ratio: 4/3;
+        border-radius: 9px;
+        overflow: hidden;
+        background: #1f2a37;
+      }
+      .v.big {
+        grid-column: span 2;
+        aspect-ratio: 16/10;
+      }
+      .v .fakecam {
+        position: absolute;
+        inset: 0;
+      }
+      .v .n {
+        position: absolute;
+        bottom: 5px;
+        inset-inline-start: 5px;
+        right: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #fff;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .v .n span {
+        background: rgba(0, 0, 0, 0.45);
+        padding: 1px 7px;
+        border-radius: 5px;
+        display: flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .v .n .i {
+        width: 13px;
+        height: 13px;
+      }
+      .v.speak {
+        outline: 2.5px solid var(--ok);
+        outline-offset: -2.5px;
+      }
+      .v.noc {
+        display: grid;
+        place-items: center;
+      }
+      .v.noc .av {
+        width: 44px;
+        height: 44px;
+        font-size: 15px;
+      }
+      .eq {
+        display: inline-flex;
+        gap: 1.5px;
+        align-items: flex-end;
+        height: 11px;
+      }
+      .eq i {
+        width: 2.5px;
+        background: var(--ok);
+        border-radius: 2px;
+        animation: eq 0.8s infinite ease-in-out;
+      }
+      .eq i:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .eq i:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes eq {
+        0%,
+        100% {
+          height: 3px;
+        }
+        50% {
+          height: 11px;
+        }
+      }
+
+      /* tools module */
+      .qa {
+        padding: 10px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .qa button {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #4a5868;
+      }
+      .qa button:hover {
+        border-color: var(--pri);
+        color: var(--pri-d);
+        background: var(--pri-l);
+      }
+      .qa button .i {
+        color: var(--pri);
+      }
+      .timer {
+        margin: 0 10px 10px;
+        background: linear-gradient(135deg, var(--pri), var(--pri-d));
+        color: #fff;
+        border-radius: 10px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .timer b {
+        font-size: 22px;
+        font-variant-numeric: tabular-nums;
+        flex: 1;
+      }
+      .timer small {
+        display: block;
+        font-size: 11px;
+        opacity: 0.8;
+      }
+      .timer button {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.18);
+        display: grid;
+        place-items: center;
+      }
+
+      /* ---------- bottom toolbar ---------- */
+      .bar {
+        background: var(--card);
+        border-top: 1px solid var(--line);
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        padding: 0 16px;
+      }
+      .bar .l,
+      .bar .r {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+      .bar .r {
+        justify-content: flex-end;
+      }
+      .bar .c {
+        display: flex;
+        gap: 6px;
+      }
+      .tb {
+        min-width: 66px;
+        height: 54px;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        font-size: 11.5px;
+        font-weight: 600;
+        color: #4a5868;
+        position: relative;
+        transition: 0.15s;
+      }
+      .tb:hover {
+        background: var(--bg);
+      }
+      .tb .ic {
+        width: 34px;
+        height: 30px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+      }
+      .tb.on .ic {
+        background: var(--pri);
+        color: #fff;
+      }
+      .tb.off .ic {
+        background: #fdecea;
+        color: var(--bad);
+      }
+      .tb.hand.on .ic {
+        background: var(--acc);
+      }
+      .tb .dd {
+        position: absolute;
+        top: 6px;
+        inset-inline-start: 6px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .tb .dd .i {
+        width: 12px;
+        height: 12px;
+      }
+      .exit {
+        height: 40px;
+        padding: 0 16px;
+        border-radius: 10px;
+        background: var(--bad);
+        color: #fff;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .exit .i {
+        width: 18px;
+      }
+      .startbtn {
+        height: 40px;
+        padding: 0 14px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--txt);
+      }
+      .lvl {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .lvl .meter {
+        width: 90px;
+        height: 6px;
+        border-radius: 6px;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      .lvl .meter i {
+        display: block;
+        height: 100%;
+        width: 40%;
+        background: linear-gradient(90deg, var(--ok), #a3e635);
+        border-radius: 6px;
+        transition: width 0.15s;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- ===== header ===== -->
+      <header class="hdr">
+        <div class="brand">
+          <div class="lg"><span>T</span></div>
+          توستر
+        </div>
+        <div class="vsep"></div>
+        <div class="room">
+          <b>ریاضی پایه دهم — جلسه ۱۲</b>
+          <small>مدرس: دکتر سارا محمدی</small>
+        </div>
+        <span class="chip live">زنده · در حال ضبط</span>
+        <span class="chip time"><i data-i="clock"></i> <span id="clock">۰۰:۴۲:۱۵</span></span>
+        <div class="grow"></div>
+        <span class="chip net"><i data-i="wifi"></i> کیفیت اتصال: عالی</span>
+        <button class="hbtn" title="زبان"><i data-i="globe"></i> EN</button>
+        <button class="hbtn" title="چیدمان"><i data-i="layout"></i></button>
+        <button class="hbtn" title="تمام صفحه"><i data-i="expand"></i></button>
+        <button class="hbtn" title="تنظیمات"><i data-i="settings"></i></button>
+        <div class="me">
+          <div><b>علی رضایی</b><small>دانش‌آموز</small></div>
+          <div class="av" style="background: #8e44ad">ع‌ر</div>
+        </div>
+      </header>
+
+      <!-- ===== body ===== -->
+      <div class="body">
+        <!-- right column: users + chat -->
+        <div class="col">
+          <section class="mod" style="flex: 1.05">
+            <header>
+              <i data-i="users"></i>
+              <h3>کاربران حاضر</h3>
+              <span class="cnt">۱۲ نفر</span>
+              <div class="ctl">
+                <button title="کوچک کردن" onclick="this.closest('.mod').classList.toggle('min')"><i data-i="chevD"></i></button>
+              </div>
+            </header>
+            <div class="tabs" id="utabs">
+              <button class="on" data-f="all">همه</button>
+              <button data-f="hand">دست بالا <em>۲</em></button>
+              <button data-f="mod">مدیران</button>
+            </div>
+            <label class="search"><i data-i="search"></i><input placeholder="جستجوی کاربر…" id="usearch" /></label>
+            <div class="ulist" id="ulist"></div>
+          </section>
+
+          <section class="mod flex">
+            <header>
+              <i data-i="chat"></i>
+              <h3>گفتگو</h3>
+              <div class="ctl">
+                <button title="کوچک کردن" onclick="this.closest('.mod').classList.toggle('min')"><i data-i="chevD"></i></button>
+              </div>
+            </header>
+            <div class="tabs">
+              <button class="on">عمومی</button>
+              <button>خصوصی <em>۱</em></button>
+              <button>پرسش‌ها</button>
+            </div>
+            <div class="msgs" id="msgs">
+              <div class="bub t"><b>دکتر سارا محمدی</b>سلام بچه‌ها، امروز روش دلتا رو کامل می‌کنیم 🌱<time>۱۸:۰۲</time></div>
+              <div class="bub"><b>مریم احمدی</b>سلام استاد 👋<time>۱۸:۰۳</time></div>
+              <div class="bub q"><b>رضا کریمی · پرسش</b>اگه a صفر باشه هنوز درجه دومه؟<time>۱۸:۰۵</time></div>
+              <div class="bub me">سلام، صدا و تصویر عالیه 👌<time>۱۸:۰۶</time></div>
+              <div class="bub t"><b>دکتر سارا محمدی</b>سؤال خیلی خوبیه رضا، الان روی تخته توضیح می‌دم.<time>۱۸:۰۷</time></div>
+            </div>
+            <form class="send" id="sendForm">
+              <button type="button" title="پیوست"><i data-i="attach"></i></button>
+              <input id="sendIn" placeholder="پیام خود را بنویسید…" />
+              <button class="go" title="ارسال"><i data-i="send"></i></button>
+            </form>
+          </section>
+        </div>
+
+        <!-- center: board -->
+        <section class="mod">
+          <div class="doc-tabs" id="dtabs">
+            <button class="on"><i data-i="board"></i> تخته سفید ۱</button>
+            <button><i data-i="pdf"></i> فصل۲-معادلات.pdf <span class="x">✕</span></button>
+            <button><i data-i="notes"></i> یادداشت مشترک</button>
+            <button><i data-i="screen"></i> اشتراک صفحه</button>
+            <button class="add" title="سند جدید"><i data-i="plus"></i></button>
+            <span class="sync"><i data-i="check"></i> همگام‌سازی شد</span>
+          </div>
+          <div class="wb-bar" id="wb">
+            <button data-t title="انتخاب"><i data-i="pointer"></i></button>
+            <button data-t class="on" title="قلم"><i data-i="pen"></i></button>
+            <button data-t title="شکل‌ها"><i data-i="shape"></i></button>
+            <button data-t title="متن"><i data-i="text"></i></button>
+            <button data-t title="اشاره‌گر لیزری"><i data-i="laser"></i></button>
+            <button data-t title="پاک‌کن"><i data-i="eraser"></i></button>
+            <span class="sep"></span>
+            <span class="col-dot on" style="background: #1e88e5"></span>
+            <span class="col-dot" style="background: #e53935"></span>
+            <span class="col-dot" style="background: #2bb673"></span>
+            <span class="col-dot" style="background: #ff8f00"></span>
+            <span class="col-dot" style="background: #1f2a37"></span>
+            <span class="sep"></span>
+            <input type="range" min="1" max="12" value="4" title="ضخامت" />
+            <span class="sep"></span>
+            <button title="برگشت"><i data-i="undo"></i></button>
+            <button title="جلو"><i data-i="redo"></i></button>
+            <div class="pg">
+              <button title="صفحه قبل"><i data-i="chevR"></i></button>
+              صفحه ۲ از ۵
+              <button title="صفحه بعد"><i data-i="chevL"></i></button>
+            </div>
+          </div>
+          <div class="canvas" id="canvas">
+            <svg viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet">
+              <g font-family="Vazirmatn" direction="rtl" text-anchor="start">
+                <text x="940" y="70" font-size="34" font-weight="800" fill="#1f2a37">حالت a = ۰ چه می‌شود؟</text>
+                <text x="940" y="112" font-size="18" fill="#7a8899">پاسخ به پرسش رضا کریمی</text>
+              </g>
+              <g font-family="Cambria Math, serif" font-style="italic" fill="#1e88e5" font-size="38">
+                <text x="560" y="200">ax² + bx + c = 0</text>
+                <text x="560" y="290" fill="#e53935">0·x² + bx + c = 0</text>
+                <text x="600" y="380" fill="#2bb673">bx + c = 0  ⟹  x = −c/b</text>
+              </g>
+              <path d="M548 300 L 890 270" stroke="#e53935" stroke-width="4" stroke-linecap="round" />
+              <path d="M720 215 q 10 30 0 45 m 0 0 l -10 -12 m 10 12 l 10 -12" stroke="#1f2a37" stroke-width="3" fill="none" stroke-linecap="round" />
+              <path d="M720 305 q 10 30 0 45 m 0 0 l -10 -12 m 10 12 l 10 -12" stroke="#1f2a37" stroke-width="3" fill="none" stroke-linecap="round" />
+              <g font-family="Vazirmatn" direction="rtl" text-anchor="start" font-size="22" fill="#ff8f00">
+                <text x="940" y="440">← معادله «درجه یک» می‌شود!</text>
+              </g>
+              <rect x="70" y="150" width="380" height="300" rx="14" fill="#f6f8fb" stroke="#e4e9f0" />
+              <path d="M100 400 H 430 M 140 170 V 430" stroke="#9aa8b6" stroke-width="2" />
+              <path d="M110 420 L 420 190" stroke="#2bb673" stroke-width="5" stroke-linecap="round" />
+              <path d="M120 180 Q 260 640 400 180" stroke="#1e88e5" stroke-width="4" fill="none" stroke-dasharray="10 8" opacity=".6" />
+              <g font-family="Vazirmatn" font-size="15" fill="#7a8899" direction="rtl" text-anchor="middle">
+                <text x="260" y="476">خط (درجه یک) در برابر سهمی (درجه دو)</text>
+              </g>
+              <path d="M520 470 c 60 30 300 30 380 -6" stroke="#ff8f00" stroke-width="3" fill="none" stroke-linecap="round" />
+            </svg>
+            <div class="presenter"><div class="av" style="background: #e65100">س‌م</div> دکتر سارا محمدی در حال نوشتن…</div>
+            <div class="cursor" id="cur" style="left: 62%; top: 52%"><i data-i="pointer"></i><span>دکتر محمدی</span></div>
+            <div class="zoomer">
+              <button title="کوچک‌نمایی"><i data-i="zoomOut"></i></button><span>۱۰۰٪</span
+              ><button title="بزرگ‌نمایی"><i data-i="zoomIn"></i></button><button title="تناسب"><i data-i="fit"></i></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- left column: videos + tools -->
+        <div class="col">
+          <section class="mod">
+            <header>
+              <i data-i="cam"></i>
+              <h3>تصاویر</h3>
+              <span class="cnt">۴ دوربین</span>
+              <div class="ctl">
+                <button title="شبکه‌ای"><i data-i="grid"></i></button>
+                <button title="کوچک کردن" onclick="this.closest('.mod').classList.toggle('min')"><i data-i="chevD"></i></button>
+              </div>
+            </header>
+            <div class="vids">
+              <div class="v big speak">
+                <div class="fakecam" style="--h: 25"></div>
+                <div class="n">
+                  <span><span class="eq"><i></i><i></i><i></i></span> دکتر سارا محمدی</span>
+                </div>
+              </div>
+              <div class="v">
+                <div class="fakecam" style="--h: 280"></div>
+                <div class="n"><span><i data-i="micOff"></i> علی (شما)</span></div>
+              </div>
+              <div class="v">
+                <div class="fakecam" style="--h: 160"></div>
+                <div class="n"><span><i data-i="micOff"></i> مریم</span></div>
+              </div>
+              <div class="v noc">
+                <div class="av" style="background: #c0392b">ن‌ح</div>
+                <div class="n"><span><span class="eq"><i></i><i></i><i></i></span> نگار</span></div>
+              </div>
+              <div class="v noc">
+                <div class="av" style="background: #d35400">ر‌ک</div>
+                <div class="n"><span><i data-i="micOff"></i> رضا</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mod flex">
+            <header>
+              <i data-i="apps"></i>
+              <h3>ابزارهای کلاس</h3>
+              <div class="ctl">
+                <button title="کوچک کردن" onclick="this.closest('.mod').classList.toggle('min')"><i data-i="chevD"></i></button>
+              </div>
+            </header>
+            <div class="timer">
+              <div style="flex: 1">
+                <small>زمان تمرین کلاسی</small>
+                <b id="cd">۰۴:۵۹</b>
+              </div>
+              <button title="توقف"><i data-i="clock"></i></button>
+            </div>
+            <div class="qa">
+              <button><i data-i="poll"></i> نظرسنجی</button>
+              <button><i data-i="question"></i> آزمونک</button>
+              <button><i data-i="breakout"></i> اتاق گروهی</button>
+              <button><i data-i="files"></i> فایل‌ها</button>
+              <button><i data-i="sparkle"></i> قرعه‌کشی</button>
+              <button><i data-i="clock"></i> حضور و غیاب</button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- ===== bottom toolbar ===== -->
+      <footer class="bar">
+        <div class="l">
+          <div class="lvl">
+            <i data-i="speaker"></i>
+            <div class="meter"><i id="lvl"></i></div>
+          </div>
+        </div>
+        <div class="c">
+          <button class="tb off" id="mic" onclick="tg(this,'mic')">
+            <span class="ic"><i data-i="micOff"></i></span>میکروفون<span class="dd"><i data-i="chevD"></i></span>
+          </button>
+          <button class="tb on" id="cam" onclick="tg(this,'cam')">
+            <span class="ic"><i data-i="cam"></i></span>دوربین<span class="dd"><i data-i="chevD"></i></span>
+          </button>
+          <button class="tb" onclick="this.classList.toggle('on')">
+            <span class="ic"><i data-i="screen"></i></span>اشتراک صفحه
+          </button>
+          <button class="tb hand" onclick="this.classList.toggle('on')">
+            <span class="ic"><i data-i="hand"></i></span>اجازه صحبت
+          </button>
+          <button class="tb"><span class="ic"><i data-i="smile"></i></span>واکنش</button>
+          <button class="tb"><span class="ic"><i data-i="moreH"></i></span>بیشتر</button>
+        </div>
+        <div class="r">
+          <button class="startbtn"><i data-i="rec"></i> توقف ضبط</button>
+          <button class="exit"><i data-i="leave"></i> خروج از کلاس</button>
+        </div>
+      </footer>
+    </div>
+    <a class="mock-back" href="index.html">بازگشت به گالری طرح‌ها</a>
+
+    <script src="shared/icons.js"></script>
+    <script>
+      const U = [
+        ['دکتر سارا محمدی', 'مدرس', '#e65100', 't', 'mic cam'],
+        ['کامران نیک‌پور', 'دستیار', '#1565c0', 'a', 'mic cam'],
+        ['علی رضایی', 'شما', '#8e44ad', '', 'cam'],
+        ['مریم احمدی', 'دانش‌آموز', '#16a085', '', 'cam hand'],
+        ['رضا کریمی', 'دانش‌آموز', '#d35400', '', 'hand'],
+        ['نگار حسینی', 'دانش‌آموز', '#c0392b', '', 'mic'],
+        ['امیر جعفری', 'دانش‌آموز', '#27ae60', '', ''],
+        ['زهرا موسوی', 'دانش‌آموز', '#e67e22', '', ''],
+        ['حسین نوری', 'موبایل', '#2980b9', '', ''],
+        ['فاطمه صادقی', 'دانش‌آموز', '#9b59b6', '', ''],
+        ['پارسا عباسی', 'دانش‌آموز', '#1abc9c', '', ''],
+        ['سپیده رحیمی', 'دانش‌آموز', '#e74c3c', '', ''],
+      ];
+      const ini = (n) =>
+        n
+          .replace('دکتر ', '')
+          .split(' ')
+          .map((p) => p[0])
+          .join('‌');
+      let filter = 'all';
+      function renderUsers() {
+        const q = document.getElementById('usearch').value.trim();
+        document.getElementById('ulist').innerHTML = U.filter(
+          ([n, , , r, p]) =>
+            (filter === 'all' || (filter === 'hand' && p.includes('hand')) || (filter === 'mod' && r)) && (!q || n.includes(q)),
+        )
+          .map(
+            ([n, s, c, r, p]) => `
+          <div class="u">
+            <div class="av" style="background:${c}">${ini(n)}<span class="on"></span></div>
+            <div class="nm"><b>${n} ${r ? `<span class="role ${r}">${r === 't' ? 'مدرس' : 'دستیار'}</span>` : ''}</b><small>${s}</small></div>
+            <div class="perm">
+              ${p.includes('hand') ? `<button class="h" title="دست بالا">${icon('hand')}</button>` : ''}
+              <button class="${p.includes('mic') ? 'y' : ''}" title="مجوز میکروفون">${icon(p.includes('mic') ? 'mic' : 'micOff')}</button>
+              <button class="${p.includes('cam') ? 'y' : ''}" title="مجوز دوربین">${icon(p.includes('cam') ? 'cam' : 'camOff')}</button>
+            </div>
+          </div>`,
+          )
+          .join('');
+      }
+      renderUsers();
+      document.getElementById('usearch').oninput = renderUsers;
+      document.querySelectorAll('#utabs button').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('#utabs button').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+            filter = b.dataset.f;
+            renderUsers();
+          }),
+      );
+      // generic tab groups
+      document.querySelectorAll('.tabs:not(#utabs), #dtabs').forEach((g) =>
+        g.querySelectorAll('button:not(.add)').forEach(
+          (b) =>
+            (b.onclick = () => {
+              g.querySelectorAll('button').forEach((x) => x.classList.remove('on'));
+              b.classList.add('on');
+            }),
+        ),
+      );
+      document.querySelectorAll('#wb [data-t]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('#wb [data-t]').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+          }),
+      );
+      document.querySelectorAll('.col-dot').forEach(
+        (d) =>
+          (d.onclick = () => {
+            document.querySelectorAll('.col-dot').forEach((x) => x.classList.remove('on'));
+            d.classList.add('on');
+          }),
+      );
+      function tg(b, k) {
+        const on = !b.classList.contains('on');
+        b.classList.toggle('on', on);
+        b.classList.toggle('off', !on);
+        b.querySelector('.ic').innerHTML = icon(on ? k : k + 'Off');
+      }
+      // chat
+      document.getElementById('sendForm').onsubmit = (e) => {
+        e.preventDefault();
+        const i = document.getElementById('sendIn');
+        if (!i.value.trim()) return;
+        const d = document.createElement('div');
+        d.className = 'bub me';
+        d.textContent = i.value;
+        d.insertAdjacentHTML('beforeend', '<time>اکنون</time>');
+        const m = document.getElementById('msgs');
+        m.appendChild(d);
+        m.scrollTop = m.scrollHeight;
+        i.value = '';
+      };
+      // clocks
+      const fa = (n, l = 2) => n.toLocaleString('fa-IR', { minimumIntegerDigits: l, useGrouping: false });
+      let s = 42 * 60 + 15,
+        cd = 299;
+      setInterval(() => {
+        s++;
+        cd = Math.max(0, cd - 1);
+        document.getElementById('clock').textContent = `${fa(0)}:${fa(Math.floor(s / 60))}:${fa(s % 60)}`;
+        document.getElementById('cd').textContent = `${fa(Math.floor(cd / 60))}:${fa(cd % 60)}`;
+      }, 1000);
+      // audio level + cursor
+      setInterval(() => (document.getElementById('lvl').style.width = 15 + Math.random() * 70 + '%'), 160);
+      const pts = [
+        [62, 52],
+        [40, 38],
+        [55, 70],
+        [70, 30],
+      ];
+      let k = 0;
+      setInterval(() => {
+        k = (k + 1) % pts.length;
+        const c = document.getElementById('cur');
+        c.style.left = pts[k][0] + '%';
+        c.style.top = pts[k][1] + '%';
+      }, 1600);
+    </script>
+  </body>
+</html>

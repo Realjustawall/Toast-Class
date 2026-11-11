@@ -1,0 +1,25 @@
+.application-settings-page label.settings-check {
+  justify-content: flex-start;
+  gap: 10px;
+  line-height: 1.6;
+}
+.application-settings-page .settings-check input[type='checkbox'] {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  margin: 0;
+  accent-color: #2563eb;
+}
+.application-settings-page > header p {
+  font-size: 12px;
+  margin: 6px 0 0;
+  line-height: 1.5;
+}
+.application-settings-page > header > div {
+  min-width: 0;
+  flex: 1;
+}
+.application-settings-page > header > button {
+  flex: 0 0 auto;
+}

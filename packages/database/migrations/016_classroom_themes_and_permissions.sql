@@ -1,0 +1,9 @@
+ALTER TABLE organizations ADD COLUMN default_classroom_theme text NOT NULL DEFAULT 'classic-bbb';
+ALTER TABLE classrooms ADD COLUMN theme text NOT NULL DEFAULT 'classic-bbb';
+ALTER TABLE classrooms ADD COLUMN chat_enabled boolean NOT NULL DEFAULT true;
+ALTER TABLE classrooms ADD COLUMN hand_raise_enabled boolean NOT NULL DEFAULT true;
+ALTER TABLE classrooms ADD COLUMN student_whiteboard_enabled boolean NOT NULL DEFAULT false;
+ALTER TABLE classrooms ADD COLUMN default_microphone boolean NOT NULL DEFAULT true;
+ALTER TABLE classrooms ADD COLUMN default_camera boolean NOT NULL DEFAULT true;
+ALTER TABLE classrooms ADD COLUMN default_screen_share boolean NOT NULL DEFAULT true;
+ALTER TABLE classrooms ADD COLUMN locked boolean NOT NULL DEFAULT false;

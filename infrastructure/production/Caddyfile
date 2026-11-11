@@ -1,0 +1,38 @@
+{
+  admin off
+  email {$ACME_EMAIL}
+}
+{$APP_HOST} {
+  @mathAssets path /geogebra/* /vendor/geogebra/*
+  handle @mathAssets {
+    respond "Not found" 404
+  }
+  header {
+    X-Content-Type-Options nosniff
+    Referrer-Policy same-origin
+    X-Frame-Options SAMEORIGIN
+    Strict-Transport-Security "max-age=31536000"
+    Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' wss://{$APP_HOST}; media-src 'self' blob:; worker-src 'self' blob:; frame-src 'self' https://math.{$APP_HOST}; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'"
+    -Server
+  }
+  handle /api/* {
+    reverse_proxy 127.0.0.1:{$API_PORT}
+  }
+  handle {
+    root * /srv/toaster
+    try_files {path} /index.html
+    file_server
+  }
+}
+math.{$APP_HOST} {
+  root * /srv/toaster
+  @mathAssets path /geogebra/* /vendor/geogebra/*
+  handle @mathAssets {
+    header Access-Control-Allow-Origin "*"
+    header X-Content-Type-Options nosniff
+    file_server
+  }
+  handle {
+    respond "Not found" 404
+  }
+}

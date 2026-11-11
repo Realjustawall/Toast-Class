@@ -1,0 +1,52 @@
+name: TOASTER native MySQL
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  mysql:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      mysql:
+        image: mysql:8.4@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
+        env:
+          # Public disposable test credential; never a deployment default.
+          MYSQL_ROOT_PASSWORD: ephemeral-ci-only
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_DATABASE: toaster_admin_test
+        ports: ['127.0.0.1:3306:3306']
+        options: >-
+          --health-cmd "MYSQL_PWD=ephemeral-ci-only mysql --protocol=TCP -h 127.0.0.1 -uroot -e 'SELECT 1'"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 30
+    env:
+      TEST_DATABASE_ENGINE: mysql
+      TEST_MYSQL_ADMIN_URL: mysql://root:ephemeral-ci-only@127.0.0.1:3306/toaster_admin_test
+      TEST_MYSQL_RECOVERY_DOCKER: 'true'
+      TEST_PLATFORM_ADMIN_SEED: 'true'
+      TEST_WEB_BUILD: 'true'
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run format:check
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run build:server
+      - run: npm audit --audit-level=high
+      - uses: actions/upload-artifact@v7.0.2
+        if: always()
+        with:
+          name: mysql-browser-evidence
+          path: |
+            test-results/
+            docs/screenshots/
+          retention-days: 7

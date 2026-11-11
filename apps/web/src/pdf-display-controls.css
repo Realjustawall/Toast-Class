@@ -1,0 +1,11 @@
+.classroom-shell[data-theme] .shared-workspace-bar .pdf-display-mode {
+  width: 160px;
+  max-width: min(160px, 100%);
+  min-width: 140px;
+  flex: 0 0 160px;
+  height: 28px;
+  min-height: 28px;
+  padding: 3px 5px;
+  font-size: 11px;
+  margin: 0;
+}

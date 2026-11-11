@@ -1,0 +1,1418 @@
+﻿<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>طرح ۱ — کلاسیک (الهام از BigBlueButton)</title>
+    <link rel="stylesheet" href="shared/common.css" />
+    <style>
+      :root {
+        --primary: #0f70d7;
+        --primary-h: #0b5bb0;
+        --danger: #df2721;
+        --success: #00a383;
+        --dark: #06172a;
+        --dark-2: #0d2238;
+        --dark-3: #18324d;
+        --panel: #f3f6f9;
+        --line: #dfe4ea;
+        --txt: #1c2733;
+        --muted: #6b7a89;
+      }
+      body {
+        background: var(--dark);
+        color: var(--txt);
+        font-size: 14px;
+      }
+      .app {
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 64px auto auto 1fr;
+      }
+
+      /* ---------- navigation rail ---------- */
+      .rail {
+        background: #fff;
+        border-inline-end: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 12px 0;
+        gap: 6px;
+      }
+      .rail .logo {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, #ae471c, #e07a3f);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        margin-bottom: 12px;
+      }
+      .rail button {
+        position: relative;
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        transition: 0.15s;
+      }
+      .rail button:hover {
+        background: var(--panel);
+        color: var(--txt);
+      }
+      .rail button.on {
+        background: #e7f0fb;
+        color: var(--primary);
+      }
+      .rail button.on::before {
+        content: '';
+        position: absolute;
+        inset-inline-start: -10px;
+        top: 10px;
+        bottom: 10px;
+        width: 3px;
+        border-radius: 3px;
+        background: var(--primary);
+      }
+      .rail .badge {
+        position: absolute;
+        top: 4px;
+        inset-inline-end: 4px;
+        min-width: 17px;
+        height: 17px;
+        padding: 0 4px;
+        border-radius: 9px;
+        background: var(--danger);
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        border: 2px solid #fff;
+      }
+      .rail .sep {
+        width: 28px;
+        height: 1px;
+        background: var(--line);
+        margin: 6px 0;
+      }
+      .rail .grow {
+        flex: 1;
+      }
+
+      /* ---------- user list ---------- */
+      .userlist {
+        width: 250px;
+        background: var(--panel);
+        border-inline-end: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .userlist.hide,
+      .chat.hide {
+        display: none;
+      }
+      .ul-sec {
+        padding: 14px 14px 4px;
+      }
+      .ul-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .ul-title button {
+        color: var(--muted);
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+      }
+      .ul-title button:hover {
+        background: #e3e9ef;
+      }
+      .ul-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .ul-item:hover {
+        background: #e6ebf0;
+      }
+      .ul-item.active {
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+      }
+      .ul-item .i {
+        color: var(--muted);
+      }
+      .ul-item .count {
+        margin-inline-start: auto;
+        background: var(--primary);
+        color: #fff;
+        font-size: 11px;
+        border-radius: 9px;
+        padding: 0 7px;
+      }
+      .users {
+        flex: 1;
+        overflow: auto;
+        padding: 0 8px 12px;
+      }
+      .user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 7px 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        position: relative;
+      }
+      .user:hover {
+        background: #e6ebf0;
+      }
+      .user:hover .u-actions {
+        opacity: 1;
+      }
+      .av {
+        position: relative;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 13px;
+        flex: none;
+      }
+      .av.mod {
+        border-radius: 9px;
+      }
+      .av.talking {
+        box-shadow:
+          0 0 0 2px var(--panel),
+          0 0 0 4px var(--success);
+        animation: pulse 1.2s infinite;
+      }
+      @keyframes pulse {
+        50% {
+          box-shadow:
+            0 0 0 2px var(--panel),
+            0 0 0 6px rgba(0, 163, 131, 0.35);
+        }
+      }
+      .av .tag {
+        position: absolute;
+        bottom: -4px;
+        inset-inline-start: -4px;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--primary);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+      .av .tag .i {
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.4;
+      }
+      .user .nm {
+        flex: 1;
+        min-width: 0;
+        line-height: 1.35;
+      }
+      .user .nm b {
+        display: block;
+        font-weight: 600;
+        font-size: 13.5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .user .nm small {
+        color: var(--muted);
+        font-size: 11.5px;
+      }
+      .user .st {
+        display: flex;
+        gap: 2px;
+        color: var(--muted);
+      }
+      .user .st .i {
+        width: 16px;
+        height: 16px;
+      }
+      .user .st .muted {
+        color: var(--danger);
+      }
+      .user .st .hand {
+        color: #e79b00;
+      }
+      .u-actions {
+        position: absolute;
+        inset-inline-end: 6px;
+        opacity: 0;
+        display: flex;
+        gap: 2px;
+        background: #e6ebf0;
+        transition: 0.15s;
+      }
+      .u-actions button {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .u-actions button:hover {
+        background: #fff;
+        color: var(--primary);
+      }
+      .u-actions .i {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* ---------- chat ---------- */
+      .chat {
+        width: 300px;
+        background: #fff;
+        border-inline-end: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+      }
+      .panel-head {
+        height: 56px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .panel-head h2 {
+        font-size: 15px;
+        margin: 0;
+        flex: 1;
+      }
+      .ibtn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+      }
+      .ibtn:hover {
+        background: var(--panel);
+        color: var(--txt);
+      }
+      .msgs {
+        flex: 1;
+        overflow: auto;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .sys {
+        align-self: center;
+        background: var(--panel);
+        color: var(--muted);
+        font-size: 12px;
+        padding: 4px 12px;
+        border-radius: 99px;
+      }
+      .msg {
+        display: flex;
+        gap: 10px;
+      }
+      .msg .av {
+        width: 30px;
+        height: 30px;
+        font-size: 12px;
+      }
+      .msg .body {
+        flex: 1;
+        min-width: 0;
+      }
+      .msg .meta {
+        display: flex;
+        gap: 8px;
+        align-items: baseline;
+      }
+      .msg .meta b {
+        font-size: 13px;
+      }
+      .msg .meta time {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .msg p {
+        margin: 3px 0 0;
+        line-height: 1.7;
+        color: #2c3a48;
+      }
+      .msg.mod .meta b::after {
+        content: 'مدرس';
+        font-size: 10px;
+        font-weight: 600;
+        background: #e7f0fb;
+        color: var(--primary);
+        padding: 1px 6px;
+        border-radius: 4px;
+        margin-inline-start: 6px;
+      }
+      .typing {
+        font-size: 12px;
+        color: var(--muted);
+        padding: 0 14px 6px;
+        height: 20px;
+      }
+      .composer {
+        padding: 10px 12px 14px;
+        border-top: 1px solid var(--line);
+      }
+      .composer form {
+        display: flex;
+        gap: 8px;
+        align-items: flex-end;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 6px;
+      }
+      .composer form:focus-within {
+        border-color: var(--primary);
+        background: #fff;
+      }
+      .composer textarea {
+        flex: 1;
+        border: 0;
+        background: none;
+        resize: none;
+        outline: none;
+        padding: 6px;
+        height: 36px;
+        line-height: 1.6;
+      }
+      .composer .send {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--primary);
+        color: #fff;
+        display: grid;
+        place-items: center;
+      }
+      .composer .send .i {
+        transform: scaleX(-1);
+      }
+
+      /* ---------- main ---------- */
+      .main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        color: #fff;
+      }
+      .navbar {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 18px;
+      }
+      .navbar .ibtn {
+        color: #c8d3de;
+        position: relative;
+      }
+      .navbar .ibtn:hover {
+        background: var(--dark-3);
+        color: #fff;
+      }
+      .navbar .dot {
+        position: absolute;
+        top: 6px;
+        inset-inline-end: 6px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--danger);
+      }
+      .title {
+        flex: 1;
+        text-align: center;
+      }
+      .title b {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .title small {
+        display: block;
+        color: #8ea2b6;
+        font-size: 12px;
+      }
+      .rec {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid var(--dark-3);
+        border-radius: 99px;
+        padding: 6px 14px 6px 10px;
+        font-size: 13px;
+        color: #c8d3de;
+      }
+      .rec.on {
+        border-color: rgba(223, 39, 33, 0.5);
+        background: rgba(223, 39, 33, 0.12);
+        color: #fff;
+      }
+      .rec .i {
+        color: var(--danger);
+      }
+      .rec.on .i {
+        animation: blink 1.4s infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0.3;
+        }
+      }
+      .conn {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: #61d4b3;
+      }
+      .content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 0 14px 0;
+        min-height: 0;
+      }
+      .cams {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        height: 132px;
+        flex: none;
+      }
+      .cams.hide {
+        display: none;
+      }
+      .tile {
+        position: relative;
+        height: 100%;
+        aspect-ratio: 16/10;
+        border-radius: 10px;
+        overflow: hidden;
+        outline: 2px solid transparent;
+        transition: outline 0.2s;
+      }
+      .tile.talk {
+        outline-color: var(--success);
+      }
+      .tile .fakecam {
+        position: absolute;
+        inset: 0;
+      }
+      .tile .lbl {
+        position: absolute;
+        bottom: 6px;
+        inset-inline-start: 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: rgba(6, 23, 42, 0.7);
+        backdrop-filter: blur(4px);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+      }
+      .tile .lbl .i {
+        width: 14px;
+        height: 14px;
+      }
+      .tile.off {
+        background: var(--dark-2);
+        display: grid;
+        place-items: center;
+      }
+      .tile.off .av {
+        width: 52px;
+        height: 52px;
+        font-size: 18px;
+      }
+      .tile .more {
+        position: absolute;
+        top: 6px;
+        inset-inline-end: 6px;
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: rgba(6, 23, 42, 0.55);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+      }
+      .tile:hover .more {
+        opacity: 1;
+      }
+      .tile.plus {
+        background: var(--dark-2);
+        display: grid;
+        place-items: center;
+        color: #8ea2b6;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      .pres {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        border-radius: 10px;
+        overflow: hidden;
+        background: var(--dark-2);
+        position: relative;
+      }
+      .pres-stage {
+        flex: 1;
+        min-height: 0;
+        display: grid;
+        place-items: center;
+        padding: 14px;
+        padding-inline-end: 70px;
+        position: relative;
+      }
+      .slide {
+        width: 100%;
+        height: 100%;
+        direction: ltr;
+        filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.35));
+        transition: transform 0.2s;
+      }
+      .tools {
+        position: absolute;
+        inset-inline-end: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        border-radius: 12px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.3);
+        color: #3b4a59;
+      }
+      .tools button {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+      }
+      .tools button:hover {
+        background: var(--panel);
+      }
+      .tools button.on {
+        background: var(--primary);
+        color: #fff;
+      }
+      .tools .sw {
+        width: 38px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        justify-content: center;
+        padding: 6px 0;
+        border-top: 1px solid var(--line);
+        margin-top: 4px;
+      }
+      .tools .sw span {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+      .tools .sw span.on {
+        outline: 2px solid var(--primary);
+        outline-offset: 1px;
+      }
+      .pres-bar {
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        border-top: 1px solid var(--dark-3);
+        color: #c8d3de;
+        flex: none;
+        position: relative;
+      }
+      .pres-bar .ibtn {
+        color: #c8d3de;
+      }
+      .pres-bar .ibtn:hover {
+        background: var(--dark-3);
+        color: #fff;
+      }
+      .pres-bar select {
+        background: var(--dark-3);
+        border: 0;
+        border-radius: 6px;
+        padding: 5px 10px;
+        color: #fff;
+      }
+      .pres-bar .zoom {
+        min-width: 48px;
+        text-align: center;
+        font-size: 13px;
+      }
+      .pres-bar .vsep {
+        width: 1px;
+        height: 22px;
+        background: var(--dark-3);
+        margin: 0 6px;
+      }
+      .pres-bar .name {
+        position: absolute;
+        inset-inline-start: 16px;
+        font-size: 12px;
+        color: #8ea2b6;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      /* ---------- actions bar ---------- */
+      .actions {
+        height: 78px;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        align-items: center;
+        padding: 0 18px;
+        flex: none;
+      }
+      .actions .start,
+      .actions .end {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .actions .end {
+        justify-content: flex-end;
+      }
+      .actions .center {
+        display: flex;
+        gap: 14px;
+      }
+      .rb {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--dark-3);
+        color: #fff;
+        position: relative;
+        transition: 0.15s;
+      }
+      .rb:hover {
+        filter: brightness(1.15);
+      }
+      .rb.on {
+        background: var(--primary);
+      }
+      .rb.off-red {
+        background: var(--danger);
+      }
+      .rb.ghost {
+        background: transparent;
+        border: 2px solid var(--dark-3);
+      }
+      .rb.hand.on {
+        background: #e79b00;
+      }
+      .rb .tip {
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        color: var(--txt);
+        font-size: 12px;
+        white-space: nowrap;
+        padding: 4px 10px;
+        border-radius: 6px;
+        pointer-events: none;
+        opacity: 0;
+        transition: 0.15s;
+      }
+      .rb:hover .tip {
+        opacity: 1;
+      }
+      .rb .caret {
+        position: absolute;
+        bottom: -2px;
+        inset-inline-start: -2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #fff;
+        color: var(--dark);
+        display: grid;
+        place-items: center;
+        border: 2px solid var(--dark);
+      }
+      .rb .caret .i {
+        width: 12px;
+        height: 12px;
+        stroke-width: 2.6;
+      }
+      .session {
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #8ea2b6;
+      }
+      .session b {
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* ---------- popovers ---------- */
+      .menu {
+        position: absolute;
+        bottom: 84px;
+        background: #fff;
+        color: var(--txt);
+        border-radius: 12px;
+        padding: 6px;
+        min-width: 250px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        display: none;
+        z-index: 30;
+      }
+      .menu.open {
+        display: block;
+        animation: pop 0.15s ease-out;
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+      }
+      .menu button {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 10px 12px;
+        border-radius: 8px;
+        text-align: start;
+        font-weight: 500;
+      }
+      .menu button:hover {
+        background: var(--panel);
+      }
+      .menu button .i {
+        color: var(--primary);
+      }
+      .menu hr {
+        border: 0;
+        border-top: 1px solid var(--line);
+        margin: 4px 0;
+      }
+      .menu .h {
+        font-size: 11px;
+        color: var(--muted);
+        font-weight: 700;
+        padding: 6px 12px 2px;
+      }
+      #plusMenu {
+        inset-inline-start: 18px;
+      }
+      .reactions {
+        position: absolute;
+        bottom: 84px;
+        inset-inline-end: 18px;
+        background: #fff;
+        border-radius: 99px;
+        padding: 6px 8px;
+        display: none;
+        gap: 4px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+        z-index: 30;
+      }
+      .reactions.open {
+        display: flex;
+        animation: pop 0.15s ease-out;
+      }
+      .reactions button {
+        font-size: 22px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+      .reactions button:hover {
+        background: var(--panel);
+        transform: scale(1.15);
+      }
+      .float-emoji {
+        position: absolute;
+        font-size: 32px;
+        bottom: 90px;
+        animation: up 2.2s ease-out forwards;
+        pointer-events: none;
+        z-index: 40;
+      }
+      @keyframes up {
+        to {
+          transform: translateY(-260px);
+          opacity: 0;
+        }
+      }
+
+      /* poll card (student side) */
+      .poll {
+        position: absolute;
+        bottom: 62px;
+        inset-inline-start: 14px;
+        width: 270px;
+        background: #fff;
+        color: var(--txt);
+        border-radius: 12px;
+        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+        padding: 14px;
+        z-index: 20;
+      }
+      .poll header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+      .poll header .i {
+        color: var(--primary);
+      }
+      .poll header b {
+        flex: 1;
+      }
+      .poll p {
+        margin: 0 0 10px;
+        font-weight: 600;
+      }
+      .poll .opts {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+      .poll .opts button {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px;
+        font-weight: 600;
+        transition: 0.15s;
+      }
+      .poll .opts button:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .poll .opts button.sel {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: #fff;
+      }
+      .poll small {
+        display: block;
+        color: var(--muted);
+        margin-top: 8px;
+        font-size: 11.5px;
+      }
+
+      .toast {
+        position: absolute;
+        top: 72px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #fff;
+        color: var(--txt);
+        border-radius: 10px;
+        padding: 10px 14px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+        z-index: 50;
+        font-weight: 500;
+        animation: pop 0.2s;
+      }
+      .toast .i {
+        color: #e79b00;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- Navigation rail -->
+      <nav class="rail" aria-label="ناوبری کلاس">
+        <div class="logo">T</div>
+        <button class="on" data-panel="userlist" title="کاربران">
+          <i data-i="users"></i><span class="badge">۱۲</span>
+        </button>
+        <button class="on" data-panel="chat" title="گفتگو">
+          <i data-i="chat"></i><span class="badge">۳</span>
+        </button>
+        <button title="یادداشت مشترک"><i data-i="notes"></i></button>
+        <div class="sep"></div>
+        <button title="نظرسنجی"><i data-i="poll"></i></button>
+        <button title="اتاق‌های گروهی"><i data-i="breakout"></i></button>
+        <button title="فایل‌ها"><i data-i="files"></i></button>
+        <button title="حضور و غیاب"><i data-i="clock"></i></button>
+        <div class="grow"></div>
+        <button title="تنظیمات"><i data-i="settings"></i></button>
+      </nav>
+
+      <!-- User list -->
+      <aside class="userlist" id="userlist">
+        <div class="ul-sec">
+          <div class="ul-title">پیام‌ها</div>
+          <div class="ul-item active"><i data-i="chat"></i> گفتگوی عمومی <span class="count">۳</span></div>
+          <div class="ul-item"><i data-i="question"></i> پرسش و پاسخ</div>
+        </div>
+        <div class="ul-sec">
+          <div class="ul-title">یادداشت‌ها</div>
+          <div class="ul-item"><i data-i="notes"></i> یادداشت مشترک</div>
+        </div>
+        <div class="ul-sec">
+          <div class="ul-title">
+            <span>کاربران (۱۲)</span>
+            <span>
+              <button title="جستجو"><i data-i="search"></i></button>
+              <button title="مدیریت"><i data-i="settings"></i></button>
+            </span>
+          </div>
+        </div>
+        <div class="users" id="users"></div>
+      </aside>
+
+      <!-- Chat -->
+      <aside class="chat" id="chat">
+        <div class="panel-head">
+          <h2>گفتگوی عمومی</h2>
+          <button class="ibtn" title="گزینه‌ها"><i data-i="more"></i></button>
+          <button class="ibtn" title="بستن" onclick="togglePanel('chat')"><i data-i="close"></i></button>
+        </div>
+        <div class="msgs" id="msgs">
+          <div class="sys">به کلاس «ریاضی دهم — جلسه ۱۲» خوش آمدید</div>
+          <div class="msg mod">
+            <div class="av mod" style="background: #0f70d7">س‌م</div>
+            <div class="body">
+              <div class="meta"><b>دکتر سارا محمدی</b><time>۱۸:۰۲</time></div>
+              <p>سلام به همه 👋 امروز می‌ریم سراغ معادلات درجه دوم و روش دلتا.</p>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="av" style="background: #8e44ad">ع‌ر</div>
+            <div class="body">
+              <div class="meta"><b>علی رضایی</b><time>۱۸:۰۳</time></div>
+              <p>سلام استاد، صدا خیلی خوبه 👌</p>
+            </div>
+          </div>
+          <div class="msg">
+            <div class="av" style="background: #16a085">م‌ا</div>
+            <div class="body">
+              <div class="meta"><b>مریم احمدی</b><time>۱۸:۰۵</time></div>
+              <p>ببخشید فایل جزوه جلسه قبل رو کجا آپلود کردید؟</p>
+            </div>
+          </div>
+          <div class="msg mod">
+            <div class="av mod" style="background: #0f70d7">س‌م</div>
+            <div class="body">
+              <div class="meta"><b>دکتر سارا محمدی</b><time>۱۸:۰۶</time></div>
+              <p>از منوی «فایل‌ها» قابل دانلوده 📎</p>
+            </div>
+          </div>
+        </div>
+        <div class="typing" id="typing">رضا کریمی در حال نوشتن…</div>
+        <div class="composer">
+          <form id="chatForm">
+            <textarea id="chatIn" placeholder="ارسال پیام به گفتگوی عمومی"></textarea>
+            <button class="ibtn" type="button" title="ایموجی"><i data-i="smile"></i></button>
+            <button class="send" title="ارسال"><i data-i="send"></i></button>
+          </form>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <section class="main">
+        <header class="navbar">
+          <button class="ibtn" title="نمایش/مخفی کردن پنل‌ها" onclick="togglePanel('userlist')">
+            <i data-i="menu"></i><span class="dot"></span>
+          </button>
+          <div class="conn"><i data-i="wifi"></i> اتصال عالی</div>
+          <div class="title">
+            <b>ریاضی پایه دهم — جلسه ۱۲</b>
+            <small>دبیرستان فرزانگان · کلاس ۱۰۲</small>
+          </div>
+          <button class="rec on" id="rec" onclick="this.classList.toggle('on')">
+            <i data-i="rec"></i> <span>در حال ضبط ۰۰:۴۲:۱۵</span>
+          </button>
+          <button class="ibtn" title="تمام صفحه"><i data-i="expand"></i></button>
+          <button class="ibtn" title="گزینه‌ها"><i data-i="more"></i></button>
+        </header>
+
+        <div class="content">
+          <div class="cams" id="cams">
+            <div class="tile talk">
+              <div class="fakecam" style="--h: 205"></div>
+              <span class="lbl"><i data-i="mic"></i> دکتر سارا محمدی</span>
+              <span class="more"><i data-i="moreH"></i></span>
+            </div>
+            <div class="tile">
+              <div class="fakecam" style="--h: 280"></div>
+              <span class="lbl"><i data-i="micOff"></i> علی رضایی</span>
+              <span class="more"><i data-i="moreH"></i></span>
+            </div>
+            <div class="tile">
+              <div class="fakecam" style="--h: 150"></div>
+              <span class="lbl"><i data-i="micOff"></i> مریم احمدی</span>
+              <span class="more"><i data-i="moreH"></i></span>
+            </div>
+            <div class="tile off">
+              <div class="av" style="background: #d35400">ر‌ک</div>
+              <span class="lbl"><i data-i="micOff"></i> رضا کریمی</span>
+            </div>
+            <div class="tile plus">+۸</div>
+          </div>
+
+          <div class="pres">
+            <div class="pres-stage">
+              <svg class="slide" id="slide" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet"><g id="slideArt"></g></svg>
+              <div class="tools" id="tools">
+                <button data-t="pointer" title="انتخاب"><i data-i="pointer"></i></button>
+                <button data-t="pen" class="on" title="قلم"><i data-i="pen"></i></button>
+                <button data-t="shape" title="شکل"><i data-i="shape"></i></button>
+                <button data-t="text" title="متن"><i data-i="text"></i></button>
+                <button data-t="laser" title="لیزر"><i data-i="laser"></i></button>
+                <button data-t="eraser" title="پاک‌کن"><i data-i="eraser"></i></button>
+                <button title="برگشت"><i data-i="undo"></i></button>
+                <div class="sw" id="swatches">
+                  <span style="background: #df2721" class="on"></span>
+                  <span style="background: #0f70d7"></span>
+                  <span style="background: #00a383"></span>
+                  <span style="background: #1c2733"></span>
+                </div>
+              </div>
+            </div>
+            <div class="pres-bar">
+              <span class="name"><i data-i="pdf"></i> فصل۲-معادلات.pdf</span>
+              <button class="ibtn" title="اسلاید قبل" onclick="slide(-1)"><i data-i="chevR"></i></button>
+              <select id="slideSel" onchange="go(+this.value)"></select>
+              <button class="ibtn" title="اسلاید بعد" onclick="slide(1)"><i data-i="chevL"></i></button>
+              <span class="vsep"></span>
+              <button class="ibtn" title="کوچک‌نمایی" onclick="zoom(-10)"><i data-i="zoomOut"></i></button>
+              <span class="zoom" id="zoom">۱۰۰٪</span>
+              <button class="ibtn" title="بزرگ‌نمایی" onclick="zoom(10)"><i data-i="zoomIn"></i></button>
+              <button class="ibtn" title="تناسب با عرض"><i data-i="fit"></i></button>
+              <span class="vsep"></span>
+              <button class="ibtn" title="مخفی کردن دوربین‌ها" onclick="document.getElementById('cams').classList.toggle('hide')">
+                <i data-i="layout"></i>
+              </button>
+              <button class="ibtn" title="تمام صفحه"><i data-i="expand"></i></button>
+            </div>
+
+            <div class="poll" id="poll">
+              <header>
+                <i data-i="poll"></i><b>نظرسنجی</b>
+                <button class="ibtn" onclick="this.closest('.poll').remove()"><i data-i="close"></i></button>
+              </header>
+              <p>اگر Δ &lt; ۰ باشد، معادله چند ریشهٔ حقیقی دارد؟</p>
+              <div class="opts">
+                <button>صفر</button>
+                <button>یک</button>
+                <button>دو</button>
+                <button>بی‌شمار</button>
+              </div>
+              <small>پاسخ‌ها ناشناس است · ۷ نفر پاسخ داده‌اند</small>
+            </div>
+          </div>
+        </div>
+
+        <footer class="actions">
+          <div class="start">
+            <button class="rb on" id="plusBtn" onclick="toggle('plusMenu')">
+              <i data-i="plus"></i><span class="tip">اقدامات</span>
+            </button>
+            <button class="rb ghost" title="ارائه"><i data-i="slides"></i><span class="tip">مخفی کردن ارائه</span></button>
+            <div class="session"><i data-i="clock"></i> مدت جلسه <b id="elapsed">۴۲:۱۵</b></div>
+          </div>
+          <div class="center">
+            <button class="rb on" id="micBtn" onclick="toggleMic()">
+              <i data-i="mic"></i><span class="tip">بستن میکروفون</span>
+            </button>
+            <button class="rb on" title="صدا"><i data-i="headphones"></i><span class="tip">قطع صدا</span></button>
+            <button class="rb" id="camBtn" onclick="toggleCam()">
+              <i data-i="camOff"></i><span class="tip">اشتراک دوربین</span>
+              <span class="caret"><i data-i="chevD"></i></span>
+            </button>
+            <button class="rb" id="shareBtn" onclick="this.classList.toggle('on')">
+              <i data-i="screen"></i><span class="tip">اشتراک صفحه</span>
+            </button>
+          </div>
+          <div class="end">
+            <button class="rb" onclick="toggle('reactions')"><i data-i="smile"></i><span class="tip">واکنش‌ها</span></button>
+            <button class="rb hand" id="handBtn" onclick="this.classList.toggle('on')">
+              <i data-i="hand"></i><span class="tip">بالا بردن دست</span>
+            </button>
+            <button class="rb off-red" title="خروج"><i data-i="leave"></i><span class="tip">ترک کلاس</span></button>
+          </div>
+        </footer>
+
+        <div class="menu" id="plusMenu">
+          <div class="h">مدرس</div>
+          <button><i data-i="upload"></i> مدیریت ارائه‌ها</button>
+          <button><i data-i="poll"></i> شروع نظرسنجی</button>
+          <button><i data-i="breakout"></i> ساخت اتاق‌های گروهی</button>
+          <button><i data-i="timer"></i> تایمر کلاس</button>
+          <button><i data-i="sparkle"></i> انتخاب تصادفی دانش‌آموز</button>
+          <hr />
+          <button><i data-i="layout"></i> چیدمان صفحه</button>
+          <button><i data-i="leave"></i> پایان جلسه برای همه</button>
+        </div>
+        <div class="reactions" id="reactions">
+          <button>👍</button><button>👏</button><button>😂</button><button>😮</button><button>❤️</button
+          ><button>🎉</button>
+        </div>
+      </section>
+    </div>
+    <a class="mock-back" href="index.html">بازگشت به گالری طرح‌ها</a>
+
+    <script src="shared/icons.js"></script>
+    <script>
+      const people = [
+        ['دکتر سارا محمدی', 'مدرس · ارائه‌دهنده', '#0f70d7', 'mod pres talking', 'mic'],
+        ['دکتر کامران نیک‌پور', 'دستیار آموزشی', '#2c3e50', 'mod', 'micOff'],
+        ['علی رضایی', 'شما', '#8e44ad', '', 'micOff'],
+        ['مریم احمدی', 'دانش‌آموز', '#16a085', 'hand', 'micOff'],
+        ['رضا کریمی', 'دانش‌آموز', '#d35400', '', 'micOff'],
+        ['نگار حسینی', 'دانش‌آموز', '#c0392b', 'talking', 'mic'],
+        ['امیر جعفری', 'دانش‌آموز', '#27ae60', '', 'micOff'],
+        ['زهرا موسوی', 'دانش‌آموز', '#e67e22', '', 'micOff'],
+        ['حسین نوری', 'دانش‌آموز · موبایل', '#2980b9', '', 'micOff'],
+        ['فاطمه صادقی', 'دانش‌آموز', '#9b59b6', '', 'micOff'],
+        ['پارسا عباسی', 'دانش‌آموز', '#1abc9c', '', 'micOff'],
+        ['سپیده رحیمی', 'دانش‌آموز', '#e74c3c', '', 'micOff'],
+      ];
+      const ini = (n) =>
+        n
+          .replace('دکتر ', '')
+          .split(' ')
+          .slice(0, 2)
+          .map((p) => p[0])
+          .join('‌');
+      document.getElementById('users').innerHTML = people
+        .map(
+          ([n, r, c, f, m]) => `
+        <div class="user">
+          <div class="av ${f.includes('mod') ? 'mod' : ''} ${f.includes('talking') ? 'talking' : ''}" style="background:${c}">
+            ${ini(n)}${f.includes('pres') ? `<span class="tag">${icon('slides')}</span>` : ''}
+          </div>
+          <div class="nm"><b>${n}</b><small>${r}</small></div>
+          <div class="st">${f.includes('hand') ? icon('hand', 'hand') : ''}${icon(m, m === 'micOff' ? 'muted' : '')}</div>
+          <div class="u-actions"><button title="پیام خصوصی">${icon('chat')}</button><button title="بیشتر">${icon('more')}</button></div>
+        </div>`,
+        )
+        .join('');
+
+      /* slides */
+      const slides = [
+        `<rect width="1600" height="900" fill="#fff"/>
+         <rect width="1600" height="12" fill="#0f70d7"/>
+         <text x="1500" y="130" font-size="64" font-weight="800" text-anchor="start" direction="rtl" fill="#1c2733" font-family="Vazirmatn">معادلات درجه دوم</text>
+         <text x="1500" y="190" font-size="30" text-anchor="start" direction="rtl" fill="#6b7a89" font-family="Vazirmatn">فصل ۲ · روش دلتا و تحلیل ریشه‌ها</text>
+         <g font-family="Vazirmatn" font-size="34" fill="#2c3a48" text-anchor="start" direction="rtl">
+           <text x="1500" y="300">• شکل کلی معادله:</text>
+           <text x="1500" y="440">• مبین (دلتا):</text>
+           <text x="1500" y="580">• اگر Δ &gt; ۰ ← دو ریشهٔ متمایز</text>
+           <text x="1500" y="640">• اگر Δ = ۰ ← یک ریشهٔ مضاعف</text>
+           <text x="1500" y="700">• اگر Δ &lt; ۰ ← ریشهٔ حقیقی ندارد</text>
+         </g>
+         <text x="1220" y="370" font-size="56" font-style="italic" fill="#0f70d7" font-family="Cambria Math, serif" text-anchor="middle" direction="ltr">ax² + bx + c = 0</text>
+         <text x="1220" y="510" font-size="56" font-style="italic" fill="#0f70d7" font-family="Cambria Math, serif" text-anchor="middle" direction="ltr">Δ = b² − 4ac</text>
+         <g transform="translate(120 230)">
+           <rect width="620" height="560" rx="16" fill="#f3f6f9"/>
+           <path d="M40 480H590M310 40V520" stroke="#9aa8b6" stroke-width="3"/>
+           <path d="M80 80Q310 900 540 80" stroke="#0f70d7" stroke-width="7" fill="none"/>
+           <circle cx="195" cy="480" r="10" fill="#df2721"/><circle cx="425" cy="480" r="10" fill="#df2721"/>
+           <text x="310" y="548" font-size="24" text-anchor="middle" fill="#6b7a89" font-family="Vazirmatn">نمودار y = x² − x − 2</text>
+         </g>
+         <path d="M985 395c40-70 420-80 470-10 30 50-60 90-240 90-160 0-260-30-230-80z" stroke="#df2721" stroke-width="6" fill="none" stroke-linecap="round"/>
+         <path d="M920 600l-50 30 50 30" stroke="#df2721" stroke-width="6" fill="none" stroke-linecap="round"/>`,
+        `<rect width="1600" height="900" fill="#fff"/><rect width="1600" height="12" fill="#0f70d7"/>
+         <text x="1500" y="130" font-size="64" font-weight="800" text-anchor="start" direction="rtl" fill="#1c2733" font-family="Vazirmatn">مثال حل‌شده</text>
+         <text x="800" y="360" font-size="70" font-style="italic" fill="#0f70d7" font-family="Cambria Math, serif" text-anchor="middle" direction="ltr">x² − 5x + 6 = 0</text>
+         <text x="800" y="500" font-size="56" font-style="italic" fill="#2c3a48" font-family="Cambria Math, serif" text-anchor="middle" direction="ltr">Δ = 25 − 24 = 1</text>
+         <text x="800" y="640" font-size="56" font-style="italic" fill="#00a383" font-family="Cambria Math, serif" text-anchor="middle" direction="ltr">x₁ = 3 ,  x₂ = 2</text>`,
+        `<rect width="1600" height="900" fill="#fff"/><rect width="1600" height="12" fill="#0f70d7"/>
+         <text x="1500" y="130" font-size="64" font-weight="800" text-anchor="start" direction="rtl" fill="#1c2733" font-family="Vazirmatn">تمرین کلاسی</text>
+         <g font-family="Vazirmatn" font-size="40" fill="#2c3a48" text-anchor="start" direction="rtl">
+         <text x="1500" y="300">۱) معادلهٔ ۲x² + ۳x − ۲ = ۰ را حل کنید.</text>
+         <text x="1500" y="400">۲) به ازای چه مقدار m معادله ریشهٔ مضاعف دارد؟</text>
+         <text x="1500" y="500">۳) مجموع و حاصل‌ضرب ریشه‌ها را بیابید.</text></g>`,
+      ];
+      const fa = (n) => n.toLocaleString('fa-IR');
+      let cur = 0,
+        z = 100;
+      const sel = document.getElementById('slideSel');
+      sel.innerHTML = Array.from({ length: 24 }, (_, i) => `<option value="${i}">اسلاید ${fa(i + 1)} از ${fa(24)}</option>`).join('');
+      function go(i) {
+        cur = Math.max(0, Math.min(23, i));
+        sel.value = cur;
+        document.getElementById('slideArt').innerHTML = slides[cur % slides.length];
+      }
+      function slide(d) {
+        go(cur + d);
+      }
+      function zoom(d) {
+        z = Math.max(50, Math.min(300, z + d));
+        document.getElementById('zoom').textContent = fa(z) + '٪';
+        document.getElementById('slide').style.transform = `scale(${z / 100})`;
+      }
+      go(0);
+
+      /* panels */
+      function togglePanel(id) {
+        document.getElementById(id).classList.toggle('hide');
+        document.querySelector(`[data-panel="${id}"]`).classList.toggle('on');
+      }
+      document.querySelectorAll('[data-panel]').forEach((b) => (b.onclick = () => togglePanel(b.dataset.panel)));
+
+      /* menus */
+      function toggle(id) {
+        document.querySelectorAll('.menu.open,.reactions.open').forEach((m) => m.id !== id && m.classList.remove('open'));
+        document.getElementById(id).classList.toggle('open');
+      }
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.menu,.reactions,#plusBtn,.rb')) document.querySelectorAll('.open').forEach((m) => m.classList.remove('open'));
+      });
+      document.querySelectorAll('#reactions button').forEach((b) => {
+        b.onclick = () => {
+          const f = document.createElement('div');
+          f.className = 'float-emoji';
+          f.textContent = b.textContent;
+          f.style.insetInlineEnd = 40 + Math.random() * 120 + 'px';
+          document.querySelector('.main').appendChild(f);
+          setTimeout(() => f.remove(), 2300);
+        };
+      });
+
+      /* media toggles */
+      function toggleMic() {
+        const b = document.getElementById('micBtn');
+        const on = b.classList.toggle('on');
+        b.classList.toggle('off-red', !on);
+        b.innerHTML = icon(on ? 'mic' : 'micOff') + `<span class="tip">${on ? 'بستن میکروفون' : 'باز کردن میکروفون'}</span>`;
+      }
+      function toggleCam() {
+        const b = document.getElementById('camBtn');
+        const on = b.classList.toggle('on');
+        b.innerHTML =
+          icon(on ? 'cam' : 'camOff') +
+          `<span class="tip">${on ? 'توقف دوربین' : 'اشتراک دوربین'}</span><span class="caret">${icon('chevD')}</span>`;
+      }
+
+      /* tools */
+      document.querySelectorAll('#tools [data-t]').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('#tools [data-t]').forEach((x) => x.classList.remove('on'));
+            b.classList.add('on');
+          }),
+      );
+      document.querySelectorAll('#swatches span').forEach(
+        (s) =>
+          (s.onclick = () => {
+            document.querySelectorAll('#swatches span').forEach((x) => x.classList.remove('on'));
+            s.classList.add('on');
+          }),
+      );
+      document.querySelectorAll('.poll .opts button').forEach(
+        (b) =>
+          (b.onclick = () => {
+            document.querySelectorAll('.poll .opts button').forEach((x) => x.classList.remove('sel'));
+            b.classList.add('sel');
+          }),
+      );
+
+      /* chat */
+      document.getElementById('chatForm').onsubmit = (e) => {
+        e.preventDefault();
+        const v = document.getElementById('chatIn').value.trim();
+        if (!v) return;
+        const m = document.createElement('div');
+        m.className = 'msg';
+        m.innerHTML = `<div class="av" style="background:#8e44ad">ع‌ر</div><div class="body"><div class="meta"><b>علی رضایی</b><time>اکنون</time></div><p></p></div>`;
+        m.querySelector('p').textContent = v;
+        const box = document.getElementById('msgs');
+        box.appendChild(m);
+        box.scrollTop = box.scrollHeight;
+        document.getElementById('chatIn').value = '';
+      };
+      document.getElementById('chatIn').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          document.getElementById('chatForm').requestSubmit();
+        }
+      });
+
+      /* timer */
+      let sec = 42 * 60 + 15;
+      setInterval(() => {
+        sec++;
+        const t = fa(Math.floor(sec / 60)).padStart(2, '۰') + ':' + fa(sec % 60).padStart(2, '۰');
+        document.getElementById('elapsed').textContent = t;
+        const r = document.querySelector('#rec span');
+        if (document.getElementById('rec').classList.contains('on')) r.textContent = 'در حال ضبط ۰۰:' + t;
+        else r.textContent = 'شروع ضبط';
+      }, 1000);
+
+      /* toast */
+      setTimeout(() => {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = icon('hand') + ' مریم احمدی دستش را بالا برد';
+        document.querySelector('.main').appendChild(t);
+        setTimeout(() => t.remove(), 3500);
+      }, 1500);
+    </script>
+  </body>
+</html>

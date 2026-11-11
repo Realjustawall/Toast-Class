@@ -1,0 +1,12 @@
+# Keep the browser image version aligned with package-lock.json.
+# This is test infrastructure, not the production application image.
+FROM mcr.microsoft.com/playwright:v1.64.1-noble
+WORKDIR /work
+ENV CI=true PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+COPY package.json package-lock.json ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/web/package.json apps/web/package.json
+COPY apps/worker/package.json apps/worker/package.json
+RUN --mount=type=cache,target=/root/.npm npm ci
+COPY . .
+CMD ["npm", "run", "test:media"]
