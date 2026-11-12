@@ -19,6 +19,18 @@ export const test = base.extend<{ classroomBrowsers: Browser[] }>({
         await use(clients);
       } finally {
         console.log('Closing owned test browser servers');
+        if (process.platform === 'win32') {
+          await Promise.race([
+            Promise.allSettled(clients.map((client) => client.close())),
+            new Promise<void>((resolve) => setTimeout(resolve, 1500)),
+          ]);
+          for (const server of servers) {
+            const child = server.process();
+            if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+          }
+          console.log('Owned test browser servers stopped and clients detached');
+          return;
+        }
         // Chrome's graceful native-capture shutdown may hang on Windows. The
         // application's disconnect assertions finish before this fixture ends.
         // Kill only these recorded BrowserServer processes, then detach clients.

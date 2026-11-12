@@ -788,11 +788,6 @@
   border-radius: 24px;
   padding-inline: 16px;
 }
-.classroom-shell .classroom-apps-menu {
-  z-index: 80;
-  max-height: min(360px, 60dvh);
-  overflow: auto;
-}
 .classroom-gallery-target {
   flex: 1;
   min-height: 0;

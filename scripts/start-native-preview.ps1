@@ -52,12 +52,12 @@ if (Test-LocalPort 37890) {
   Set-Content -LiteralPath (Join-Path $runtimePath 'preview-sfu.pid') -Value $sfuProcess.Id
   Wait-LocalPort 37890
 }
-if (Test-LocalPort 5174) {
+if (Test-LocalPort 4173) {
   Assert-OwnedService (Join-Path $runtimePath 'preview.pid') $nodeExecutable
 } else {
   $previewProcess = Start-Process -FilePath $nodeExecutable -ArgumentList @('--import', 'tsx', 'scripts/native-preview.ts') -WorkingDirectory $projectRoot -WindowStyle Hidden -RedirectStandardOutput (Join-Path $runtimePath 'preview.stdout.log') -RedirectStandardError (Join-Path $runtimePath 'preview.stderr.log') -PassThru
   Set-Content -LiteralPath (Join-Path $runtimePath 'preview.pid') -Value $previewProcess.Id
-  Wait-LocalPort 5174
+  Wait-LocalPort 4173
 }
-Write-Output 'Persistent MySQL preview: http://localhost:5174'
+Write-Output 'Persistent MySQL preview: http://localhost:4173'
 Write-Output 'Local sign-in details: .local/runtime/native-preview-access.json'

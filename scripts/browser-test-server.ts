@@ -8,7 +8,7 @@ const { pool, cleanup, workerDatabaseUrl } = await testDatabase();
 const storage = await testStorage();
 const conversion = process.env.TEST_CONVERSION_DOCKER === 'true';
 const app = await buildApp(pool, {
-  origin: process.env.TEST_APP_ORIGIN ?? 'http://localhost:5173',
+  origin: process.env.TEST_APP_ORIGIN ?? 'http://localhost:4175',
   production: false,
   mediaUrl: process.env.TEST_MEDIA_URL ?? 'ws://localhost:7880',
   mediaKey: process.env.TEST_MEDIA_KEY ?? '',
@@ -18,7 +18,7 @@ const app = await buildApp(pool, {
 });
 // Trusted fixture setup only; this file is never a production entry point.
 if (process.env.TEST_PLATFORM_ADMIN_SEED === 'true') {
-  const origin = process.env.TEST_APP_ORIGIN ?? 'http://localhost:5173';
+  const origin = process.env.TEST_APP_ORIGIN ?? 'http://localhost:4175';
   const r = await app.inject({
     method: 'POST',
     url: '/api/v1/auth/register',

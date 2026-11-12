@@ -431,24 +431,7 @@ export default function Chat({
             aria-label={t(confirmClear ? 'chatConfirmClear' : 'chatClearBtn')}
             title={t(confirmClear ? 'chatConfirmClear' : 'chatClearBtn')}
             disabled={busy}
-            onClick={() => {
-              if (!confirmClear) {
-                setConfirmClear(true);
-                return;
-              }
-              void (async () => {
-                if (!beginOperation()) return;
-                try {
-                  await request(messagesPath + '/clear', {});
-                  await load();
-                  setConfirmClear(false);
-                } catch (e) {
-                  setError((e as Error).message);
-                } finally {
-                  endOperation();
-                }
-              })();
-            }}
+            onClick={() => setConfirmClear(true)}
           >
             <ClassIcon name="trash" />
             <span className="sr-only">{t(confirmClear ? 'chatConfirmClear' : 'chatClearBtn')}</span>
@@ -456,11 +439,39 @@ export default function Chat({
         )}
       </div>
       {confirmClear && (
-        <div className="chat-clear-confirm">
+        <div className="chat-clear-confirm" role="group" aria-label={t('chatConfirmClear')}>
           <span>{t('chatConfirmClear')}</span>
-          <button type="button" className="quiet" onClick={() => setConfirmClear(false)}>
-            {t('chatCancel')}
-          </button>
+          <div className="chat-clear-confirm-actions">
+            <button
+              type="button"
+              className="quiet"
+              disabled={busy}
+              onClick={() => setConfirmClear(false)}
+            >
+              {t('chatCancel')}
+            </button>
+            <button
+              type="button"
+              className="chat-clear-confirm-action"
+              disabled={busy}
+              onClick={() => {
+                if (!beginOperation()) return;
+                void (async () => {
+                  try {
+                    await request(messagesPath + '/clear', {});
+                    await load();
+                    setConfirmClear(false);
+                  } catch (e) {
+                    setError((e as Error).message);
+                  } finally {
+                    endOperation();
+                  }
+                })();
+              }}
+            >
+              {t('chatConfirmClearAction')}
+            </button>
+          </div>
         </div>
       )}
       <small role="status">

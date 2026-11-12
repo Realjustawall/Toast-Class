@@ -49,6 +49,16 @@ type Poll = {
   responseCount: number;
   myChoice: number | null;
 };
+type ClassroomAppKey =
+  'activities' | 'files' | 'geogebra' | 'breakouts' | 'attendance' | 'announcements';
+const classroomAppTitles: Record<ClassroomAppKey, string> = {
+  activities: 'activities',
+  files: 'fileLibrary',
+  geogebra: 'geoTitle',
+  breakouts: 'breakoutRooms',
+  attendance: 'attendance',
+  announcements: 'classroomAnnouncements',
+};
 
 type State = {
   selectedStudent?: { id: string; name: string } | null;
@@ -151,13 +161,28 @@ export default function Teaching({
     };
   }, [room.id]);
 
-  const [sidePanel, setSidePanel] = useState<'chat' | 'people' | null>(() =>
+  const [sidePanel, setSidePanel] = useState<'chat' | 'people' | 'apps' | null>(() =>
     window.matchMedia('(max-width:1099px)').matches || room.theme === 'immersive-glass'
       ? null
       : 'chat',
   );
   const [compact, setCompact] = useState(() => window.matchMedia('(max-width:1099px)').matches);
   const [closedPanels, setClosedPanels] = useState<Set<'chat' | 'people'>>(new Set());
+  const [appsPage, setAppsPage] = useState<ClassroomAppKey | null>(null);
+  const appZoomKey = 'classroom-app-content-zoom-v1:' + room.id;
+  const [appContentZoom, setAppContentZoom] = useState(() => {
+    try {
+      const saved = Number(localStorage.getItem(appZoomKey));
+      return Number.isFinite(saved) && saved >= 0.8 && saved <= 1.5 ? saved : 1;
+    } catch {
+      return 1;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem(appZoomKey, String(appContentZoom));
+    } catch {}
+  }, [appZoomKey, appContentZoom]);
   const [peopleFilter, setPeopleFilter] = useState<'all' | 'hands' | 'speaking'>('all');
   const [peopleSearch, setPeopleSearch] = useState('');
   const [peoplePage, setPeoplePage] = useState(0);
@@ -170,13 +195,25 @@ export default function Teaching({
   const panelOpen = (panel: 'chat' | 'people') =>
     compact || (state?.theme ?? room.theme) === 'immersive-glass'
       ? sidePanel === panel
-      : !closedPanels.has(panel);
+      : sidePanel === 'apps' && panel === 'people'
+        ? false
+        : !closedPanels.has(panel);
 
   function togglePanel(panel: 'chat' | 'people') {
     panelLayout.collapse();
     if (compact || (state?.theme ?? room.theme) === 'immersive-glass')
       setSidePanel((current) => (current === panel ? null : panel));
     else {
+      if (panel === 'people' && sidePanel === 'apps') {
+        setAppsPage(null);
+        setClosedPanels((current) => {
+          const next = new Set(current);
+          next.delete('people');
+          return next;
+        });
+        setSidePanel('people');
+        return;
+      }
       setClosedPanels((current) => {
         const next = new Set(current);
         if (next.has(panel)) next.delete(panel);
@@ -189,7 +226,25 @@ export default function Teaching({
   function closePanel(panel: 'chat' | 'people') {
     panelLayout.collapse();
     setClosedPanels((current) => new Set([...current, panel]));
-    setSidePanel((current) => (current === panel ? null : current));
+    setSidePanel((current) =>
+      current === panel || (panel === 'people' && current === 'apps') ? null : current,
+    );
+    if (panel === 'people') setAppsPage(null);
+  }
+  function toggleAppsPanel() {
+    panelLayout.collapse();
+    setAppsPage(null);
+    if (sidePanel !== 'apps') panelLayout.resize('people', 300);
+    if (compact || (state?.theme ?? room.theme) === 'immersive-glass') {
+      setSidePanel((current) => (current === 'apps' ? null : 'apps'));
+      return;
+    }
+    setClosedPanels((current) => {
+      const next = new Set(current);
+      next.delete('people');
+      return next;
+    });
+    setSidePanel((current) => (current === 'apps' ? 'people' : 'apps'));
   }
   useEffect(() => {
     const query = window.matchMedia('(max-width:1099px)');
@@ -201,8 +256,7 @@ export default function Teaching({
     return () => query.removeEventListener('change', collapse);
   }, []);
 
-  const [appsOpen, setAppsOpen] = useState(false),
-    [manageDocuments, setManageDocuments] = useState(false),
+  const [manageDocuments, setManageDocuments] = useState(false),
     [settingsOpen, setSettingsOpen] = useState(false);
   const [geogebraOpened, setGeogebraOpened] = useState(false);
   const [controlsTarget, setControlsTarget] = useState<HTMLDivElement | null>(null),
@@ -407,7 +461,7 @@ export default function Teaching({
   }
 
   useEffect(() => {
-    if (tab !== 'attendance') return;
+    if (tab !== 'attendance' && appsPage !== 'attendance') return;
     let cancelled = false;
     const load = async () => {
       try {
@@ -423,7 +477,7 @@ export default function Teaching({
       cancelled = true;
       clearInterval(interval);
     };
-  }, [tab, base]);
+  }, [tab, appsPage, base]);
 
   function exportAttendance() {
     if (!attendance) return;
@@ -554,6 +608,17 @@ export default function Teaching({
     kicked: false,
   };
   const canPresent = manager || myPermissions.isPresenter;
+  function showSharedDocuments() {
+    if (canPresent) {
+      void openShared('document');
+      return;
+    }
+    // Viewers may open the current shared document without changing the
+    // document selected for the rest of the class.
+    const current = shared.workspace;
+    if (current?.kind === 'document' && current.documentId) setDocId(current.documentId);
+    setTab('documents');
+  }
   async function openShared(
     kind: 'document' | 'geogebra' | 'presentation',
     documentId = docId,
@@ -599,7 +664,7 @@ export default function Teaching({
     void action('/random-student', {});
   }
 
-  async function saveRoomSettings() {
+  async function saveRoomSettings(closeDialog = true) {
     setBusy(true);
     setError('');
     try {
@@ -607,7 +672,7 @@ export default function Teaching({
         pinnedNotice: draftNotice,
         externalMediaUrl: draftExternalUrl,
       });
-      setSettingsOpen(false);
+      if (closeDialog) setSettingsOpen(false);
       await refresh();
     } catch (e) {
       setError((e as Error).message);
@@ -707,8 +772,8 @@ export default function Teaching({
         <nav className="classroom-header-tabs" aria-label={t('classNavigation')}>
           <button
             aria-pressed={tab === 'documents'}
-            disabled={!canPresent || shared.busy}
-            onClick={() => void openShared('document')}
+            disabled={canPresent && shared.busy}
+            onClick={showSharedDocuments}
           >
             <ClassIcon name="board" />
             {t('documents')}
@@ -912,8 +977,8 @@ export default function Teaching({
           aria-label={t('documents')}
           title={t('documents')}
           aria-pressed={tab === 'documents'}
-          disabled={!canPresent || shared.busy}
-          onClick={() => void openShared('document')}
+          disabled={canPresent && shared.busy}
+          onClick={showSharedDocuments}
         >
           <ClassIcon name="board" />
           <span>{t('documents')}</span>
@@ -933,8 +998,8 @@ export default function Teaching({
         <button
           aria-label={t('activities')}
           title={t('classApps')}
-          aria-expanded={appsOpen}
-          onClick={() => setAppsOpen(!appsOpen)}
+          aria-pressed={sidePanel === 'apps'}
+          onClick={toggleAppsPanel}
         >
           <ClassIcon name="apps" />
           <span>{t('classApps')}</span>
@@ -977,20 +1042,67 @@ export default function Teaching({
       </aside>
       <aside
         data-layout-panel="people"
+        data-app-mode={sidePanel === 'apps' ? 'true' : 'false'}
         className={
-          'classroom-sidepanel classroom-people-panel' + (sidePanel === 'people' ? ' is-open' : '')
+          'classroom-sidepanel classroom-people-panel' +
+          (sidePanel === 'people' || sidePanel === 'apps' ? ' is-open' : '')
         }
       >
         <header>
           <h2>
-            {t('participants')} <small>{state.participants?.length ?? 0}</small>
+            {sidePanel === 'apps'
+              ? t(appsPage ? classroomAppTitles[appsPage] : 'classApps')
+              : t('participants')}
+            {sidePanel !== 'apps' && <small>{state.participants?.length ?? 0}</small>}
           </h2>
           {panelLayout.controls('people')}
-          <button aria-label={t('classClosePanel')} onClick={() => closePanel('people')}>
-            <ClassIcon name="close" />
-          </button>
+          {sidePanel === 'apps' && appsPage ? (
+            <button
+              className="quiet classroom-app-back"
+              aria-label={t('back')}
+              onClick={() => setAppsPage(null)}
+            >
+              {t('back')}
+            </button>
+          ) : (
+            <button aria-label={t('classClosePanel')} onClick={() => closePanel('people')}>
+              <ClassIcon name="close" />
+            </button>
+          )}
         </header>
-        <div className="classroom-people">
+        {sidePanel === 'apps' && (
+          <div
+            className="classroom-app-size-controls"
+            role="group"
+            aria-label={t('classroomTextSize')}
+          >
+            <span>{t('classroomTextSize')}</span>
+            <button
+              type="button"
+              title={t('contentSmaller')}
+              aria-label={t('contentSmaller')}
+              disabled={appContentZoom <= 0.8}
+              onClick={() =>
+                setAppContentZoom((size) => Math.max(0.8, Math.round((size - 0.1) * 10) / 10))
+              }
+            >
+              A−
+            </button>
+            <output>{Math.round(appContentZoom * 100)}%</output>
+            <button
+              type="button"
+              title={t('contentLarger')}
+              aria-label={t('contentLarger')}
+              disabled={appContentZoom >= 1.5}
+              onClick={() =>
+                setAppContentZoom((size) => Math.min(1.5, Math.round((size + 0.1) * 10) / 10))
+              }
+            >
+              A+
+            </button>
+          </div>
+        )}
+        <div className={'classroom-people' + (sidePanel === 'apps' ? ' is-hidden-for-apps' : '')}>
           <div className="people-search-box">
             <ClassIcon name="search" size={13} />
             <input
@@ -1435,6 +1547,304 @@ export default function Teaching({
             <MediaModeration roomId={room.id} manager={manager} userId={state.userId} />
           </details>
         </div>
+        {sidePanel === 'apps' && !appsPage && (
+          <div
+            className="classroom-apps-sidebar"
+            role="menu"
+            aria-label={t('classApps')}
+            style={{ zoom: appContentZoom }}
+          >
+            {(
+              [
+                { key: 'activities', icon: 'apps', label: 'activities' },
+                { key: 'files', icon: 'files', label: 'fileLibrary' },
+                ...(options.geoEnabled
+                  ? [{ key: 'geogebra', icon: 'shape', label: 'geoTitle' }]
+                  : []),
+                ...(!room.parent
+                  ? [{ key: 'breakouts', icon: 'people', label: 'breakoutRooms' }]
+                  : []),
+                ...(manager ? [{ key: 'attendance', icon: 'clock', label: 'attendance' }] : []),
+                ...(manager
+                  ? [{ key: 'announcements', icon: 'notes', label: 'classroomAnnouncements' }]
+                  : []),
+              ] as const
+            ).map((item) => (
+              <button
+                role="menuitem"
+                key={item.key}
+                disabled={item.key === 'geogebra' && (!canPresent || shared.busy)}
+                onClick={() => setAppsPage(item.key as ClassroomAppKey)}
+              >
+                <ClassIcon name={item.icon as 'apps'} size={18} />
+                <span>{t(item.label)}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        {sidePanel === 'apps' && appsPage && (
+          <div className="classroom-app-page" style={{ zoom: appContentZoom }}>
+            {appsPage === 'files' && (
+              <Suspense fallback={<p role="status">{t('loading')}</p>}>
+                <Files
+                  resource="classrooms"
+                  id={room.id}
+                  onPresentFile={
+                    presentations?.enabled
+                      ? async (fileId) => {
+                          setBusy(true);
+                          setError('');
+                          try {
+                            await request(base + '/presentations', { fileId });
+                            await openShared('presentation');
+                            await refresh();
+                          } catch (e) {
+                            setError((e as Error).message);
+                          } finally {
+                            setBusy(false);
+                          }
+                        }
+                      : undefined
+                  }
+                />
+              </Suspense>
+            )}
+            {appsPage === 'geogebra' && options.geoEnabled && (
+              <Suspense fallback={<p role="status">{t('geoLoading')}</p>}>
+                <GeoGebraWorkspace
+                  roomId={room.id}
+                  userId={state.userId}
+                  manager={manager}
+                  canEdit={myPermissions.canWhiteboard}
+                  selectedId={shared.workspace?.geogebraId ?? null}
+                  perspective={shared.workspace?.geoPerspective ?? '1'}
+                  onPerspective={async (value) => {
+                    try {
+                      await shared.select({
+                        kind: 'geogebra',
+                        geogebraId: shared.workspace?.geogebraId ?? null,
+                        geoPerspective: value,
+                      });
+                    } catch (e) {
+                      setError((e as Error).message);
+                    }
+                  }}
+                  canSelect={canPresent}
+                  onSelect={async (id) => {
+                    await openShared('geogebra', undefined, id);
+                  }}
+                />
+              </Suspense>
+            )}
+            {appsPage === 'breakouts' && !room.parent && (
+              <Breakouts room={room} onNavigate={move} />
+            )}
+            {appsPage === 'attendance' && manager && (
+              <section className="classroom-app-section">
+                <div className="section-heading">
+                  <h3>{t('attendance')}</h3>
+                  <button onClick={exportAttendance} disabled={!attendance?.participants.length}>
+                    {t('exportCsv')}
+                  </button>
+                </div>
+                <p>{t('attendanceHelp')}</p>
+                {attendance ? (
+                  <div className="table-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>{t('name')}</th>
+                          <th>{t('attendanceDuration')}</th>
+                          <th>{t('connections')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {attendance.participants.map((person) => (
+                          <tr key={person.userId}>
+                            <td>{person.name}</td>
+                            <td>
+                              {new Intl.NumberFormat(i18n.language, {
+                                maximumFractionDigits: 1,
+                              }).format(person.totalDurationMs / 60000)}{' '}
+                              {t('minutes')}
+                            </td>
+                            <td>{person.connections.length}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    {!attendance.participants.length && <p>{t('noAttendance')}</p>}
+                  </div>
+                ) : (
+                  <p role="status">{t('loading')}</p>
+                )}
+              </section>
+            )}
+            {appsPage === 'announcements' && manager && (
+              <section className="classroom-app-section">
+                <h3>{t('classroomBroadcastNoticeTitle')}</h3>
+                <label>
+                  {t('pinnedNoticeLabel')}
+                  <textarea
+                    value={draftNotice}
+                    maxLength={500}
+                    rows={4}
+                    onChange={(event) => setDraftNotice(event.target.value)}
+                  />
+                </label>
+                <label>
+                  {t('externalMediaUrlLabel')}
+                  <input
+                    value={draftExternalUrl}
+                    maxLength={500}
+                    onChange={(event) => setDraftExternalUrl(event.target.value)}
+                  />
+                </label>
+                <button
+                  className="primary"
+                  disabled={busy}
+                  onClick={() => void saveRoomSettings(false)}
+                >
+                  {t('adminSaveRoomSettings')}
+                </button>
+              </section>
+            )}
+            {appsPage === 'activities' && (
+              <div className="classroom-app-activities">
+                <section className="classroom-app-section">
+                  <h3>
+                    {t('handQueue')} ({state.hands.length})
+                  </h3>
+                  {state.hands.length ? (
+                    <ul>
+                      {state.hands.map((hand) => (
+                        <li key={hand.user_id}>
+                          <span>{hand.name}</span>
+                          {manager && (
+                            <button
+                              disabled={busy}
+                              onClick={() =>
+                                void action('/hand', { raised: false, userId: hand.user_id })
+                              }
+                            >
+                              {t('lowerHand')}
+                            </button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p>{t('noHands')}</p>
+                  )}
+                </section>
+                <section className="classroom-app-section">
+                  <h3>{t('timer')}</h3>
+                  <output className="timer-display" aria-label={t('timer')}>
+                    {String(Math.floor(remaining / 60000)).padStart(2, '0')}:
+                    {String(Math.floor((remaining % 60000) / 1000)).padStart(2, '0')}
+                  </output>
+                  {manager && (
+                    <>
+                      <form
+                        onSubmit={(event) => {
+                          event.preventDefault();
+                          void action('/timer', {
+                            action: 'start',
+                            durationSeconds: Number(
+                              new FormData(event.currentTarget).get('seconds'),
+                            ),
+                          });
+                        }}
+                      >
+                        <label>
+                          {t('durationSeconds')}
+                          <input
+                            name="seconds"
+                            type="number"
+                            min={1}
+                            max={86400}
+                            defaultValue={300}
+                          />
+                        </label>
+                        <button disabled={busy}>{t('startTimer')}</button>
+                      </form>
+                      {timer && (
+                        <div className="actions">
+                          <button
+                            disabled={busy || timer.status === 'stopped' || remaining === 0}
+                            onClick={() =>
+                              void action('/timer', {
+                                action: timer.status === 'running' ? 'pause' : 'resume',
+                              })
+                            }
+                          >
+                            {t(timer.status === 'running' ? 'pause' : 'resume')}
+                          </button>
+                          <button
+                            disabled={busy}
+                            onClick={() => void action('/timer', { action: 'reset' })}
+                          >
+                            {t('reset')}
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </section>
+                <section className="classroom-app-section">
+                  <h3>{t('polls')}</h3>
+                  {manager && (
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault();
+                        const form = new FormData(event.currentTarget);
+                        void action('/polls', {
+                          question: form.get('question'),
+                          options: String(form.get('options'))
+                            .split('\n')
+                            .map((value) => value.trim())
+                            .filter(Boolean),
+                        });
+                        event.currentTarget.reset();
+                      }}
+                    >
+                      <label>
+                        {t('question')}
+                        <input name="question" required maxLength={500} />
+                      </label>
+                      <label>
+                        {t('pollOptions')}
+                        <textarea name="options" required rows={3} maxLength={2400} />
+                      </label>
+                      <button className="primary" disabled={busy}>
+                        {t('launchPoll')}
+                      </button>
+                    </form>
+                  )}
+                  {state.polls.map((poll) => (
+                    <article className="poll" key={poll.id}>
+                      <h4>{poll.question}</h4>
+                      {poll.options.map((option, index) => (
+                        <button
+                          key={index}
+                          disabled={busy || poll.status !== 'open' || poll.myChoice !== null}
+                          aria-pressed={poll.myChoice === index}
+                          onClick={() =>
+                            void action('/polls/' + poll.id + '/vote', { choice: index })
+                          }
+                        >
+                          {option}
+                          {poll.counts && <span>{poll.counts[index]}</span>}
+                        </button>
+                      ))}
+                    </article>
+                  ))}
+                  {!state.polls.length && <p>{t('noPolls')}</p>}
+                </section>
+              </div>
+            )}
+          </div>
+        )}
         {panelLayout.separator('people')}
       </aside>
       <section className="classroom-tools-panel">
@@ -2207,9 +2617,9 @@ export default function Teaching({
           <button
             className="classroom-round"
             aria-label={t('classApps')}
-            aria-expanded={appsOpen}
+            aria-pressed={sidePanel === 'apps'}
             title={t('classApps')}
-            onClick={() => setAppsOpen(!appsOpen)}
+            onClick={toggleAppsPanel}
           >
             <ClassIcon name="plus" />
           </button>
@@ -2293,42 +2703,6 @@ export default function Teaching({
           </button>
         </div>
       </footer>
-      {appsOpen && (
-        <div className="classroom-apps-menu" role="menu" aria-label={t('classApps')}>
-          {(
-            [
-              { key: 'activities', icon: 'apps', label: 'activities' },
-              { key: 'files', icon: 'files', label: 'fileLibrary' },
-              ...(options.geoEnabled
-                ? [{ key: 'geogebra', icon: 'shape', label: 'geoTitle' }]
-                : []),
-              ...(!room.parent
-                ? [{ key: 'breakouts', icon: 'people', label: 'breakoutRooms' }]
-                : []),
-              ...(manager ? [{ key: 'attendance', icon: 'clock', label: 'attendance' }] : []),
-              ...(manager
-                ? [{ key: 'announcements', icon: 'notes', label: 'classroomAnnouncements' }]
-                : []),
-            ] as const
-          ).map((item) => (
-            <button
-              role="menuitem"
-              key={item.key}
-              disabled={item.key === 'geogebra' && (!canPresent || shared.busy)}
-              onClick={() => {
-                if (item.key === 'announcements') setSettingsOpen(true);
-                else if (item.key === 'geogebra') {
-                  void openShared('geogebra');
-                } else setTab(item.key as typeof tab);
-                setAppsOpen(false);
-              }}
-            >
-              <ClassIcon name={item.icon as 'apps'} />
-              <span>{t(item.label)}</span>
-            </button>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

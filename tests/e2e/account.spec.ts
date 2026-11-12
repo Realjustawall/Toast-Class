@@ -9,14 +9,21 @@ test('registration recovery, personal panel, independent device revocation and p
     if (window === window.top) localStorage.setItem('language', 'en');
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  const registrationTab = page
+    .getByRole('navigation', { name: 'Your account' })
+    .getByRole('button', { name: 'Create account', exact: true });
+  await expect(registrationTab).toBeEnabled();
+  await registrationTab.click();
+  const submitRegistration = page
+    .locator('form')
+    .getByRole('button', { name: 'Create account', exact: true });
   await page.getByLabel('Name', { exact: true }).fill('Account Learner');
   const email = `account-${Date.now()}@example.org`,
     password = 'abc123';
   await page.getByLabel('Email', { exact: true }).fill(email);
   await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByLabel('Confirm password', { exact: true }).fill('different-password');
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await submitRegistration.click();
   await expect(page.getByText('The passwords do not match.', { exact: true })).toBeVisible();
   await page.getByLabel('Confirm password', { exact: true }).fill(password);
   await page.getByRole('button', { name: 'Show password', exact: true }).click();
@@ -26,10 +33,10 @@ test('registration recovery, personal panel, independent device revocation and p
   await page.route('**/api/v1/auth/register', (route) =>
     fail ? route.fulfill({ status: 502, body: '' }) : route.continue(),
   );
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await submitRegistration.click();
   await expect(page.getByRole('alert')).toContainText('The server is restarting or unavailable');
   fail = false;
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await submitRegistration.click();
   await page.getByRole('button', { name: 'My account', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'My account', exact: true })).toBeVisible();
   await page.getByLabel('Name', { exact: true }).fill('Updated Learner');

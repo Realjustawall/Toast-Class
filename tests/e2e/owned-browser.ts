@@ -16,8 +16,15 @@ export const test = base.extend({
       // Use the recorded child handle on managed Windows accounts where
       // taskkill is denied, including for processes owned by the test.
       const child = server.process();
-      if (process.platform === 'win32' && child.exitCode === null && child.signalCode === null)
-        child.kill('SIGKILL');
+      if (process.platform === 'win32') {
+        await Promise.race([
+          browser.close().catch(() => {}),
+          new Promise<void>((resolve) => setTimeout(resolve, 1500)),
+        ]);
+        if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
+        return;
+      }
+      if (child.exitCode === null && child.signalCode === null) child.kill('SIGKILL');
       await server.kill();
       await browser.close();
     }

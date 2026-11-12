@@ -20,7 +20,7 @@ type Sizes = {
   mediaWidth: number;
   text: number;
 };
-const defaults: Sizes = { people: 240, chat: 280, mediaHeight: 144, mediaWidth: 208, text: 14 };
+const defaults: Sizes = { people: 300, chat: 320, mediaHeight: 160, mediaWidth: 240, text: 15 };
 const clamp = (n: number, min: number, max: number) =>
   Math.min(Math.max(n, min), Math.max(min, max));
 
@@ -313,6 +313,7 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
   return {
     expanded,
     collapse: () => setExpanded(null),
+    resize: change,
     controls,
     separator,
     preferences,

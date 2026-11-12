@@ -182,13 +182,48 @@
   padding: 4px;
 }
 .chat-clear-confirm {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
   flex: none;
-  gap: 6px;
-  padding: 4px 8px;
+  gap: 10px;
+  margin: 6px 8px;
+  padding: 12px;
+  border: 1px solid #f3b6b6;
+  border-radius: 9px;
+  background: #fff5f5;
+  color: #7f1d1d;
   font-size: 12px;
+  line-height: 1.6;
+}
+.chat-clear-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.classroom-shell[data-theme] .chat-clear-confirm-actions button {
+  min-width: 84px;
+  min-height: 36px;
+  padding: 7px 12px;
+  border-radius: 7px;
+  font-size: 12px;
+}
+.classroom-shell[data-theme] .chat-clear-confirm-actions .chat-clear-confirm-action {
+  border: 1px solid #b42318;
+  background: #b42318;
+  color: #fff;
+  font-weight: 700;
+}
+.classroom-shell[data-theme] .chat-clear-confirm-actions .chat-clear-confirm-action:hover {
+  background: #8f1d14;
+  border-color: #8f1d14;
+}
+.classroom-shell[data-theme='immersive-glass'] .chat-clear-confirm,
+.classroom-shell[data-theme='studio-hybrid'] .chat-clear-confirm {
+  border-color: #743f4a;
+  background: #3b1f2a;
+  color: #fecaca;
 }
 .classroom-shell[data-theme] .messages {
   padding: 10px;

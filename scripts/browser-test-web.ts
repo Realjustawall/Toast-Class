@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import { build, preview } from 'vite';
 
 // Exercise the built offline runtime, avoiding development HMR during recovery tests.
-const port = Number(process.env.TEST_WEB_PORT ?? 5173);
+const port = Number(process.env.TEST_WEB_PORT ?? 4175);
 if (!Number.isInteger(port) || port <= 1024 || port > 65535)
   throw new Error('Invalid test web port');
 await import(new URL('./prepare-offline-assets.mjs', import.meta.url).href);
@@ -19,7 +19,7 @@ await build(
       }
     : {},
 );
-const server = await preview({ preview: { host: '0.0.0.0', port, strictPort: true } });
+const server = await preview({ preview: { host: '127.0.0.1', port, strictPort: true } });
 server.printUrls();
 for (const signal of ['SIGTERM', 'SIGINT'])
   process.on(signal, () => {

@@ -504,12 +504,13 @@ export default function AdvancedBoard({
         <span role="status">
           {!loaded
             ? t('loading')
-            : !editable
-              ? t('boardReadOnly')
-              : pending
-                ? t('boardPending', { count: pending })
-                : t('boardSaved')}
+            : pending
+              ? t('boardPending', { count: pending })
+              : t('boardSaved')}
         </span>
+        {!editable && loaded && (
+          <span className="board-read-only-status">{t('boardReadOnly')}</span>
+        )}
         <button onClick={() => void sync()} aria-label={t('retry')} title={t('retry')}>
           <span aria-hidden="true">↻</span>
         </button>
