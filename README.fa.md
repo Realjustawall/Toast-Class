@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="docs/screenshots/toaster-banner.svg" alt="TOASTER Classroom Banner" width="100%" />
+<img src="docs/screenshots/toaster-banner-dark.gif" alt="TOASTER Classroom 3D Dark Banner" width="100%" />
 
 <br />
 
