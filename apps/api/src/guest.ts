@@ -187,9 +187,10 @@ export async function registerGuest(app: FastifyInstance, ctx: GuestContext) {
         const placeholders = userIds.map((_, i) => '$' + (i + 1)).join(',');
         await c.query(`DELETE FROM auth_sessions WHERE user_id IN (${placeholders})`, userIds);
         await c.query('DELETE FROM classroom_guests WHERE classroom_id=$1', [room.id]);
+        const memberPlaceholders = userIds.map((_, i) => '$' + (i + 2)).join(',');
         await c.query(
-          `DELETE FROM classroom_memberships WHERE classroom_id=$1 AND user_id IN (${placeholders})`,
-          [room.id, ...userIds.map((_, i) => userIds[i])],
+          `DELETE FROM classroom_memberships WHERE classroom_id=$1 AND user_id IN (${memberPlaceholders})`,
+          [room.id, ...userIds],
         );
       }
       return userIds.length;

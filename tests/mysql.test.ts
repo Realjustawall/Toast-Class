@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -40,7 +40,10 @@ test(
         pool,
         'SELECT status FROM schema_migrations',
       );
-      assert.equal(versions.length, 23);
+      const expectedMigrations = (await readdir('packages/database/mysql')).filter((f) =>
+        f.endsWith('.sql'),
+      ).length;
+      assert.equal(versions.length, expectedMigrations);
       assert.ok(versions.every((v) => v.status === 'complete'));
       const id = randomUUID(),
         attack = "x'); DROP TABLE users;-- فارسی 😀";
