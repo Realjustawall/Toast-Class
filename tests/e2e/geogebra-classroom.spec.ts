@@ -68,7 +68,7 @@ test('GeoGebra worksheets save in MySQL, synchronize between users, export and e
     }));
     expect(width.tab).toBeGreaterThanOrEqual(width.bar - 6);
     await a.getByRole('button', { name: 'New worksheet', exact: true }).click();
-    const workspace = a.locator('.geogebra-workspace');
+    const workspace = a.locator('.geogebra-stage .geogebra-workspace');
     await expect(workspace.getByRole('button', { name: 'Save', exact: true })).toBeEnabled({
       timeout: 60000,
     });
@@ -90,8 +90,9 @@ test('GeoGebra worksheets save in MySQL, synchronize between users, export and e
       )
       .toBeGreaterThan(100);
     await expect(workspace.getByRole('status').filter({ hasText: 'Saved' })).toBeVisible();
-    await open(b);
-    const viewer = b.locator('.geogebra-workspace');
+    await b.goto('/#classroom/' + room.id);
+    await expect(b.getByTestId('classroom-connection')).toHaveText('Live connection');
+    const viewer = b.locator('.geogebra-stage .geogebra-workspace');
     await expect(
       viewer.getByText('Viewing; a moderator can grant editing access', { exact: true }),
     ).toBeVisible({ timeout: 60000 });

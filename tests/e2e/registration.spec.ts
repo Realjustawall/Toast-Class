@@ -16,7 +16,7 @@ test('platform administrator closes registration while existing users can still 
   await page.goto('/');
   await page.getByLabel('Email', { exact: true }).fill('platform-admin@browser.test');
   await page.getByLabel('Password', { exact: true }).fill('admin123');
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.locator('form').getByRole('button', { name: 'Sign in', exact: true }).click();
   await page.getByRole('button', { name: 'Platform settings', exact: true }).click();
   await page.getByRole('button', { name: 'Close registration', exact: true }).click();
   await expect(

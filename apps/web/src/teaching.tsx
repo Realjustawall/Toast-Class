@@ -1894,6 +1894,17 @@ export default function Teaching({
                           {poll.counts && <span>{poll.counts[index]}</span>}
                         </button>
                       ))}
+                      {manager && (
+                        <button
+                          type="button"
+                          disabled={busy || poll.results_published}
+                          onClick={() =>
+                            void action('/polls/' + poll.id + '/control', { action: 'publish' })
+                          }
+                        >
+                          {t('publishResults')}
+                        </button>
+                      )}
                     </article>
                   ))}
                   {!state.polls.length && <p>{t('noPolls')}</p>}

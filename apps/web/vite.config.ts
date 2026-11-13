@@ -21,6 +21,14 @@ export default defineConfig({
             return;
           }
           const mathAsset = path.startsWith('/vendor/geogebra/') || path.startsWith('/geogebra/');
+          if (
+            path.startsWith('/@fs/') &&
+            /(?:^|\/)(?:\.env(?:\.|$)|\.git(?:\/|$)|\.local(?:\/|$)|\.aws(?:\/|$))/i.test(path)
+          ) {
+            res.statusCode = 403;
+            res.end('Forbidden');
+            return;
+          }
           const mathHost = req.headers.host?.split(':')[0] === 'geogebra.localhost';
           if ((mathHost && !mathAsset) || (!mathHost && mathAsset)) {
             res.statusCode = 404;

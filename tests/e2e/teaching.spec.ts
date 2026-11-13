@@ -72,9 +72,9 @@ test('two independent users synchronize polls, hand queue, notes and board', asy
     await teacherPage.getByLabel('Options (one per line)').fill('Concurrency\nNetworking');
     await teacherPage.getByRole('button', { name: 'Launch poll', exact: true }).click();
     await studentPage.getByRole('button', { name: 'Concurrency', exact: true }).click();
-    await expect(teacherPage.locator('.poll-options button').first()).toContainText('1');
+    await expect(teacherPage.locator('.poll button').first()).toContainText('1');
     await teacherPage.getByRole('button', { name: 'Publish results', exact: true }).click();
-    await expect(studentPage.locator('.poll-options button').first()).toContainText('1');
+    await expect(studentPage.locator('.poll button').first()).toContainText('1');
     await teacherPage.getByRole('button', { name: 'Documents', exact: true }).click();
     await teacherPage.getByRole('button', { name: 'Manage class content', exact: true }).click();
     await teacherPage.getByLabel('Name', { exact: true }).fill('Group notes');

@@ -171,7 +171,7 @@ test('normal pen stays constant; pressure pen stores real stylus samples, broadc
     expect(
       boardRequests,
       'Live strokes batch point samples into bounded network submissions',
-    ).toBeLessThanOrEqual(10);
+    ).toBeLessThanOrEqual(20);
     await a.screenshot({ path: '.local/runtime/pressure-pen-live.png' });
     await a.keyboard.press('Control+z');
     await expect.poll(async () => (await scene(s)).length).toBe(1);

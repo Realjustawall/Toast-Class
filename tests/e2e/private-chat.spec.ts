@@ -83,6 +83,7 @@ test('private messages stay between participants and public/private switches wor
     await expect(b.locator('.messages')).toContainText('Private remains enabled');
     await expect(b.getByRole('button', { name: 'Send', exact: true })).toBeDisabled();
     await b.setViewportSize({ width: 320, height: 568 });
+    await expect(b.locator('.classroom-shell')).toHaveAttribute('data-compact-layout', 'true');
     if (!(await b.locator('[data-layout-panel="chat"]').isVisible()))
       await b.getByRole('button', { name: 'Class discussion', exact: true }).click();
     await expect(b.locator('.chat-private-peer select')).toBeVisible();

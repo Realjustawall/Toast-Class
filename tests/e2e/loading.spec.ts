@@ -15,12 +15,14 @@ test('brand animation is confined to the landing page and classroom transitions 
     if (window === window.top) localStorage.setItem('language', 'en');
   });
   await page.goto('/');
-  const scene = page.frameLocator('.landing-brand-scene');
+  const scene = page.frameLocator('.stage-3d-mount');
   await expect(scene.locator('canvas')).toBeVisible();
   const animation = page.frames().find((frame) => frame.url().includes('/intro/'))!;
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect.poll(() => animation.evaluate('playing')).toBe(false);
-  await expect(page.getByRole('button', { name: 'Sign in', exact: true })).toBeEnabled();
+  await expect(
+    page.locator('form').getByRole('button', { name: 'Sign in', exact: true }),
+  ).toBeEnabled();
   const post = async (path: string, data: unknown) => {
     const response = await page.request.post('/api/v1' + path, { headers: { origin }, data });
     expect(response.ok()).toBe(true);

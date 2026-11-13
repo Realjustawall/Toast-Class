@@ -127,12 +127,18 @@ test('real file workflows: two users, previews, download, folders, copy, persist
     await setAppLanguage(teacher, 'fa');
     await teacher.setViewportSize({ width: 390, height: 844 });
     await expect(teacher.locator('html')).toHaveAttribute('dir', 'rtl');
-    await expect(teacher.getByRole('heading', { name: 'فایل‌ها', exact: true })).toBeVisible();
+    await teacher.getByRole('button', { name: 'فعالیت‌ها', exact: true }).click();
+    await teacher.getByRole('menuitem', { name: 'فایل‌ها', exact: true }).click();
+    await expect(
+      teacher
+        .getByRole('region', { name: 'فایل‌ها' })
+        .getByRole('heading', { name: 'فایل‌ها', exact: true }),
+    ).toBeVisible();
     expect(
       await teacher.evaluate(() => document.documentElement.scrollWidth <= innerWidth),
     ).toBeTruthy();
     await teacher.screenshot({ path: 'docs/screenshots/files-mobile-fa.png', fullPage: true });
-    await teacher.getByRole('button', { name: 'بازگشت به فضای کاری', exact: true }).click();
+    await teacher.locator('.classroom-leave').click();
     await teacher.getByRole('button', { name: 'فایل‌ها', exact: true }).click();
     await expect(teacher.locator('.file-row')).toHaveCount(0);
     await teacher.getByLabel('انتخاب فایل', { exact: true }).setInputFiles({

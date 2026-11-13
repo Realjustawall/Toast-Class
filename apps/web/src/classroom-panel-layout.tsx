@@ -119,10 +119,12 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        if (nativePanel.current && document.fullscreenElement)
-          void document.exitFullscreen().catch(() => {});
-        nativePanel.current = null;
-        setExpanded(null);
+        void (async () => {
+          if (nativePanel.current && document.fullscreenElement)
+            await document.exitFullscreen().catch(() => {});
+          nativePanel.current = null;
+          setExpanded(null);
+        })();
       }
     };
     const resize = () =>

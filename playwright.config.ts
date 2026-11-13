@@ -15,7 +15,18 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 20_000 },
   globalTimeout: 180000,
-  use: { baseURL: origin, channel: process.env.PW_CHANNEL },
+  use: {
+    baseURL: origin,
+    channel: process.env.PW_CHANNEL,
+    launchOptions: {
+      args: [
+        '--autoplay-policy=no-user-gesture-required',
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+        '--enable-usermedia-screen-capturing',
+      ],
+    },
+  },
   webServer: [
     {
       command: 'npx tsx scripts/browser-test-server.ts',

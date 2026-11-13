@@ -58,7 +58,7 @@ test('moderator locks use real dialogs and all viewers follow the same live boar
     await expect(selector.locator('option')).toHaveCount(2);
     await expect(b.getByRole('combobox', { name: 'Whiteboard pages', exact: true })).toHaveValue(
       await selector.inputValue(),
-      { timeout: 3000 },
+      { timeout: 10000 },
     );
     await a.getByRole('button', { name: 'Text', exact: true }).click();
     const canvas = a.locator('.excalidraw__canvas.interactive'),

@@ -7,11 +7,16 @@ const files = {
   'login-toaster-3d.js': source
     .replace(
       'const duration = 17.8;',
-      "const duration = 17.8;\n  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;",
+      "const duration = 17.8;\n  const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');\n  const reduceMotion = motionQuery.matches;\n  window.playing = !reduceMotion;",
     )
     .replace(
       'let origin = performance.now();',
-      'let origin = performance.now() - (reduceMotion ? duration * 1000 : 0);',
+      "let origin = performance.now() - (reduceMotion ? duration * 1000 : 0);\n  motionQuery.addEventListener('change', (event) => {\n    if (event.matches) {\n      currentElapsed = duration;\n      animationFinished = true;\n      window.playing = false;\n      renderAt(duration);\n    }\n  });",
+    )
+    .replace('function loop(now) {', 'function loop(now) {\n    if (animationFinished) return;')
+    .replace(
+      'animationFinished = true;',
+      'animationFinished = true;\n      window.playing = false;',
     ),
   'login-scene-config.js':
     "document.documentElement.dataset.theme = location.hash === '#light' ? 'light' : 'dark';\n",
