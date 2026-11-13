@@ -39,8 +39,13 @@ export async function selectEditorText(editor: Locator, from: number, to: number
 }
 export async function openDocumentMenu(page: Page) {
   const menu = page.locator('.document-editor header .overflow-menu').first();
-  if ((await menu.count()) && !(await menu.getAttribute('open').then((value) => value !== null)))
-    await menu.locator('summary').click();
+  if ((await menu.count()) && !(await menu.getAttribute('open').then((value) => value !== null))) {
+    const summary = menu.locator('summary');
+    await summary.evaluate((element) =>
+      element.scrollIntoView({ block: 'center', inline: 'nearest' }),
+    );
+    await summary.click();
+  }
 }
 export async function boardAction(page: Page, name: string) {
   const button = page.getByRole('button', { name, exact: true });

@@ -4,6 +4,9 @@ import { testStorage } from '../tests/storage-fixture';
 import { buildApp } from '../apps/api/src/app.js';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import { mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 const { pool, cleanup, workerDatabaseUrl } = await testDatabase();
 const storage = await testStorage();
 const conversion = process.env.TEST_CONVERSION_DOCKER === 'true';
@@ -33,6 +36,7 @@ if (process.env.TEST_PLATFORM_ADMIN_SEED === 'true') {
   await pool.query('INSERT INTO platform_admins(user_id) VALUES($1)', [r.json().id]);
 }
 let conversionProcess: ReturnType<typeof spawn> | undefined;
+let conversionWorkDir: string | undefined;
 if (conversion) {
   if (process.platform !== 'linux' || !workerDatabaseUrl)
     throw new Error(
@@ -44,6 +48,9 @@ if (conversion) {
       ? /^\/toaster_[a-f0-9]{32}_test$/.test(url.pathname)
       : /^-c search_path=test_[a-f0-9]{32}$/.test(url.searchParams.get('options') ?? '');
   if (!isolated) throw new Error('Refusing conversion worker outside an isolated test database');
+  conversionWorkDir =
+    process.env.TEST_CONVERSION_WORK_DIR ??
+    (await mkdtemp(join(tmpdir(), 'toaster-conversion-e2e-')));
   conversionProcess = spawn(process.execPath, ['--import', 'tsx', 'apps/worker/src/main.ts'], {
     stdio: 'inherit',
     env: {
@@ -55,7 +62,7 @@ if (conversion) {
       FILE_STORAGE_DIR: storage.storage.root,
       FILE_ALLOW_UNSCANNED: 'true',
       CLAMAV_HOST: '',
-      CONVERSION_WORK_DIR: process.env.TEST_CONVERSION_WORK_DIR ?? '/tmp/toaster-conversion-jobs',
+      CONVERSION_WORK_DIR: conversionWorkDir,
     },
   });
 }
@@ -86,6 +93,8 @@ async function shutdown() {
   await app.close();
   await cleanup();
   await storage.cleanup();
+  if (conversionWorkDir && !process.env.TEST_CONVERSION_WORK_DIR)
+    await rm(conversionWorkDir, { recursive: true, force: true });
   process.exit(0);
 }
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => void shutdown());

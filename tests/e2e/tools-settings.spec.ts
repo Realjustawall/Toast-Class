@@ -357,6 +357,9 @@ test('precise pen/text controls and sized eraser persist; settings are a separat
       a.getByRole('dialog', { name: 'Application settings', exact: true }),
     ).toBeVisible();
     await a.keyboard.press('Escape');
+    await expect(a.getByRole('dialog', { name: 'Application settings', exact: true })).toHaveCount(
+      0,
+    );
     await a.reload();
     await expect(a.locator('.board-tool-dock')).toBeVisible();
     await a.getByRole('button', { name: 'Pen', exact: true }).click();

@@ -53,6 +53,8 @@ test('moderator locks use real dialogs and all viewers follow the same live boar
     await Promise.all([a.goto('/#classroom/' + room.id), b.goto('/#classroom/' + room.id)]);
     await expect(a.locator('.board-tool-dock')).toBeVisible();
     await expect(b.locator('.advanced-board-canvas')).toBeVisible();
+    await expect(a.getByTestId('classroom-connection')).toHaveText('Live connection');
+    await expect(b.getByTestId('classroom-connection')).toHaveText('Live connection');
     await a.getByRole('button', { name: 'Blank page', exact: true }).click();
     const selector = a.getByRole('combobox', { name: 'Whiteboard pages', exact: true });
     await expect(selector.locator('option')).toHaveCount(2);

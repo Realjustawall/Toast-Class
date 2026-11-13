@@ -15,7 +15,9 @@ const isolatedAssetsMiddleware: Connect.NextHandleFunction = (req, res, next) =>
   const mathAsset = path.startsWith('/vendor/geogebra/') || path.startsWith('/geogebra/');
   if (
     path.startsWith('/@fs/') &&
-    /(?:^|\/)(?:\.env(?:\.|$)|\.git(?:\/|$)|\.local(?:\/|$)|\.aws(?:\/|$))/i.test(path)
+    /(?:^|\/)(?:\.env(?:\.|$)|\.git(?:\/|$)|\.local(?:\/|$)|\.aws(?:\/|$)|apps\/api(?:\/|$)|packages\/database(?:\/|$))/i.test(
+      path,
+    )
   ) {
     res.statusCode = 403;
     res.end('Forbidden');
