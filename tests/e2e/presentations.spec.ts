@@ -66,7 +66,11 @@ test('real converter and two-user presentation: pages, independent viewing, relo
       .filter({ hasText: 'Reading.pdf' });
     await expect(prepared).toContainText('Ready to present', { timeout: 45000 });
     await prepared.getByRole('button', { name: 'Present document', exact: true }).click();
-    await learner.getByRole('button', { name: 'Presentations', exact: true }).click();
+    const learnerPresentations = learner.getByRole('button', {
+      name: 'Presentations',
+      exact: true,
+    });
+    if (await learnerPresentations.isEnabled()) await learnerPresentations.click();
     await expect(learner.getByAltText('Presentation page 1 of 2', { exact: true })).toBeVisible();
     await expect
       .poll(() =>

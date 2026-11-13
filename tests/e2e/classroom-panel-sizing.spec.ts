@@ -81,11 +81,13 @@ test('all four classrooms support readable text, keyboard and drag resizing, pan
     await page.keyboard.press('Escape');
     await page.reload();
     await expect(page.locator('.classroom-shell')).toHaveAttribute('data-theme', theme);
-    expect(
-      await page
-        .locator('.classroom-meeting-name h1')
-        .evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
-    ).toBeGreaterThanOrEqual(20);
+    await expect
+      .poll(() =>
+        page
+          .locator('.classroom-meeting-name h1')
+          .evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
+      )
+      .toBeGreaterThanOrEqual(20);
     await setAppLanguage(page, 'fa');
     await page.setViewportSize({ width: 390, height: 844 });
     await page.getByRole('button', { name: 'گفت‌وگوی کلاس', exact: true }).click();

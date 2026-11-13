@@ -42,7 +42,8 @@ export async function openDocumentMenu(page: Page) {
   if ((await menu.count()) && !(await menu.getAttribute('open').then((value) => value !== null))) {
     const summary = menu.locator('summary');
     await expect(summary).toBeVisible();
-    await summary.click({ force: true });
+    await summary.evaluate((element) => (element as HTMLElement).click());
+    await expect(menu).toHaveAttribute('open', '');
   }
 }
 export async function boardAction(page: Page, name: string) {

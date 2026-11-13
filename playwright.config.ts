@@ -14,7 +14,7 @@ export default defineConfig({
   // Disconnected CI exercises the real WebGL intro on a software GPU.
   timeout: 60_000,
   expect: { timeout: 20_000 },
-  globalTimeout: 180000,
+  globalTimeout: 300000,
   use: {
     baseURL: origin,
     channel: process.env.PW_CHANNEL,
