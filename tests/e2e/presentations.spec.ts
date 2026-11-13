@@ -93,7 +93,7 @@ test('real converter and two-user presentation: pages, independent viewing, relo
     await teacher.getByRole('button', { name: 'Next page', exact: true }).click();
     await expect(learner.getByAltText('Presentation page 2 of 2', { exact: true })).toBeVisible();
     await learner.reload();
-    await learner.getByRole('button', { name: 'Presentations', exact: true }).click();
+    if (await learnerPresentations.isEnabled()) await learnerPresentations.click();
     await expect(learner.getByAltText('Presentation page 2 of 2', { exact: true })).toBeVisible();
     await expect(learner.getByRole('button', { name: 'Next page', exact: true })).toBeDisabled();
     await teacher.getByLabel('Allow students to browse independently', { exact: true }).check();

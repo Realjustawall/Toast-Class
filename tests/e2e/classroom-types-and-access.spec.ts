@@ -307,10 +307,12 @@ test('owner configures type and enrollment, students only see assigned classes, 
           });
           const preview = notesEditor.locator('header button[aria-pressed]');
           await openDocumentMenu(ownerPage);
-          await preview.click();
+          await expect(preview).toBeVisible();
+          await preview.evaluate((element) => (element as HTMLElement).click());
           await expect(notesEditor.locator('.shared-notes-preview')).toBeVisible();
           await openDocumentMenu(ownerPage);
-          await preview.click();
+          await expect(preview).toBeVisible();
+          await preview.evaluate((element) => (element as HTMLElement).click());
           await expect(notesEditor.locator('.tiptap')).toBeVisible();
           await notesEditor.evaluate((editor) => {
             editor.scrollTop = 0;

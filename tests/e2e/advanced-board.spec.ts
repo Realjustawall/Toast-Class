@@ -120,7 +120,7 @@ test('advanced editor synchronizes independent users, persists refresh, enforces
     ).toBeVisible();
     await boardAction(a, 'Board history');
     const textBounds = (await canvas.boundingBox())!;
-    const textPoint = { x: textBounds.width / 4, y: textBounds.height * 0.55 };
+    const textPoint = { x: textBounds.width / 4, y: Math.min(textBounds.height * 0.35, 36) };
     await canvas.click({ position: textPoint });
     await a.keyboard.press('t');
     await a.mouse.click(textBounds.x + textPoint.x, textBounds.y + textPoint.y);
