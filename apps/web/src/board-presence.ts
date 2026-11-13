@@ -103,8 +103,18 @@ export function useBoardPresence(
             setConnected(true);
             setViewTick((value) => value + 1);
             void refresh();
-          } else if (data.type === 'presence_changed') void refresh();
-          else if (data.type === 'view_changed') setViewTick((value) => value + 1);
+          } else if (data.type === 'presence_changed') {
+            if (Array.isArray(data.peers)) {
+              setConnected(true);
+              setPeers(
+                data.generation === generation
+                  ? data.peers.filter((peer: BoardPeer) => peer.id !== ownId)
+                  : [],
+              );
+            } else {
+              void refresh();
+            }
+          } else if (data.type === 'view_changed') setViewTick((value) => value + 1);
         } catch {
           current.close();
         }
@@ -160,7 +170,7 @@ export function useBoardPresence(
         socket.current.send(JSON.stringify({ generation, ...pending.current }));
         pending.current = undefined;
       }
-    }, 120);
+    }, 25);
   };
   return { peers, connected, send, viewTick };
 }

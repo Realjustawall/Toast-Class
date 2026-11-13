@@ -1,0 +1,171 @@
+{
+  "verifiedAt": "2026-11-10T18:26:26.633Z",
+  "previewUrl": "http://localhost:5174/#classroom/eb803738-7a0e-4e49-b250-06acd34e71fb",
+  "backend": {
+    "engine": "MySQL 8.4.13",
+    "tests": 107,
+    "passed": 104,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/tools-settings-full-native-final.log",
+    "skips": [
+      "Real Linux/Docker converter",
+      "Dedicated MySQL dump/restore fixture",
+      "Real S3 provider"
+    ]
+  },
+  "browser": {
+    "uniqueScenarios": 7,
+    "passed": 7,
+    "failed": 0,
+    "batches": [
+      {
+        "name": "tools-settings-final",
+        "exitCode": 0,
+        "durationMs": 25755,
+        "stats": {
+          "startTime": "2026-11-10T18:15:15.198Z",
+          "duration": 21735.384000000002,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "tools-settings-annotations",
+        "exitCode": 0,
+        "durationMs": 33140,
+        "stats": {
+          "startTime": "2026-11-10T18:15:41.551Z",
+          "duration": 28434.466,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "tools-settings-workspace-media",
+        "exitCode": 0,
+        "durationMs": 27039,
+        "stats": {
+          "startTime": "2026-11-10T18:16:14.722Z",
+          "duration": 22360.896999999997,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "tools-settings-platform",
+        "exitCode": 0,
+        "durationMs": 11794,
+        "stats": {
+          "startTime": "2026-11-10T18:16:41.817Z",
+          "duration": 6960.649,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "focusedFinalReruns": [
+      {
+        "scenario": "Precise tools, sounds, persistence, hydration race and settings history after UI refinements",
+        "passed": 1,
+        "log": ".local/tools-settings-history-final.log"
+      },
+      {
+        "scenario": "PDF placement preserving ink and shared replacement display",
+        "passed": 1,
+        "log": ".local/tools-settings-pdf-final.log"
+      }
+    ],
+    "soundAssertions": [
+      "microphoneOff",
+      "microphoneOn",
+      "connected preview at 0.37 volume",
+      "device category suppresses microphone sound while actual microphone toggles",
+      "poll",
+      "timer",
+      "hand",
+      "lock",
+      "unlock"
+    ],
+    "media": "Actual local SFU with synthetic browser capture; AudioContext oscillator creation and playback scheduling observed"
+  },
+  "pgMem": {
+    "passed": 2,
+    "overlapsMySql": true,
+    "log": ".local/tools-settings-pgmem.log"
+  },
+  "build": {
+    "typescript": true,
+    "web": true,
+    "server": true,
+    "largeChunkWarnings": true
+  },
+  "migration": {
+    "version": 20,
+    "existingRecordsPreserved": {
+      "users": 2,
+      "rooms": 5,
+      "messages": 5,
+      "documents": 11,
+      "geogebra": 1,
+      "boards": 6,
+      "workspace": 1,
+      "permissions": 0
+    }
+  },
+  "persistentPreview": {
+    "classroomId": "eb803738-7a0e-4e49-b250-06acd34e71fb",
+    "persianSettingsRoute": true,
+    "fontChoices": 8,
+    "mobileToolPopoverInsideCanvas": true,
+    "mobileNoOverflow": true,
+    "existingMessagesPreserved": 5,
+    "existingDocumentsPreserved": 3,
+    "personalPreferencesUnchanged": true,
+    "browserErrors": []
+  },
+  "settings": {
+    "endpoint": "/api/v1/account/preferences",
+    "scope": "Authenticated user only",
+    "concurrency": "Serialized account row lock and revision CAS",
+    "validation": "Strict shared schema",
+    "autoSaveDebounceMs": 600,
+    "fontChoices": 8,
+    "penWidthRange": [0.1, 100],
+    "eraserDiameterPxRange": [2, 200],
+    "textSizeRange": [8, 256],
+    "layouts": "Per-user and theme in MySQL",
+    "route": "#settings?return=..."
+  },
+  "pdfModes": [
+    "Place on existing background-free Excalidraw page preserving annotations",
+    "Display new PDF book instead of current shared board, retaining original book",
+    "Append imported PDF pages to current book"
+  ],
+  "eraser": "Deletes touched annotation objects; protects locked objects and PDF background. Not partial-stroke pixel erasing.",
+  "artifacts": [
+    "docs/screenshots/precise-board-fa-2026-11-10.png",
+    "docs/screenshots/precise-settings-page-fa-2026-11-10.png",
+    "docs/screenshots/precise-tools-mobile-fa-2026-11-10.png",
+    "docs/screenshots/precise-settings-mobile-fa-2026-11-10.png",
+    "docs/screenshots/precise-pdf-modes-2026-11-10.png"
+  ],
+  "remainingGlobalLimits": [
+    "Full PDF Annotator feature parity remains incomplete; previous report has the detailed list",
+    "800-user media acceptance has not passed",
+    "Real Redis unavailable in this environment"
+  ],
+  "storage": {
+    "projectAndRuntimeDrive": "E:",
+    "newInstallations": false,
+    "npmCache": ".local/npm-cache"
+  }
+}

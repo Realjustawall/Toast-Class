@@ -1,0 +1,96 @@
+{
+  "recordedAt": "2026-11-09T12:43:02.788Z",
+  "scope": "Persistent moderator-managed classroom chat categories; additive database migration and compact UI regressions.",
+  "backend": {
+    "total": 97,
+    "passed": 94,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/chat-categories-backend-all.log",
+    "confirmation": ".local/chat-categories-backend-confirm.log",
+    "defaultAdapter": ".local/chat-categories-pgmem.log"
+  },
+  "browser": {
+    "passed": 3,
+    "failed": 0,
+    "entries": [
+      {
+        "file": "tests/e2e/chat-categories.spec.ts",
+        "report": ".local/chat-categories-browser-results.json",
+        "log": ".local/chat-categories-browser.log",
+        "stats": {
+          "startTime": "2026-11-09T12:37:01.792Z",
+          "duration": 9549.376999999999,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "50d55e263c94df86ceb927e1b8cfd9fe687df05298ec81e2b092ce853ecea2e7"
+      },
+      {
+        "file": "tests/e2e/classroom-compact.spec.ts",
+        "report": ".local/chat-categories-compact-results.json",
+        "log": ".local/chat-categories-compact-regression.log",
+        "stats": {
+          "startTime": "2026-11-09T12:39:25.728Z",
+          "duration": 34670.19,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "fe3996aaa9e8d01fb959f9979f38a19bf67ffa9c09d3d60abff593d825a6d101"
+      },
+      {
+        "file": "tests/e2e/classroom-types-and-access.spec.ts",
+        "report": ".local/chat-categories-access-results.json",
+        "log": ".local/chat-categories-access-regression.log",
+        "stats": {
+          "startTime": "2026-11-09T12:40:05.293Z",
+          "duration": 27240.525,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "662bd58c95c330a7ad8bcbfde978054e5d8dab74be49c965770d9c46ea0ed7b4"
+      }
+    ]
+  },
+  "checks": [
+    {
+      "name": "TypeScript",
+      "status": "passed",
+      "log": ".local/chat-categories-typecheck.log"
+    },
+    {
+      "name": "Server build",
+      "status": "passed",
+      "log": ".local/chat-categories-build-server.log"
+    },
+    {
+      "name": "Web build",
+      "status": "passed",
+      "log": ".local/chat-categories-build-web.log"
+    }
+  ],
+  "preview": {
+    "onlyPublicByDefault": true,
+    "customCategories": 0,
+    "existingMessages": 5,
+    "categoryManagementAvailable": true,
+    "mobileWidth": 320
+  },
+  "migration": {
+    "mysql": "012_chat_categories",
+    "postgres": "019_chat_categories",
+    "existingMessagesPreserved": 5,
+    "backup": ".local/runtime/chat-categories-before-migration.json"
+  },
+  "screenshots": [
+    ".local/runtime/user-chat-public-only.png",
+    ".local/runtime/user-chat-category-management.png",
+    ".local/runtime/chat-categories-admin-mobile-fa.png"
+  ]
+}

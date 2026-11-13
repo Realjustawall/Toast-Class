@@ -43,6 +43,9 @@ test('teacher viewport follows across independent browsers, supports opt-out, re
     const base = `/classrooms/${room.id}/documents/${doc.id}/board`;
     const teacher = await a.newPage(),
       student = await b.newPage();
+    // Keep the rectangle fully visible after the 60px pan. Measuring the
+    // bounding box of a clipped rectangle compares different geometry.
+    await teacher.setViewportSize({ width: 1280, height: 1000 });
     await student.setViewportSize({ width: 1440, height: 900 });
     for (const page of [teacher, student]) {
       await page.goto('/');
@@ -135,6 +138,7 @@ test('teacher viewport follows across independent browsers, supports opt-out, re
     await teacher.keyboard.press('h');
     await teacher.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
     await teacher.mouse.down();
+    const panStarted = performance.now();
     await teacher.mouse.move(bounds.x + bounds.width / 2 + 100, bounds.y + bounds.height / 2 + 60, {
       steps: 6,
     });
@@ -149,6 +153,9 @@ test('teacher viewport follows across independent browsers, supports opt-out, re
         return left && right ? Math.abs(left.x - right.x) + Math.abs(left.y - right.y) : 1000;
       })
       .toBeLessThan(4);
+    const panLatency = performance.now() - panStarted;
+    console.log('Presenter input-to-view latency (ms):', panLatency);
+    expect(panLatency).toBeLessThanOrEqual(500);
     await boardAction(student, 'Following presenter');
     const independentZoom = await student.getByLabel('Board zoom', { exact: true }).textContent();
     await canvas.click();

@@ -62,14 +62,39 @@ export async function registerBoardPresence(
       documentId,
       setTimeout(() => {
         notifications.delete(documentId);
-        for (const peer of rooms.get(documentId)?.values() ?? []) {
-          // No private payload on the socket. Every actual presence read is authorized again.
-          if (peer.socket.readyState === 1 && peer.socket.bufferedAmount < 65536)
-            peer.socket.send('{"type":"presence_changed"}');
-          else if (peer.socket.bufferedAmount >= 65536)
+        const group = rooms.get(documentId);
+        const activePeers = [...(group?.values() ?? [])].filter(
+          (peer) => peer.socket.readyState === 1 && peer.pointer !== null,
+        );
+        const byGeneration = new Map<string, ReturnType<typeof activePeers.map>>();
+        for (const peer of activePeers) {
+          let list = byGeneration.get(peer.generation);
+          if (!list) {
+            list = [];
+            byGeneration.set(peer.generation, list);
+          }
+          list.push({
+            id: peer.id,
+            userId: peer.userId,
+            name: peer.name,
+            pointer: peer.pointer,
+            button: peer.button,
+            updatedAt: peer.updatedAt,
+          });
+        }
+        for (const peer of group?.values() ?? []) {
+          if (peer.socket.readyState === 1 && peer.socket.bufferedAmount < 65536) {
+            peer.socket.send(
+              JSON.stringify({
+                type: 'presence_changed',
+                generation: peer.generation,
+                peers: byGeneration.get(peer.generation) ?? [],
+              }),
+            );
+          } else if (peer.socket.bufferedAmount >= 65536)
             peer.socket.close(1013, 'Slow presence consumer');
         }
-      }, 100),
+      }, 16),
     );
   };
   async function authorize(request: Request, params: Params) {

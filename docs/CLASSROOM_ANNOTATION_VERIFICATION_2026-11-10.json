@@ -1,0 +1,142 @@
+{
+  "verifiedAt": "2026-11-10T17:25:53.648Z",
+  "previewUrl": "http://localhost:5174/#classroom/eb803738-7a0e-4e49-b250-06acd34e71fb",
+  "backend": {
+    "engine": "MySQL 8.4.13",
+    "tests": 105,
+    "passed": 102,
+    "failed": 0,
+    "skipped": 3,
+    "skips": [
+      "Real isolated Linux/Docker converter",
+      "Dedicated MySQL dump/restore fixture",
+      "Real S3 provider"
+    ],
+    "log": ".local/annotation-full-native-final.log"
+  },
+  "pgMem": {
+    "passed": 2,
+    "failed": 0,
+    "overlapsMySql": true,
+    "log": ".local/annotation-pgmem.log"
+  },
+  "browser": {
+    "uniqueScenarios": 5,
+    "passed": 5,
+    "failed": 0,
+    "batches": [
+      {
+        "name": "annotation-core-final",
+        "exitCode": 0,
+        "durationMs": 30622,
+        "stats": {
+          "startTime": "2026-11-10T17:15:13.943Z",
+          "duration": 26656.319,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "annotation-workspace-media-final",
+        "exitCode": 0,
+        "durationMs": 26948,
+        "stats": {
+          "startTime": "2026-11-10T17:15:46.309Z",
+          "duration": 21307.123,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "annotation-member-final",
+        "exitCode": 0,
+        "durationMs": 7811,
+        "stats": {
+          "startTime": "2026-11-10T17:16:12.614Z",
+          "duration": 2812.392,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    ],
+    "additionalReruns": [
+      {
+        "scenario": "Core presenter/locks with voice-card max-height assertion",
+        "passed": 1,
+        "log": ".local/annotation-voice-card-browser.log"
+      },
+      {
+        "scenario": "PDF with actual saved-stamp insertion and remapped copies",
+        "passed": 1,
+        "log": ".local/annotation-stamp-final-browser.log"
+      }
+    ],
+    "media": "Fake capture through a real local SFU; decoded inbound video frames checked"
+  },
+  "build": {
+    "typecheck": true,
+    "web": true,
+    "server": true,
+    "largeChunkWarnings": true
+  },
+  "migration": {
+    "version": 19,
+    "originalRecordsPreserved": {
+      "users": 2,
+      "rooms": 5,
+      "messages": 5,
+      "documents": 11,
+      "geogebra": 1,
+      "boards": 6,
+      "workspace": 1,
+      "permissions": 0
+    }
+  },
+  "persistentPreview": {
+    "classroomId": "eb803738-7a0e-4e49-b250-06acd34e71fb",
+    "originalMessagesPreserved": 5,
+    "originalClassDocumentsPreserved": 3,
+    "persianDesktop": true,
+    "persianMobileNoOverflow": true,
+    "nativeFullscreen": true,
+    "annotationTools": true,
+    "locksDialog": true,
+    "browserErrors": []
+  },
+  "artifacts": {
+    "screenshots": [
+      "docs/screenshots/annotation-desktop-fa-2026-11-10.png",
+      "docs/screenshots/annotation-fullscreen-fa-2026-11-10.png",
+      "docs/screenshots/annotation-mobile-tools-fa-2026-11-10.png",
+      "docs/screenshots/annotation-mobile-locks-fa-2026-11-10.png",
+      "docs/screenshots/annotation-member-selection-2026-11-10.png",
+      "docs/screenshots/annotation-export-page-1-2026-11-10.png",
+      "docs/screenshots/annotation-export-page-3-2026-11-10.png"
+    ],
+    "pdf": "docs/artifacts/annotation-vector-export-2026-11-10.pdf"
+  },
+  "fullPdfAnnotatorParity": false,
+  "remaining": [
+    "Permanent PDF page crop/margins",
+    "Headers/footers, automatic page numbering and watermarks",
+    "Image crop/rotation/transparency/pixelation editor",
+    "Mixed-format text within one board text object",
+    "Specialized angle tool",
+    "Automatic highlights for all PDF text-search matches",
+    "Password-encrypted PDF export",
+    "Vector annotation export",
+    "800-participant media acceptance has not passed",
+    "Real Redis unavailable"
+  ],
+  "pdfExport": "Original source PDF pages preserve searchable text/vectors; annotations are flattened PNG overlays. Legacy books without originals remain raster.",
+  "storageConstraint": {
+    "newFilesAndCachesDrive": "E:",
+    "newInstallation": false
+  }
+}

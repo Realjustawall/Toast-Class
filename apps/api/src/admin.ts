@@ -22,38 +22,54 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
   }
   app.get<{ Params: { id: string } }>(base + '/overview', async (req) => {
     const { org } = await access(req, req.params.id);
-    const [organization, members, rooms, active, files, presentations, sessions, classroomRows] =
-      await Promise.all([
-        ctx.pool.query(
-          'SELECT id,name,storage_quota_bytes,default_classroom_theme FROM organizations WHERE id=$1',
-          [org],
-        ),
-        ctx.pool.query(
-          'SELECT role,COUNT(*) AS count FROM memberships WHERE organization_id=$1 GROUP BY role',
-          [org],
-        ),
-        ctx.pool.query('SELECT COUNT(*) AS count FROM classrooms WHERE organization_id=$1', [org]),
-        ctx.pool.query(
-          'SELECT COUNT(*) AS count FROM classroom_sessions s JOIN classrooms c ON c.id=s.classroom_id WHERE c.organization_id=$1 AND s.ended_at IS NULL',
-          [org],
-        ),
-        ctx.pool.query(
-          "SELECT status,COUNT(*) AS count,COALESCE(SUM(byte_size),0) AS bytes FROM files WHERE organization_id=$1 AND status<>'deleted' GROUP BY status",
-          [org],
-        ),
-        ctx.pool.query(
-          "SELECT status,COUNT(*) AS count,COALESCE(SUM(reserved_bytes),0) AS reserved_bytes FROM presentations WHERE organization_id=$1 AND status<>'deleted' GROUP BY status",
-          [org],
-        ),
-        ctx.pool.query(
-          'SELECT s.id,s.classroom_id,c.name,s.started_at FROM classroom_sessions s JOIN classrooms c ON c.id=s.classroom_id WHERE c.organization_id=$1 AND s.ended_at IS NULL ORDER BY s.started_at DESC,s.id DESC LIMIT 100',
-          [org],
-        ),
-        ctx.pool.query(
-          'SELECT c.id,c.name,c.theme,c.locked,c.chat_enabled,c.hand_raise_enabled,c.student_whiteboard_enabled,c.default_microphone,c.default_camera,c.default_screen_share,c.created_at FROM classrooms c LEFT JOIN breakout_rooms b ON b.classroom_id=c.id WHERE c.organization_id=$1 AND b.classroom_id IS NULL ORDER BY c.created_at DESC LIMIT 100',
-          [org],
-        ),
-      ]);
+    const [
+      organization,
+      members,
+      rooms,
+      active,
+      files,
+      presentations,
+      sessions,
+      classroomRows,
+      guestCounts,
+    ] = await Promise.all([
+      ctx.pool.query(
+        'SELECT id,name,storage_quota_bytes,default_classroom_theme FROM organizations WHERE id=$1',
+        [org],
+      ),
+      ctx.pool.query(
+        'SELECT role,COUNT(*) AS count FROM memberships WHERE organization_id=$1 GROUP BY role',
+        [org],
+      ),
+      ctx.pool.query('SELECT COUNT(*) AS count FROM classrooms WHERE organization_id=$1', [org]),
+      ctx.pool.query(
+        'SELECT COUNT(*) AS count FROM classroom_sessions s JOIN classrooms c ON c.id=s.classroom_id WHERE c.organization_id=$1 AND s.ended_at IS NULL',
+        [org],
+      ),
+      ctx.pool.query(
+        "SELECT status,COUNT(*) AS count,COALESCE(SUM(byte_size),0) AS bytes FROM files WHERE organization_id=$1 AND status<>'deleted' GROUP BY status",
+        [org],
+      ),
+      ctx.pool.query(
+        "SELECT status,COUNT(*) AS count,COALESCE(SUM(reserved_bytes),0) AS reserved_bytes FROM presentations WHERE organization_id=$1 AND status<>'deleted' GROUP BY status",
+        [org],
+      ),
+      ctx.pool.query(
+        'SELECT s.id,s.classroom_id,c.name,s.started_at FROM classroom_sessions s JOIN classrooms c ON c.id=s.classroom_id WHERE c.organization_id=$1 AND s.ended_at IS NULL ORDER BY s.started_at DESC,s.id DESC LIMIT 100',
+        [org],
+      ),
+      ctx.pool.query(
+        'SELECT c.id,c.name,c.theme,c.locked,c.chat_enabled,c.hand_raise_enabled,c.student_whiteboard_enabled,c.default_microphone,c.default_camera,c.default_screen_share,c.guest_entry_enabled,c.guest_max_capacity,c.created_at FROM classrooms c LEFT JOIN breakout_rooms b ON b.classroom_id=c.id WHERE c.organization_id=$1 AND b.classroom_id IS NULL ORDER BY c.created_at DESC LIMIT 100',
+        [org],
+      ),
+      ctx.pool.query(
+        'SELECT g.classroom_id,COUNT(*) AS count FROM classroom_guests g JOIN classrooms c ON c.id=g.classroom_id WHERE c.organization_id=$1 GROUP BY g.classroom_id',
+        [org],
+      ),
+    ]);
+    const guestCountByRoom = new Map(
+      guestCounts.rows.map((row) => [String(row.classroom_id), Number(row.count ?? 0)]),
+    );
     return {
       organization: organization.rows[0],
       asOf: new Date().toISOString(),
@@ -66,6 +82,7 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
       classrooms: classroomRows.rows.map((row) => ({
         ...row,
         ...formatRoomSettings(row),
+        guestCount: guestCountByRoom.get(String(row.id)) ?? 0,
       })),
     };
   });
@@ -166,6 +183,8 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
           permissions: classroomPermissionsSchema.optional(),
           enrollmentMode: z.enum(['assigned', 'organization']).optional(),
           memberIds: z.array(z.uuid()).max(1000).optional(),
+          guestEntryEnabled: z.boolean().optional(),
+          guestMaxCapacity: z.number().int().min(1).max(500).optional(),
         })
         .strict()
         .parse(req.body);
@@ -180,6 +199,8 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
         const currentSettings = formatRoomSettings(current);
         const nextName = data.name ?? current.name;
         const nextTheme = data.theme ?? currentSettings.theme;
+        const nextGuestEntryEnabled = data.guestEntryEnabled ?? currentSettings.guestEntryEnabled;
+        const nextGuestMaxCapacity = data.guestMaxCapacity ?? currentSettings.guestMaxCapacity;
         const nextPerms = {
           chatEnabled: data.permissions?.chatEnabled ?? currentSettings.permissions.chatEnabled,
           handRaiseEnabled:
@@ -196,7 +217,7 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
           locked: data.permissions?.locked ?? currentSettings.permissions.locked,
         };
         await c.query(
-          'UPDATE classrooms SET name=$1,theme=$2,chat_enabled=$3,hand_raise_enabled=$4,student_whiteboard_enabled=$5,default_microphone=$6,default_camera=$7,default_screen_share=$8,locked=$9 WHERE id=$10',
+          'UPDATE classrooms SET name=$1,theme=$2,chat_enabled=$3,hand_raise_enabled=$4,student_whiteboard_enabled=$5,default_microphone=$6,default_camera=$7,default_screen_share=$8,locked=$9,guest_entry_enabled=$10,guest_max_capacity=$11 WHERE id=$12',
           [
             nextName,
             nextTheme,
@@ -207,6 +228,8 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
             nextPerms.defaultCamera,
             nextPerms.defaultScreenShare,
             nextPerms.locked,
+            nextGuestEntryEnabled,
+            nextGuestMaxCapacity,
             roomId,
           ],
         );
@@ -218,7 +241,13 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
             org,
             'classroom.settings_updated',
             roomId,
-            JSON.stringify({ name: nextName, theme: nextTheme, permissions: nextPerms }),
+            JSON.stringify({
+              name: nextName,
+              theme: nextTheme,
+              permissions: nextPerms,
+              guestEntryEnabled: nextGuestEntryEnabled,
+              guestMaxCapacity: nextGuestMaxCapacity,
+            }),
           ],
         );
         if (data.enrollmentMode !== undefined || data.memberIds !== undefined) {
@@ -234,7 +263,14 @@ export async function registerAdmin(app: FastifyInstance, ctx: TeachingContext) 
             memberIds: ids,
           });
         }
-        return { id: roomId, name: nextName, theme: nextTheme, permissions: nextPerms };
+        return {
+          id: roomId,
+          name: nextName,
+          theme: nextTheme,
+          permissions: nextPerms,
+          guestEntryEnabled: nextGuestEntryEnabled,
+          guestMaxCapacity: nextGuestMaxCapacity,
+        };
       });
       const notify = (app as unknown as { notifyClassroom?: (id: string) => void }).notifyClassroom;
       notify?.(roomId);

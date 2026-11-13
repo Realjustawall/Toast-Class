@@ -46,7 +46,7 @@ export async function registerTeaching(app: FastifyInstance, ctx: TeachingContex
         }),
     ).values(),
   ];
-  const broadcast = (roomId: string, type = 'changed') => {
+  const broadcast = (roomId: string, type = 'changed', payloadData?: Record<string, unknown>) => {
     // Coalesce join/leave bursts so a large classroom does not generate N² notifications.
     if (type === 'users_changed') {
       if (!presenceTimers.has(roomId))
@@ -59,7 +59,7 @@ export async function registerTeaching(app: FastifyInstance, ctx: TeachingContex
         );
       return;
     }
-    const payload = JSON.stringify({ type });
+    const payload = JSON.stringify(payloadData ? { type, ...payloadData } : { type });
     for (const socket of listeners.get(roomId) ?? [])
       if (socket.readyState === 1) {
         if (socket.bufferedAmount > 256 * 1024) socket.close(1013, 'Reconnect to synchronize');
@@ -67,15 +67,18 @@ export async function registerTeaching(app: FastifyInstance, ctx: TeachingContex
       }
   };
   app.decorate('notifyClassroom', broadcast);
-  app.decorate('notifyClassroomUsers', (roomId: string, users: string[], type: string) => {
-    const wanted = new Set(users),
-      payload = JSON.stringify({ type });
-    for (const socket of listeners.get(roomId) ?? [])
-      if (socket.readyState === 1 && wanted.has(liveIdentities.get(socket)?.id ?? '')) {
-        if (socket.bufferedAmount > 256 * 1024) socket.close(1013, 'Reconnect to synchronize');
-        else socket.send(payload);
-      }
-  });
+  app.decorate(
+    'notifyClassroomUsers',
+    (roomId: string, users: string[], type: string, payloadData?: Record<string, unknown>) => {
+      const wanted = new Set(users),
+        payload = JSON.stringify(payloadData ? { type, ...payloadData } : { type });
+      for (const socket of listeners.get(roomId) ?? [])
+        if (socket.readyState === 1 && wanted.has(liveIdentities.get(socket)?.id ?? '')) {
+          if (socket.bufferedAmount > 256 * 1024) socket.close(1013, 'Reconnect to synchronize');
+          else socket.send(payload);
+        }
+    },
+  );
   async function access(
     req: { cookies: Record<string, string | undefined> },
     roomId: string,
@@ -949,7 +952,11 @@ export async function registerTeaching(app: FastifyInstance, ctx: TeachingContex
           [data.id, d.id, u.id, data.update],
         );
       });
-      broadcast(room.id, 'document_changed');
+      broadcast(room.id, 'document_changed', {
+        documentId: d.id,
+        updateId: data.id,
+        update: data.update,
+      });
       return { ok: true };
     },
   );

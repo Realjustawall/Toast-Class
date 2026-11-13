@@ -1,0 +1,189 @@
+{
+  "verifiedAt": "2026-11-11T12:36:18.866Z",
+  "previewUrl": "http://localhost:5174/#classroom/eb803738-7a0e-4e49-b250-06acd34e71fb",
+  "backend": {
+    "engine": "MySQL 8.4.13",
+    "tests": 113,
+    "passed": 110,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/downloads-full-native-final.log",
+    "finalTargetedChecks": {
+      "tests": 11,
+      "passed": 11,
+      "failed": 0,
+      "log": ".local/downloads-targets-verified.log",
+      "overlapsFullSuite": true
+    },
+    "pgMem": {
+      "passed": 1,
+      "failed": 0,
+      "log": ".local/downloads-pgmem-verified.log"
+    },
+    "skips": [
+      "Real Linux/Docker converter",
+      "Dedicated MySQL dump/restore fixture",
+      "Real S3 provider"
+    ]
+  },
+  "browser": {
+    "uniqueScenarios": 6,
+    "passed": 6,
+    "failed": 0,
+    "batches": [
+      {
+        "name": "downloads-pressure",
+        "stats": {
+          "startTime": "2026-11-11T12:23:27.100Z",
+          "duration": 30211.273,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/classroom-downloads.spec.ts",
+            "title": "presenter controls persisted file and board downloads; all-page PDF includes ink and cancellation/revocation prevent delivery",
+            "passed": true
+          },
+          {
+            "file": "e2e/pressure-chat.spec.ts",
+            "title": "normal pen stays constant; pressure pen stores real stylus samples, broadcasts before release and supports whole-stroke undo",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "name": "downloads-annotation",
+        "stats": {
+          "startTime": "2026-11-11T12:27:51.870Z",
+          "duration": 31097.303,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/annotation-regressions.spec.ts",
+            "title": "pen and marker keep their styles; student presenter gets real fullscreen and screen sharing; locks revoke capture and survive reopening",
+            "passed": true
+          },
+          {
+            "file": "e2e/annotation-regressions.spec.ts",
+            "title": "PDF pages, searchable original text, vector export, images, formulas, stamps, measurements and page management persist for both browsers",
+            "passed": true
+          }
+        ]
+      },
+      {
+        "name": "downloads-layout",
+        "stats": {
+          "startTime": "2026-11-11T12:29:14.023Z",
+          "duration": 62274.775,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/classroom-compact.spec.ts",
+            "title": "compact chat leaves room for messages, keeps formatting usable and fits all four layouts",
+            "passed": true
+          },
+          {
+            "file": "e2e/classroom-types-and-access.spec.ts",
+            "title": "owner configures type and enrollment, students only see assigned classes, teachers teach, text formats and all four layouts fit",
+            "passed": true
+          }
+        ]
+      }
+    ]
+  },
+  "downloads": {
+    "storage": "classroom_download_policies",
+    "defaultEnabled": true,
+    "perFile": true,
+    "perPresentation": true,
+    "perBoardBook": true,
+    "legacyBoardSupported": true,
+    "managersAndFreshPresentersOnly": true,
+    "strictInputAndCsrf": true,
+    "targetTenantAndClassroomFenced": true,
+    "compareAndSwapRevision": true,
+    "audit": true,
+    "liveInvalidations": true,
+    "lateJoinAndReload": true,
+    "rawBase64RangeAndHeadChecked": true,
+    "fabricatedDocumentDoesNotBypass": true,
+    "convertedPdfAndOriginalChecked": true,
+    "renderingAssetsRemainReadable": true,
+    "archivingBookRootPreservesPolicy": true,
+    "independentOrganizationLibraryGrantsUnchanged": true
+  },
+  "pdf": {
+    "generatedIn": "browser",
+    "serverAuthorization": "Before generation and before delivery",
+    "wholeBookWithInk": true,
+    "singlePage": true,
+    "legacySvgToPdf": true,
+    "originalPdfTextAndRotationPreserved": true,
+    "annotations": "Raster overlay; full vector annotation export remains outstanding.",
+    "cancelSupported": true,
+    "revocationDuringGenerationPreventsDelivery": true,
+    "waitsForInFlightBoardReceipts": true
+  },
+  "migration": {
+    "migrationsThrough": 22,
+    "backup": ".local/runtime/downloads-before-migration-1794399603498.json",
+    "existingRecordsPreserved": {
+      "users": 2,
+      "rooms": 5,
+      "messages": 5,
+      "documents": 11,
+      "geogebra": 1,
+      "boards": 6,
+      "workspace": 1,
+      "permissions": 0
+    }
+  },
+  "persistentPreview": {
+    "classroomId": "eb803738-7a0e-4e49-b250-06acd34e71fb",
+    "pdfPages": 2,
+    "pdfBytes": 587,
+    "pdfPath": ".local/runtime/user-board-download.pdf",
+    "visiblePersianDownloadControl": true,
+    "mobileNoOverflow": true,
+    "existingMessagesPreserved": 5,
+    "existingDocumentsPreserved": 3,
+    "personalPreferencesUnchanged": true,
+    "downloadPoliciesUnchanged": true,
+    "browserErrors": [],
+    "checkedWidths": [390, 320]
+  },
+  "builds": {
+    "typecheck": "passed",
+    "server": "passed",
+    "web": "passed",
+    "largeBundleWarningsRemain": true
+  },
+  "filesAndCachesOnDrive": "E",
+  "newInstallations": 0,
+  "screenshots": [
+    "docs/screenshots/download-controls-desktop-fa-2026-11-11.png",
+    "docs/screenshots/download-controls-mobile-fa-2026-11-11.png",
+    "docs/screenshots/download-controls-320-fa-2026-11-11.png",
+    "docs/screenshots/download-controls-files-2026-11-11.png"
+  ],
+  "sourceBehaviorReference": "https://docs.bigbluebutton.org/3.0/testing/release-testing/",
+  "limits": [
+    "This is a classroom download permission, not protection against screenshots or extraction of already-rendered data.",
+    "An independent organization library permission is not revoked by a classroom toggle.",
+    "Full BigBlueButton feature parity and a numerical 1000x improvement are not claimed.",
+    "800-user media acceptance has not passed.",
+    "Real Redis remains unavailable.",
+    "Full PDF Annotator parity remains incomplete."
+  ]
+}

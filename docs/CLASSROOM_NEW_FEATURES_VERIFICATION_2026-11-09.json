@@ -1,0 +1,148 @@
+{
+  "measuredAt": "2026-11-09T17:41:34.581Z",
+  "scope": "Chat image grants, reversible participant locks and request authorization, optional Redis, measured connection signal, multipage whiteboard/PDF annotation and supplied login design.",
+  "backend": {
+    "tests": 101,
+    "passed": 98,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/new-ui-final-all.log"
+  },
+  "targetedMySQL": {
+    "tests": 13,
+    "passed": 13,
+    "failed": 0,
+    "skipped": 0,
+    "log": ".local/new-ui-final-targeted.log"
+  },
+  "targetedPgMem": {
+    "tests": 13,
+    "passed": 12,
+    "failed": 0,
+    "skipped": 1,
+    "log": ".local/new-ui-final-pgmem.log"
+  },
+  "browserScenarios": {
+    "features": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 21971,
+      "evidence": ".local/runtime/images-pages-login-browser-results.json"
+    },
+    "compact": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 67237,
+      "evidence": ".local/runtime/new-ui-compact-results.json"
+    },
+    "board": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 45470,
+      "evidence": ".local/runtime/new-ui-board-regression-results.json"
+    },
+    "connection": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 8306,
+      "evidence": ".local/runtime/new-ui-connection-results.json"
+    },
+    "media": {
+      "passed": 1,
+      "failed": 0,
+      "skipped": 0,
+      "durationMs": 24203,
+      "evidence": ".local/runtime/new-ui-media-results.json"
+    }
+  },
+  "build": {
+    "typecheck": "passed",
+    "server": "passed",
+    "web": "passed",
+    "warnings": "Existing large editor/font chunks and dependency comment annotations"
+  },
+  "persistentPreview": {
+    "origin": "http://localhost:5174",
+    "classroomId": "eb803738-7a0e-4e49-b250-06acd34e71fb",
+    "mysqlMigrationsThrough": 16,
+    "loginSceneCanvas": true,
+    "userClassroom": true,
+    "existingMessages": 5,
+    "mobileNoHorizontalOverflow": true,
+    "errors": []
+  },
+  "capacity": {
+    "measuredAt": "2026-11-09T17:19:29.283Z",
+    "results": [
+      {
+        "users": 200,
+        "accepted": 200,
+        "rejected": 0,
+        "delivered": 200,
+        "connectMs": 1124,
+        "connectP95Ms": 267,
+        "rssMiB": 244,
+        "rssDeltaMiB": 46,
+        "eventLoopP99Ms": 37,
+        "database": "mysql",
+        "scope": "Authenticated WebSocket signaling only; no media, browser rendering or production capacity certification"
+      },
+      {
+        "users": 800,
+        "accepted": 800,
+        "rejected": 0,
+        "delivered": 800,
+        "connectMs": 3117,
+        "connectP95Ms": 117,
+        "rssMiB": 269,
+        "rssDeltaMiB": 40,
+        "eventLoopP99Ms": 61,
+        "database": "mysql",
+        "scope": "Authenticated WebSocket signaling only; no media, browser rendering or production capacity certification"
+      }
+    ]
+  },
+  "redis": {
+    "realServerInstalled": false,
+    "officialClient": "@redis/client 6.3.1",
+    "verified": "RESP protocol fixture using official client; shared versioned cache, namespaces, fresh authorization and stalled-command fallback",
+    "commandDeadlineMs": 80,
+    "ttlSeconds": 30
+  },
+  "pdf": {
+    "renderer": "pdfjs-dist 6.5.438",
+    "exporter": "pdf-lib 1.17.1",
+    "importMaxMiB": 20,
+    "importMaxPages": 30,
+    "bookMaxPages": 100,
+    "export": "Rasterized current page or complete book PDF; PNG and SVG current page",
+    "encryptedInputSupported": false
+  },
+  "storage": {
+    "newInstallsAndCachesOn": "E:",
+    "migrationPreserved": {
+      "users": 2,
+      "classrooms": 5,
+      "messages": 5,
+      "documents": 10,
+      "geogebraDocuments": 1
+    }
+  },
+  "limits": [
+    "Signaling test is not a media-capacity certification.",
+    "Earlier 200 synthetic media participants passed; 800 media participants did not pass.",
+    "No production zero-outage, minimum-RAM or full PDF Annotator feature-parity claim."
+  ],
+  "artifacts": [
+    ".local/runtime/user-login-design-desktop-fa.png",
+    ".local/runtime/user-new-features-desktop-fa.png",
+    ".local/runtime/user-new-features-mobile-fa.png",
+    ".local/runtime/pdf-annotation-desktop.png",
+    ".local/runtime/pdf-annotation-mobile.png",
+    ".local/runtime/annotated-book.pdf"
+  ]
+}

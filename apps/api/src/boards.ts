@@ -21,11 +21,12 @@ export async function registerBoards(app: FastifyInstance, ctx: TeachingContext)
   const { pool, user, roomAccess, membership } = ctx;
   const base = '/api/v1/classrooms/:id/documents/:doc/board';
   type Params = { id: string; doc: string };
-  const notify = (id: string) =>
-    (app as unknown as { notifyClassroom: (id: string, type?: string) => void }).notifyClassroom(
-      id,
-      'board_changed',
-    );
+  const notify = (id: string, payload?: Record<string, unknown>) =>
+    (
+      app as unknown as {
+        notifyClassroom: (id: string, type?: string, payload?: Record<string, unknown>) => void;
+      }
+    ).notifyClassroom(id, 'board_changed', payload);
   async function access(req: { cookies: Record<string, string | undefined> }, params: Params) {
     const u = await user(req),
       room = await roomAccess(z.uuid().parse(params.id), u.id),
@@ -188,7 +189,12 @@ export async function registerBoards(app: FastifyInstance, ctx: TeachingContext)
           );
         return next;
       });
-      notify(a.room.id);
+      notify(a.room.id, {
+        documentId: a.document.id,
+        generation: data.generation,
+        revision,
+        ...(data.update.length <= 65536 ? { update: data.update } : {}),
+      });
       return { revision };
     },
   );

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { request } from './api';
 import {
@@ -247,6 +247,31 @@ export default function PlatformSettings() {
                       onChange={(e) => update('pdfImportEnabled', e.target.checked)}
                     />
                     {t('platformPdfEnabled')}
+                  </label>
+                </div>
+              </section>
+              <section className="account-section">
+                <h2>{t('platformGuestSection')}</h2>
+                <p>{t('platformGuestHelp')}</p>
+                <div className="platform-form-grid">
+                  <label className="platform-checkbox platform-full-row">
+                    <input
+                      type="checkbox"
+                      checked={draft.guestEntryEnabled}
+                      onChange={(e) => update('guestEntryEnabled', e.target.checked)}
+                    />
+                    {t('platformGuestEnabled')}
+                  </label>
+                  <label>
+                    {t('platformGuestMaxCapacity')}
+                    <input
+                      type="number"
+                      min={1}
+                      max={500}
+                      required
+                      value={draft.guestMaxCapacity}
+                      onChange={(e) => update('guestMaxCapacity', Number(e.target.value))}
+                    />
                   </label>
                 </div>
               </section>

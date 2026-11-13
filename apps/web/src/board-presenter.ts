@@ -134,7 +134,7 @@ export function useBoardPresenter(
           active: true,
           viewport: value,
         });
-    }, 500);
+    }, 30);
   }
   function move(value: Viewport) {
     if (!current.current?.active || current.current.actorId !== userId || failed.current) return;

@@ -322,6 +322,12 @@
   .classroom-shell {
     grid-template-rows: 68px var(--preferred-media-height, 160px) minmax(0, 1fr) 82px;
   }
+  .classroom-shell[data-theme='modular-skyroom'] {
+    grid-template-rows: 58px minmax(0, 1fr) minmax(0, 1fr) 68px;
+  }
+  .classroom-shell[data-theme='immersive-glass'] {
+    grid-template-rows: 64px minmax(0, 1fr) 84px;
+  }
   .classroom-shell[data-theme='studio-hybrid'] {
     grid-template-rows: 68px minmax(0, 1fr) var(--preferred-media-height, 160px) 82px;
   }

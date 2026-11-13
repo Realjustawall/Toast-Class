@@ -38,6 +38,8 @@ export const platformOptionsSchema = z
     chatImageMaxMiB: z.number().int().min(1).max(5).default(5),
     geoEnabled: z.boolean().default(true),
     pdfImportEnabled: z.boolean().default(true),
+    guestEntryEnabled: z.boolean().default(false),
+    guestMaxCapacity: z.number().int().min(1).max(500).default(20),
     defaultPermissions: z
       .object({
         chatEnabled: z.boolean(),

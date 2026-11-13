@@ -5,10 +5,43 @@ import { transaction } from './db.js';
 import { fail } from './errors.js';
 import { z } from 'zod';
 import { randomUUID } from 'node:crypto';
+import { readPlatformOptions } from './platform-options.js';
 
 type Query = Pick<DatabasePool, 'query'>;
 // Use the transaction connection for writes so a queued request cannot reuse an
 // old permission result after a moderator changes access.
+export async function assertGuestAccess(
+  c: Query,
+  room: Record<string, unknown>,
+  userId: string,
+): Promise<boolean> {
+  const userRow = (await c.query('SELECT is_guest FROM users WHERE id=$1', [userId])).rows[0];
+  if (!userRow?.is_guest) return false;
+  const options = await readPlatformOptions(c);
+  if (!options.guestEntryEnabled) fail(403, 'Guest entry is disabled');
+  const roomId = String(room.id);
+  const parent = (
+    await c.query(
+      'SELECT s.classroom_id AS parent_id FROM breakout_rooms b JOIN breakout_groups g ON g.id=b.group_id JOIN classroom_sessions s ON s.id=g.parent_session_id WHERE b.classroom_id=$1',
+      [roomId],
+    )
+  ).rows[0];
+  const rootId = parent?.parent_id ?? roomId;
+  const rootRoom =
+    rootId === roomId
+      ? room
+      : (await c.query('SELECT guest_entry_enabled FROM classrooms WHERE id=$1', [rootId])).rows[0];
+  if (!rootRoom?.guest_entry_enabled) fail(403, 'Guest entry is disabled for this classroom');
+  const guestRow = (
+    await c.query('SELECT id FROM classroom_guests WHERE classroom_id=$1 AND user_id=$2', [
+      rootId,
+      userId,
+    ])
+  ).rows[0];
+  if (!guestRow) fail(403, 'Guest access is not authorized for this classroom');
+  return true;
+}
+
 export async function classroomAuthorization(c: Query, classroomId: string, userId: string) {
   const room = (
     await c.query('SELECT * FROM classrooms WHERE id=$1', [z.uuid().parse(classroomId)])
@@ -23,8 +56,10 @@ export async function classroomAuthorization(c: Query, classroomId: string, user
   if (!member || !['owner', 'teacher', 'student'].includes(member.role))
     fail(403, 'Permission denied');
   const role = member.role as string;
-  if (!(await hasClassroomAccess(c, room.id, userId, role)))
+  const isGuest = await assertGuestAccess(c, room, userId);
+  if (!isGuest && !(await hasClassroomAccess(c, room.id, userId, role))) {
     fail(403, 'Classroom access is not assigned');
+  }
   if (room.locked && role === 'student') fail(403, 'Classroom is locked by moderator');
   const permission =
     (

@@ -75,10 +75,14 @@ export default function Presentations({
         });
     return () => controller.abort();
   }, [roomId, current?.presentationId]);
+  const converting = !!state?.presentations.some(
+    (p) => p.status === 'queued' || p.status === 'processing',
+  );
   useEffect(() => {
+    if (!converting) return;
     const interval = setInterval(() => void refreshRef.current(), 2500);
     return () => clearInterval(interval);
-  }, [roomId]);
+  }, [roomId, converting]);
   const number = (n: number) => new Intl.NumberFormat(i18n.language).format(n);
   useEffect(() => {
     if (pendingIndependent && state && state.revision > pendingIndependent.revision)
@@ -88,6 +92,16 @@ export default function Presentations({
     current && (manager || !current.independentView || following) ? current.page : localPage;
   const selected = details?.assets.find((a) => a.page === page),
     pdf = details?.assets.find((a) => a.page === 0);
+  useEffect(() => {
+    if (!details?.assets.length) return;
+    for (const offset of [1, -1]) {
+      const neighbor = details.assets.find((a) => a.page === page + offset);
+      if (neighbor) {
+        const img = new Image();
+        img.src = '/api/v1/classrooms/' + roomId + '/files/' + neighbor.fileId + '/content';
+      }
+    }
+  }, [roomId, details, page]);
   useEffect(() => {
     const element = scroll.current;
     if (!element) return;

@@ -19,7 +19,9 @@ import { registerClassroomWorkspace } from './classroom-workspace.js';
 import { registerAnnotationPages } from './annotation-pages.js';
 import { readPlatformOptions, registerPlatformOptions } from './platform-options.js';
 import { registerAdmin } from './admin.js';
+import { registerGuest } from './guest.js';
 import {
+  assertGuestAccess,
   enrollmentSchema,
   hasClassroomAccess,
   saveClassroomEnrollment,
@@ -175,6 +177,8 @@ export function formatRoomSettings(row: Record<string, unknown>) {
       : 'classic-bbb') as ClassroomTheme,
     pinnedNotice: typeof row.pinned_notice === 'string' ? row.pinned_notice : '',
     externalMediaUrl: typeof row.external_media_url === 'string' ? row.external_media_url : '',
+    guestEntryEnabled: Boolean(row.guest_entry_enabled),
+    guestMaxCapacity: Number(row.guest_max_capacity ?? 20),
     permissions: {
       chatEnabled: row.chat_enabled !== false && row.chat_enabled !== 0,
       handRaiseEnabled: row.hand_raise_enabled !== false && row.hand_raise_enabled !== 0,
@@ -326,7 +330,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
     const r = await pool.query('SELECT * FROM classrooms WHERE id=$1', [roomId]);
     if (!r.rows[0]) throw new HttpError(404, 'Classroom not found');
     const role = await membership(r.rows[0].organization_id, uid);
-    if (!(await hasClassroomAccess(pool, roomId, uid, role)))
+    const isGuest = await assertGuestAccess(pool, r.rows[0], uid);
+    if (!isGuest && !(await hasClassroomAccess(pool, roomId, uid, role)))
       throw new HttpError(403, 'Classroom access is not assigned');
     if (r.rows[0].locked && role === 'student')
       throw new HttpError(403, 'Classroom is locked by moderator');
@@ -609,6 +614,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
           permissions: classroomPermissionsSchema.optional(),
           enrollmentMode: enrollmentSchema.shape.enrollmentMode,
           memberIds: enrollmentSchema.shape.memberIds,
+          guestEntryEnabled: z.boolean().optional(),
+          guestMaxCapacity: z.number().int().min(1).max(500).optional(),
         })
         .strict()
         .parse(req.body);
@@ -653,8 +660,10 @@ export async function buildApp(pool: DatabasePool, config: Config) {
             data.permissions?.defaultScreenShare ?? options.defaultPermissions.defaultScreenShare,
           locked: data.permissions?.locked ?? options.defaultPermissions.locked,
         };
+        const guestEntryEnabled = data.guestEntryEnabled ?? false;
+        const guestMaxCapacity = data.guestMaxCapacity ?? options.guestMaxCapacity ?? 20;
         await c.query(
-          'INSERT INTO classrooms(id,organization_id,name,created_by,theme,chat_enabled,hand_raise_enabled,student_whiteboard_enabled,default_microphone,default_camera,default_screen_share,locked) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)',
+          'INSERT INTO classrooms(id,organization_id,name,created_by,theme,chat_enabled,hand_raise_enabled,student_whiteboard_enabled,default_microphone,default_camera,default_screen_share,locked,guest_entry_enabled,guest_max_capacity) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)',
           [
             id,
             req.params.org,
@@ -668,6 +677,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
             perms.defaultCamera,
             perms.defaultScreenShare,
             perms.locked,
+            guestEntryEnabled,
+            guestMaxCapacity,
           ],
         );
         await c.query('UPDATE classrooms SET locks_json=$1 WHERE id=$2', [
@@ -677,12 +688,21 @@ export async function buildApp(pool: DatabasePool, config: Config) {
         await audit(u.id, req.params.org, 'classroom.created', id, c, {
           theme,
           permissions: perms,
+          guestEntryEnabled,
+          guestMaxCapacity,
         });
         await saveClassroomEnrollment(c, id, req.params.org, {
           enrollmentMode: data.enrollmentMode,
           memberIds: data.memberIds,
         });
-        return { id, name: data.name, theme, permissions: perms };
+        return {
+          id,
+          name: data.name,
+          theme,
+          permissions: perms,
+          guestEntryEnabled,
+          guestMaxCapacity,
+        };
       });
       return reply.code(201).send(created);
     },
@@ -712,6 +732,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
         name: named.shape.name.optional(),
         theme: classroomThemeSchema.optional(),
         permissions: classroomPermissionsSchema.optional(),
+        guestEntryEnabled: z.boolean().optional(),
+        guestMaxCapacity: z.number().int().min(1).max(500).optional(),
       })
       .strict()
       .parse(req.body);
@@ -722,6 +744,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
       const currentSettings = formatRoomSettings(current);
       const nextName = data.name ?? current.name;
       const nextTheme = data.theme ?? currentSettings.theme;
+      const nextGuestEntryEnabled = data.guestEntryEnabled ?? currentSettings.guestEntryEnabled;
+      const nextGuestMaxCapacity = data.guestMaxCapacity ?? currentSettings.guestMaxCapacity;
       const nextPerms = {
         chatEnabled: data.permissions?.chatEnabled ?? currentSettings.permissions.chatEnabled,
         handRaiseEnabled:
@@ -737,7 +761,7 @@ export async function buildApp(pool: DatabasePool, config: Config) {
         locked: data.permissions?.locked ?? currentSettings.permissions.locked,
       };
       await c.query(
-        'UPDATE classrooms SET name=$1,theme=$2,chat_enabled=$3,hand_raise_enabled=$4,student_whiteboard_enabled=$5,default_microphone=$6,default_camera=$7,default_screen_share=$8,locked=$9 WHERE id=$10',
+        'UPDATE classrooms SET name=$1,theme=$2,chat_enabled=$3,hand_raise_enabled=$4,student_whiteboard_enabled=$5,default_microphone=$6,default_camera=$7,default_screen_share=$8,locked=$9,guest_entry_enabled=$10,guest_max_capacity=$11 WHERE id=$12',
         [
           nextName,
           nextTheme,
@@ -748,6 +772,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
           nextPerms.defaultCamera,
           nextPerms.defaultScreenShare,
           nextPerms.locked,
+          nextGuestEntryEnabled,
+          nextGuestMaxCapacity,
           room.id,
         ],
       );
@@ -755,8 +781,17 @@ export async function buildApp(pool: DatabasePool, config: Config) {
         name: nextName,
         theme: nextTheme,
         permissions: nextPerms,
+        guestEntryEnabled: nextGuestEntryEnabled,
+        guestMaxCapacity: nextGuestMaxCapacity,
       });
-      return { id: room.id, name: nextName, theme: nextTheme, permissions: nextPerms };
+      return {
+        id: room.id,
+        name: nextName,
+        theme: nextTheme,
+        permissions: nextPerms,
+        guestEntryEnabled: nextGuestEntryEnabled,
+        guestMaxCapacity: nextGuestMaxCapacity,
+      };
     });
     (app as unknown as { notifyClassroom: (id: string) => void }).notifyClassroom(room.id);
     return updated;
@@ -845,8 +880,8 @@ export async function buildApp(pool: DatabasePool, config: Config) {
         .refine((data) => Boolean(data.body || data.imageFileId))
         .parse(req.body);
       const id = randomUUID();
+      const createdAt = new Date();
       const receipt = await transaction(async (c) => {
-        await c.query('SELECT id FROM classrooms WHERE id=$1 FOR UPDATE', [room.id]);
         await assertPublicChat(c, room.id);
         const authorization = await classroomAuthorization(c, room.id, u.id);
         const currentPermissions = resolveUserPermissions(
@@ -911,8 +946,16 @@ export async function buildApp(pool: DatabasePool, config: Config) {
           if (!category) throw new HttpError(404, 'Not found');
         }
         await c.query(
-          'INSERT INTO messages(id,classroom_id,user_id,body,category_id,image_file_id) VALUES($1,$2,$3,$4,$5,$6)',
-          [id, room.id, u.id, data.body, data.categoryId ?? null, data.imageFileId ?? null],
+          'INSERT INTO messages(id,classroom_id,user_id,body,category_id,image_file_id,created_at) VALUES($1,$2,$3,$4,$5,$6,$7)',
+          [
+            id,
+            room.id,
+            u.id,
+            data.body,
+            data.categoryId ?? null,
+            data.imageFileId ?? null,
+            createdAt,
+          ],
         );
         await c.query('UPDATE classrooms SET chat_revision=chat_revision+1 WHERE id=$1', [room.id]);
         if (data.clientMessageId)
@@ -920,13 +963,35 @@ export async function buildApp(pool: DatabasePool, config: Config) {
             'INSERT INTO chat_send_receipts(classroom_id,user_id,client_message_id,message_id,digest) VALUES($1,$2,$3,$4,$5)',
             [room.id, u.id, data.clientMessageId, id, digest],
           );
-        return { id, replayed: false };
+        return {
+          id,
+          replayed: false,
+          role: authorization.role,
+        };
       });
-      (app as unknown as { notifyClassroom: (id: string, type?: string) => void }).notifyClassroom(
+      (
+        app as unknown as {
+          notifyClassroom: (id: string, type?: string, payload?: Record<string, unknown>) => void;
+        }
+      ).notifyClassroom(
         req.params.id,
         'chat_changed',
+        receipt.replayed
+          ? undefined
+          : {
+              message: {
+                id,
+                body: data.body,
+                user_id: u.id,
+                category_id: data.categoryId ?? null,
+                image_file_id: data.imageFileId ?? null,
+                created_at: createdAt.toISOString(),
+                name: u.name,
+                role: receipt.role ?? null,
+              },
+            },
       );
-      return reply.code(201).send(receipt);
+      return reply.code(201).send({ id: receipt.id, replayed: receipt.replayed });
     },
   );
   app.post<{ Params: { id: string } }>(
@@ -1532,5 +1597,12 @@ export async function buildApp(pool: DatabasePool, config: Config) {
   );
   await registerAdmin(app, { pool, origin: config.origin, user, roomAccess, membership });
   await registerClassroomAccess(app, { pool, origin: config.origin, user, roomAccess, membership });
+  await registerGuest(app, {
+    pool,
+    production: process.env.NODE_ENV === 'production',
+    user,
+    roomAccess,
+    membership,
+  });
   return app;
 }

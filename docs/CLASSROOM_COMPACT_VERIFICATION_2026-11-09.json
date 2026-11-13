@@ -1,0 +1,147 @@
+{
+  "recordedAt": "2026-11-09T12:19:41.037Z",
+  "scope": "Compact classroom UI, typography, overflow and editor interaction. This is not a new media capacity run.",
+  "defaults": {
+    "chatWidth": 280,
+    "peopleWidth": 240,
+    "mediaHeight": 144,
+    "mediaWidth": 208,
+    "textSize": 14
+  },
+  "previewMeasurements": {
+    "desktopChatWidth": 280,
+    "composerHeight": 96,
+    "headerHeight": 42,
+    "screenWidths": [390, 320]
+  },
+  "browser": {
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "entries": [
+      {
+        "file": "tests/e2e/classroom-compact.spec.ts",
+        "log": ".local/compact-touch-final.log",
+        "exitCode": 0,
+        "stats": {
+          "startTime": "2026-11-09T12:18:25.882Z",
+          "duration": 24865.511000000002,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "ba32e9bbad18290952c2ea5abfefe752c556b163b528eb3ac04b67fed97d4c4d"
+      },
+      {
+        "file": "tests/e2e/classroom-panel-sizing.spec.ts",
+        "log": ".local/compact-classroom-panel-sizing.log",
+        "exitCode": 0,
+        "stats": {
+          "startTime": "2026-11-09T12:16:02.050Z",
+          "duration": 16256.937,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "7f693fb7b52fb588e73b037f57c941e8280164a03ab52345a5955fec882fd0fc"
+      },
+      {
+        "file": "tests/e2e/classroom-types-and-access.spec.ts",
+        "log": ".local/compact-classroom-types-and-access.log",
+        "exitCode": 0,
+        "stats": {
+          "startTime": "2026-11-09T12:16:23.501Z",
+          "duration": 26814.239,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "622ed0fc34f9dd84abba998b0604bb28cdedf09ccef7c52b9a6dea2f52b0332d"
+      },
+      {
+        "file": "tests/e2e/teaching.spec.ts",
+        "log": ".local/compact-teaching.log",
+        "exitCode": 0,
+        "stats": {
+          "startTime": "2026-11-09T12:16:55.484Z",
+          "duration": 21093.84,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "sha256": "9805823a6ea3942a3c89bd31ce272dff981a225123e8db09b6a959aa2e4353a6"
+      }
+    ]
+  },
+  "responsive": {
+    "themes": 4,
+    "languages": ["en", "fa"],
+    "viewports": [
+      {
+        "width": 3840,
+        "height": 2160
+      },
+      {
+        "width": 1440,
+        "height": 900
+      },
+      {
+        "width": 1280,
+        "height": 720
+      },
+      {
+        "width": 1024,
+        "height": 768
+      },
+      {
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "width": 390,
+        "height": 844
+      },
+      {
+        "width": 320,
+        "height": 568
+      },
+      {
+        "width": 667,
+        "height": 375
+      },
+      {
+        "width": 640,
+        "height": 360
+      }
+    ],
+    "desktopPointerCombinations": 72,
+    "touchCombinations": 12
+  },
+  "units": {
+    "passed": 2,
+    "failed": 0,
+    "log": ".local/compact-rich-unit.log"
+  },
+  "checks": [
+    {
+      "name": "TypeScript",
+      "status": "passed",
+      "log": ".local/compact-typecheck.log"
+    },
+    {
+      "name": "Web build",
+      "status": "passed",
+      "log": ".local/compact-build.log",
+      "note": "Existing chunk size warnings remain."
+    }
+  ],
+  "screenshots": [
+    ".local/runtime/user-chat-compact-desktop-fa.png",
+    ".local/runtime/user-chat-compact-390-fa.png",
+    ".local/runtime/user-chat-compact-320-fa.png"
+  ]
+}

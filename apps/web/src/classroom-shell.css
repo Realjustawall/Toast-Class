@@ -897,7 +897,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.classroom-shell[data-theme] .classroom-people-panel[data-app-mode='true'] .classroom-panel-tools button,
+.classroom-shell[data-theme]
+  .classroom-people-panel[data-app-mode='true']
+  .classroom-panel-tools
+  button,
 .classroom-shell[data-theme] .classroom-people-panel[data-app-mode='true'] > header > button {
   width: 30px;
   height: 32px;
@@ -905,7 +908,10 @@
   min-height: 32px;
   font-size: 13px;
 }
-.classroom-shell[data-theme] .classroom-people-panel[data-app-mode='true'] > header > .classroom-app-back {
+.classroom-shell[data-theme]
+  .classroom-people-panel[data-app-mode='true']
+  > header
+  > .classroom-app-back {
   width: auto;
   min-width: 52px;
   padding-inline: 8px;

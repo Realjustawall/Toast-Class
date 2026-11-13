@@ -38,7 +38,16 @@ export function validateProductionOptions(o) {
     /[\r\n\0]/.test(o.password)
   )
     throw new Error('Administrator password must contain 6 to 128 characters on one line');
-  return { ...o, host };
+  const multiNode = Boolean(o.multiNode);
+  const redisUrl = o.redisUrl ? String(o.redisUrl).trim() : '';
+  if (redisUrl) {
+    if (
+      /[\r\n\0]/.test(redisUrl) ||
+      (!redisUrl.startsWith('redis://') && !redisUrl.startsWith('rediss://'))
+    )
+      throw new Error('Redis URL must use redis:// or rediss:// without control characters');
+  }
+  return { ...o, host, multiNode, redisUrl };
 }
 export async function readPasswordFile(path) {
   const info = await lstat(path);
@@ -67,13 +76,27 @@ export async function prepareProductionInstallation(options) {
     jobsDir: o.jobsDir,
   });
   const file = (name) => resolve(o.directory, name);
+  const redisPassword = o.multiNode && !o.redisUrl ? randomBytes(24).toString('base64url') : '';
+  const redisPort = '6379';
+  const resolvedRedisUrl = o.redisUrl
+    ? o.redisUrl
+    : o.multiNode
+      ? `redis://:${redisPassword}@127.0.0.1:${redisPort}`
+      : 'false';
   const extra = {
     SOURCE_DIR: o.source,
     ACME_EMAIL: o.email,
     ADMIN_EMAIL: o.email,
     PRESENTATIONS_ENABLED: o.documents ? 'true' : 'false',
     COMPOSE_PROFILES: o.documents ? 'documents' : '',
-    REDIS_URL: 'false',
+    REDIS_URL: resolvedRedisUrl,
+    ...(redisPassword
+      ? {
+          REDIS_PASSWORD: redisPassword,
+          REDIS_PORT: redisPort,
+          REDIS_IMAGE: 'redis:7.4-alpine',
+        }
+      : {}),
   };
   await writeFile(
     file('.env'),
@@ -126,9 +149,52 @@ export async function prepareProductionInstallation(options) {
       `  ${service}:\n    build:\n      context: \${SOURCE_DIR}\n      dockerfile: infrastructure/docker/Dockerfile.${dockerfile}${args}\n`,
     );
   }
+  const redisService = redisPassword
+    ? `
+  redis:
+    image: \${REDIS_IMAGE}
+    pull_policy: missing
+    network_mode: host
+    command:
+      [
+        'redis-server',
+        '--requirepass',
+        '\${REDIS_PASSWORD}',
+        '--bind',
+        '127.0.0.1',
+        '--port',
+        '\${REDIS_PORT}',
+        '--appendonly',
+        'no',
+        '--maxmemory',
+        '512mb',
+        '--maxmemory-policy',
+        'allkeys-lru',
+        '--rename-command',
+        'FLUSHALL',
+        '""',
+        '--rename-command',
+        'FLUSHDB',
+        '""',
+        '--rename-command',
+        'CONFIG',
+        '""',
+      ]
+    read_only: true
+    tmpfs: ['/tmp:rw,noexec,nosuid,nodev,size=67108864,mode=1777']
+    cap_drop: [ALL]
+    security_opt: ['no-new-privileges:true']
+    healthcheck:
+      test: ['CMD-SHELL', 'REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h 127.0.0.1 -p "$REDIS_PORT" ping | grep -q PONG']
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+    logging: *logs`
+    : '';
   compose = compose.replace(
     '\nvolumes:\n',
-    `
+    `${redisService}
   signatures:
     image: \${CLAMAV_IMAGE}
     pull_policy: missing
@@ -169,7 +235,8 @@ volumes:
   );
   const result = {
     ...summary,
-    topology: 'production',
+    topology: o.multiNode ? 'multi-node' : 'production',
+    redisEnabled: o.multiNode || Boolean(o.redisUrl),
     source: o.source,
     documents: Boolean(o.documents),
     mathOrigin: 'https://math.' + o.host,

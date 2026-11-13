@@ -134,7 +134,27 @@ export default function CollaborativeDocument({
       if (mounted.current) setError((e as Error).message);
     }
   }
-  useClassroomEvents(roomId, () => void sync(), ['document_changed']);
+  useClassroomEvents(
+    roomId,
+    (events) => {
+      const ev = events?.find((e) => e.type === 'document_changed');
+      if (
+        events?.length === 1 &&
+        ev &&
+        ev.documentId === info.id &&
+        typeof ev.updateId === 'string' &&
+        typeof ev.update === 'string'
+      ) {
+        if (!seen.current.has(ev.updateId)) {
+          Y.applyUpdate(ydoc, decode(ev.update), 'remote');
+          seen.current.add(ev.updateId);
+        }
+        return;
+      }
+      void sync();
+    },
+    ['document_changed'],
+  );
   useEffect(() => {
     mounted.current = true;
     undo.current = new Y.UndoManager([ytext, board], { trackedOrigins: new Set(['local']) });
@@ -149,7 +169,7 @@ export default function CollaborativeDocument({
         persist();
         setPending(queue.current.length);
         clearTimeout(debounce.current);
-        debounce.current = setTimeout(() => void flush(), 250);
+        debounce.current = setTimeout(() => void flush(), 30);
       }
     };
     ydoc.on('update', update);

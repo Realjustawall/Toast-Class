@@ -1,0 +1,13 @@
+# Accepted scope updates
+
+The latest user instruction takes precedence over the original master brief.
+
+1. **No payments.** Payment processing, paid ticket tiers, purchase/refund/invoice flows, billing integrations and finance screens are excluded. Events and registration remain in scope as free workflows. Historical descriptions of payment work in older checkpoints are superseded by this decision; no payment code or provider has been implemented.
+2. **Offline runtime.** The installed system must operate without public Internet access, including UI assets, media, fonts, conversion and future integrations. Independent devices still require LAN connectivity to the local server. Devices need a trusted HTTPS origin for capture. Public STUN, CDNs, cloud identity, paid APIs and public certificate renewal cannot be mandatory. A fully disconnected installation bundle and clean deployment verification are still outstanding.
+3. **TOASTER WORKS.** Use the supplied root `toaster-works.html` animation for classroom loading. Preserve the supplied file. Wait for actual classroom readiness rather than a fixed animation duration. Respect reduced motion and provide error recovery.
+4. **Advanced administration.** Build usable operational controls with genuine data and server authorization. No fabricated metrics, decorative controls or private content exposure. The current owner operations page is an initial delivered subset, not the full administration requirement.
+
+5. **MySQL is the required database target.** The user's latest instruction supersedes the original recommended PostgreSQL stack. Current working preview/data remain on PostgreSQL until the full native MySQL cutover, data transfer and integration tests pass. Do not label a driver, partial schema or isolated SQL tests as completed migration. MySQL 8.4 LTS is selected; the local server currently resolves to 8.4.13. Keep SQL parameterized and multi-statement user queries disabled.
+6. **Authentication corrections.** Minimum password length is 6 characters in frontend and server, including password change. Remove the verbose passphrase recommendation and organization-role explanation from the form. A platform administrator must be able to close/reopen self-registration with server enforcement; existing account sign-in remains available. Platform authority must not be inferred from organization ownership.
+
+See [offline runtime](OFFLINE.md), [administration](ADMIN.md), [account controls](ACCOUNTS.md), [MySQL migration](MYSQL.md) and [feature matrix](FEATURE_PARITY.md). All other master requirements remain active unless explicitly superseded here.

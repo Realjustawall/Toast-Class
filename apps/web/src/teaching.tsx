@@ -427,13 +427,32 @@ export default function Teaching({
     }
   }
 
-  const connection = useClassroomConnection(room.id, () => void refresh(), [
-    'document_changed',
-    'presence_changed',
-    'locks_changed',
-    'selection_changed',
-    'users_changed',
-  ]);
+  const connection = useClassroomConnection(
+    room.id,
+    (events) => {
+      const ev = events?.find((e) => e.type === 'presentation_changed');
+      if (events?.length === 1 && ev && typeof ev.revision === 'number' && 'current' in ev) {
+        setPresentations((prev) => {
+          if (!prev || prev.revision >= (ev.revision as number)) return prev;
+          return {
+            ...prev,
+            revision: ev.revision as number,
+            current: (ev.current as PresentationState['current']) ?? null,
+          };
+        });
+        return;
+      }
+      void refresh();
+    },
+    [
+      'document_changed',
+      'presence_changed',
+      'locks_changed',
+      'selection_changed',
+      'users_changed',
+      'presentation_changed',
+    ],
+  );
   useEffect(() => {
     void refresh();
     const online = () => void refresh();
@@ -618,6 +637,18 @@ export default function Teaching({
     const current = shared.workspace;
     if (current?.kind === 'document' && current.documentId) setDocId(current.documentId);
     setTab('documents');
+  }
+  function selectVisibleDocument(id: string) {
+    if (canPresent) {
+      void openShared('document', id);
+      return;
+    }
+    // A viewer can open the document already shared with the classroom, while
+    // selecting a different document remains a presenter-only action.
+    if (shared.workspace?.kind === 'document' && shared.workspace.documentId === id) {
+      setDocId(id);
+      setTab('documents');
+    }
   }
   async function openShared(
     kind: 'document' | 'geogebra' | 'presentation',
@@ -2386,8 +2417,13 @@ export default function Teaching({
                       aria-pressed={docId === d.id || bookId === d.id}
                       title={d.name}
                       key={d.id}
-                      disabled={!canPresent || shared.busy}
-                      onClick={() => void openShared('document', d.id)}
+                      disabled={
+                        (canPresent && shared.busy) ||
+                        (!canPresent &&
+                          (shared.workspace?.kind !== 'document' ||
+                            shared.workspace.documentId !== d.id))
+                      }
+                      onClick={() => selectVisibleDocument(d.id)}
                     >
                       <ClassIcon name={d.kind === 'notes' ? 'notes' : 'board'} />
                       <span>{d.name}</span>

@@ -194,8 +194,7 @@ export default function Chat({
       } finally {
         if (readAbort.current === controller) {
           readJob.current = undefined;
-          readNotBefore.current = Math.max(readNotBefore.current, Date.now() + 250);
-          if (readAgain.current) scheduleRead(readNotBefore.current - Date.now());
+          if (readAgain.current) scheduleRead(Math.max(0, readNotBefore.current - Date.now()));
         }
       }
     })();
@@ -223,9 +222,30 @@ export default function Chat({
       if (current === categoryVersion.current) setSyncError((e as Error).message);
     }
   }
-  const connection = useClassroomConnection(roomId, () => void load(), [
-    privateMode ? 'private_chat_changed' : 'chat_changed',
-  ]);
+  const connection = useClassroomConnection(
+    roomId,
+    (events) => {
+      const ev = !privateMode ? events?.find((e) => e.type === 'chat_changed') : undefined;
+      if (events?.length === 1 && ev && ev.message && typeof ev.message === 'object') {
+        const msg = ev.message as Message & { category_id?: string | null };
+        const inTab = chatTab === 'public' ? !msg.category_id : msg.category_id === chatTab;
+        if (!inTab) return;
+        if (seen.current?.has(msg.id)) return;
+        if (seen.current) {
+          if (!follow.current && msg.user_id !== userId) setUnread((v) => v + 1);
+          if (msg.user_id !== userId) playClassroomSound('message');
+          seen.current.add(msg.id);
+        } else {
+          seen.current = new Set([msg.id]);
+        }
+        setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
+        setSyncError('');
+        return;
+      }
+      void load();
+    },
+    [privateMode ? 'private_chat_changed' : 'chat_changed'],
+  );
   useClassroomConnection(roomId, () => void loadCategories(), ['chat_categories_changed'], false);
 
   useEffect(() => {

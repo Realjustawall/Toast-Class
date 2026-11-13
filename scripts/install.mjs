@@ -207,6 +207,8 @@ async function main() {
       'password-file': { type: 'string' },
       source: { type: 'string' },
       documents: { type: 'boolean', default: false },
+      'multi-node': { type: 'boolean', default: false },
+      'redis-url': { type: 'string' },
       'skip-dns': { type: 'boolean', default: false },
       help: { type: 'boolean', default: false },
     },
@@ -222,6 +224,8 @@ Usage: node scripts/install.mjs [install|configure|start|doctor|plan] [options]
   --password-file /private/password   Optional private single-line password file
   --source /opt/toaster/source        Source tree (defaults to this checkout)
   --documents                        Enable optional Office conversion worker
+  --multi-node                       Enable hardened Redis cache & high-concurrency mode
+  --redis-url rediss://...           External Redis/TLS URL for multi-server clusters
   --skip-dns                         Startup only: postpone DNS check (doctor still checks)
 configure generates configuration only. plan validates inputs without writing files.
 start resumes an existing setup without replacing its secrets. No command deletes volumes.`);
@@ -245,6 +249,8 @@ start resumes an existing setup without replacing its secrets. No command delete
     directory: values.directory,
     source: values.source ?? dirname(dirname(fileURLToPath(import.meta.url))),
     documents: values.documents,
+    multiNode: values['multi-node'],
+    redisUrl: values['redis-url'],
   };
   if (process.stdin.isTTY && action !== 'plan') {
     const terminal = createInterface({ input: process.stdin, output: process.stdout });

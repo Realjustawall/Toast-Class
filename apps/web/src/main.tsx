@@ -27,6 +27,7 @@ import './login-design.css';
 import './classroom-rebuild.css';
 import ClassroomEnrollment, { type Enrollment } from './classroom-enrollment';
 import AuthForm from './auth-form';
+import GuestJoin from './guest-join';
 import MemberChooser from './member-chooser';
 import { PlatformOptionsProvider, usePlatformOptions } from './platform-options';
 import { request as api } from './api';
@@ -99,6 +100,22 @@ function App() {
     'classrooms' | 'files' | 'admin' | 'account' | 'platform'
   >('classrooms');
   const [teaching, setTeaching] = useState<ClassroomView | null>(null);
+  const [guestRoomId, setGuestRoomId] = useState<string>(() => {
+    const m = /^#guest\/([a-f0-9-]{36})$/i.exec(location.hash);
+    return m ? m[1] : '';
+  });
+  useEffect(() => {
+    const syncGuestHash = () => {
+      const m = /^#guest\/([a-f0-9-]{36})$/i.exec(location.hash);
+      setGuestRoomId(m ? m[1] : '');
+    };
+    window.addEventListener('hashchange', syncGuestHash);
+    window.addEventListener('popstate', syncGuestHash);
+    return () => {
+      window.removeEventListener('hashchange', syncGuestHash);
+      window.removeEventListener('popstate', syncGuestHash);
+    };
+  }, []);
   const teachingRef = React.useRef(teaching);
   teachingRef.current = teaching;
   useEffect(() => {
@@ -278,6 +295,24 @@ function App() {
             />
           </Suspense>
         </AppErrorBoundary>
+      </>
+    );
+  if (guestRoomId && !teaching)
+    return (
+      <>
+        <ToastViewport />
+        <GuestJoin
+          roomId={guestRoomId}
+          onJoined={(u, classroom) => {
+            setUser(u);
+            setGuestRoomId('');
+            navigateClassroom(classroom);
+          }}
+          onCancel={() => {
+            history.pushState(null, '', location.pathname + location.search);
+            setGuestRoomId('');
+          }}
+        />
       </>
     );
   return (

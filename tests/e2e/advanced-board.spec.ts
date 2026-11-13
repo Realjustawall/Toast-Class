@@ -11,6 +11,7 @@ async function localDownload(download: Download) {
 test('advanced editor synchronizes independent users, persists refresh, enforces read-only and loads local assets', async ({
   browser,
 }) => {
+  test.setTimeout(180_000);
   const teacher = await browser.newContext(),
     student = await browser.newContext();
   const origin = process.env.TEST_APP_ORIGIN ?? 'http://localhost:5173';

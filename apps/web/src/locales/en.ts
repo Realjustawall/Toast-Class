@@ -983,6 +983,26 @@ const en = {
   chatFontSize: 'Chat text size',
   mediaEnabled: 'Enabled',
   mediaDisabled: 'Disabled',
+  platformGuestSection: 'Guest entry (without registration)',
+  platformGuestHelp:
+    'Disabled by default. When enabled, at most 1 guest user per IP address and per device can join enabled classrooms.',
+  platformGuestEnabled: 'Enable guest entry across platform',
+  platformGuestMaxCapacity: 'Default maximum guest capacity per classroom',
+  guestEntryEnabledLabel: 'Allow guest entry for this classroom (max 1 per IP & device)',
+  guestMaxCapacityLabel: 'Maximum guest capacity for this classroom',
+  guestInviteLink: 'Guest invite link',
+  guestLinkCopied: 'Guest invite link copied.',
+  copy: 'Copy',
+  guestJoinTitle: 'Join classroom as guest',
+  guestEntryDisabledMsg: 'Guest entry is disabled for this classroom or platform.',
+  guestCapacityStatus: 'Guest capacity: {{current}} of {{max}}',
+  guestDisplayName: 'Your display name',
+  guestNamePlaceholder: 'e.g. Alex Taylor',
+  guestJoinAction: 'Join classroom',
+  backToLogin: 'Back to sign in',
+  guestCountBadge: 'Active guests: {{current}} / {{max}}',
+  clearGuestsBtn: 'Clear guest list',
+  guestsClearedNotice: 'Classroom guest list cleared.',
 };
 
 export default en;

@@ -1,0 +1,102 @@
+{
+  "measuredAt": "2026-11-10T12:04:35.024Z",
+  "scope": "Shared classroom stage, granular locks, edge board toolbar, four theme layouts and real platform settings",
+  "backend": {
+    "tests": 103,
+    "passed": 100,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/shared-final-backend.log"
+  },
+  "finalNativeSecurity": {
+    "passed": 13,
+    "failed": 0,
+    "log": ".local/shared-final-security.log"
+  },
+  "finalMediaRoster": {
+    "passed": 9,
+    "failed": 0,
+    "log": ".local/shared-roster-native.log"
+  },
+  "pgMem": {
+    "passed": 3,
+    "failed": 0,
+    "skipLockedExecution": "Native MySQL verifies actual worker execution; pg-mem verifies queued commands."
+  },
+  "browser": {
+    "passed": 4,
+    "failed": 0,
+    "tests": [
+      "Granular class locks and exemptions, shared board text, GeoGebra perspective persistence, shared two-page PDF, moderator random selection, four themes at four viewport sizes and mobile lock dialog",
+      "Administrator saves options; settings survive reload, appear at sign-in and enforce disabled features",
+      "Actual SFU audio/video publishers without a UI socket lose publication rights; old grants rejected and new grants restored",
+      "Actual received microphone RTP activates speaker styling, clears on mute, disconnects on enrollment revocation"
+    ],
+    "geometryCases": 16,
+    "evidence": [
+      ".local/runtime/shared-layout-settings-browser-results.json",
+      ".local/runtime/shared-release-media-results.json"
+    ]
+  },
+  "builds": {
+    "typecheck": true,
+    "web": true,
+    "server": true,
+    "warning": "Large editor/font bundles still trigger Vite chunk warnings."
+  },
+  "preview": {
+    "loginSceneCanvas": true,
+    "userClassroom": true,
+    "existingMessages": 5,
+    "mobileNoHorizontalOverflow": true,
+    "errors": [],
+    "migration": {
+      "migrationsThrough": 18,
+      "existingRecordsPreserved": {
+        "users": 2,
+        "rooms": 5,
+        "messages": 5,
+        "documents": 11,
+        "geogebra": 1
+      }
+    }
+  },
+  "capacity": {
+    "measuredAt": "2026-11-10T11:59:17.311Z",
+    "results": [
+      {
+        "users": 200,
+        "accepted": 200,
+        "rejected": 0,
+        "delivered": 200,
+        "connectMs": 322,
+        "connectP95Ms": 58,
+        "rssMiB": 224,
+        "rssDeltaMiB": 29,
+        "eventLoopP99Ms": 30,
+        "database": "mysql",
+        "scope": "Authenticated WebSocket signaling only; no media, browser rendering or production capacity certification"
+      },
+      {
+        "users": 800,
+        "accepted": 800,
+        "rejected": 0,
+        "delivered": 800,
+        "connectMs": 3201,
+        "connectP95Ms": 120,
+        "rssMiB": 263,
+        "rssDeltaMiB": 35,
+        "eventLoopP99Ms": 63,
+        "database": "mysql",
+        "scope": "Authenticated WebSocket signaling only; no media, browser rendering or production capacity certification"
+      }
+    ],
+    "measurementScope": "Authenticated WebSocket signaling only. RSS includes API and synthetic clients in the same benchmark process, not a measurement of server-only RAM."
+  },
+  "limitations": [
+    "800 simultaneous media users have not passed; signaling and media are different capacity tests.",
+    "Real Redis was unavailable; previous optional-cache tests use a RESP fixture and fallback.",
+    "No pixel-perfect equivalence or complete BigBlueButton/PDF Annotator feature parity is certified.",
+    "PDF export is rasterized. Existing GeoGebra redistribution/license conditions still apply."
+  ]
+}

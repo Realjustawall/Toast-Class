@@ -418,8 +418,12 @@ export async function registerPresentations(
 ) {
   const { pool, user, roomAccess, membership } = ctx,
     service = new PresentationService(pool, fileConfig);
-  const notify = (id: string) =>
-    (app as unknown as { notifyClassroom: (id: string) => void }).notifyClassroom(id);
+  const notify = (id: string, type = 'changed', payload?: Record<string, unknown>) =>
+    (
+      app as unknown as {
+        notifyClassroom: (id: string, type?: string, payload?: Record<string, unknown>) => void;
+      }
+    ).notifyClassroom(id, type, payload);
   let timer: ReturnType<typeof setInterval> | undefined, work: Promise<unknown> | undefined;
   app.addHook('onReady', async () => {
     if (worker)
@@ -427,7 +431,7 @@ export async function registerPresentations(
         if (!work)
           work = service
             .maintenance()
-            .then((ids) => ids.forEach(notify))
+            .then((ids) => ids.forEach((id) => notify(id)))
             .catch((e) => app.log.error({ err: e }, 'Presentation maintenance failed'))
             .finally(() => {
               work = undefined;
@@ -592,7 +596,7 @@ export async function registerPresentations(
         }),
       ])
       .parse(req.body);
-    await transaction(pool, async (c) => {
+    const nextRevision = await transaction(pool, async (c) => {
       // Lock organization then session in the same order as presentation deletion.
       await service.files.lock(c, a.room.organization_id);
       const session = (
@@ -642,8 +646,19 @@ export async function registerPresentations(
         data.action === 'show' ? data.presentationId : a.room.id,
         { action: data.action },
       );
+      return (previous?.revision ?? 0) + 1;
     });
-    notify(a.room.id);
+    notify(a.room.id, 'presentation_changed', {
+      revision: nextRevision,
+      current:
+        data.action === 'show'
+          ? {
+              presentationId: data.presentationId,
+              page: data.page,
+              independentView: data.independentView,
+            }
+          : null,
+    });
     return { ok: true };
   });
 }

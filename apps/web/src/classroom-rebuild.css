@@ -1073,6 +1073,12 @@
   border-color: #e4e9f0;
   box-shadow: none;
 }
+.classroom-shell[data-theme='modular-skyroom'] .classroom-stage {
+  border: 1px solid #e4e9f0;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+}
 .classroom-shell[data-theme='modular-skyroom'] .teaching-media .media-tiles,
 .classroom-shell[data-theme='modular-skyroom'] .teaching-media .media-idle-list {
   grid-auto-flow: row;
@@ -1109,6 +1115,23 @@
   --class-bg: #0a0c12;
   background: #0a0c12;
   color: #eef1f7;
+  gap: 8px 12px;
+}
+.classroom-shell[data-theme='immersive-glass'] .classroom-stage {
+  background: var(--layout-surface);
+  border: 1px solid var(--layout-line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.classroom-shell[data-theme='immersive-glass'] .teaching-media {
+  background: var(--layout-surface);
+  border: 1px solid var(--layout-line);
+  border-radius: 12px;
+  padding: 8px;
+}
+.classroom-shell[data-theme='immersive-glass'] .classroom-sidepanel {
+  max-width: calc(100vw - 36px);
+  overflow: hidden;
 }
 .classroom-shell[data-theme='studio-hybrid'] {
   --layout-surface: #1e293b;
@@ -1118,6 +1141,17 @@
   background: #0f172a;
   color: #f8fafc;
   gap: 8px;
+}
+.classroom-shell[data-theme='studio-hybrid'] .classroom-stage {
+  border: 1px solid var(--layout-line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.classroom-shell[data-theme='studio-hybrid'] .teaching-media {
+  background: var(--layout-surface);
+  border: 1px solid var(--layout-line);
+  border-radius: 8px;
+  padding: 8px;
 }
 .classroom-shell[data-theme='immersive-glass'] .classroom-sidepanel,
 .classroom-shell[data-theme='studio-hybrid'] .classroom-sidepanel {

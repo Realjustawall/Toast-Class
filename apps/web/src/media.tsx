@@ -84,15 +84,20 @@ export default function Media({
     () =>
       new Room({
         singlePeerConnection: false,
-        adaptiveStream: true,
-        dynacast: true,
+        adaptiveStream: false,
+        dynacast: false,
         videoCaptureDefaults: { resolution: VideoPresets.h720.resolution },
         audioCaptureDefaults: {
           noiseSuppression: localStorage.getItem('microphone-processing') !== 'false',
           echoCancellation: localStorage.getItem('microphone-processing') !== 'false',
           autoGainControl: true,
         },
-        publishDefaults: { simulcast: true },
+        publishDefaults: {
+          simulcast: false,
+          degradationPreference: 'maintain-framerate',
+          videoEncoding: { maxBitrate: 1_000_000, maxFramerate: 30 },
+          screenShareEncoding: { maxBitrate: 1_500_000, maxFramerate: 30 },
+        },
       }),
   );
   const callbacks = useRef({ onLeave, onError, refreshJoin });
@@ -479,7 +484,10 @@ function MediaRoom({
           await localParticipant.setCameraEnabled(!localParticipant.isCameraEnabled);
         else if (source === Track.Source.Microphone)
           await localParticipant.setMicrophoneEnabled(!localParticipant.isMicrophoneEnabled);
-        else await localParticipant.setScreenShareEnabled(!localParticipant.isScreenShareEnabled);
+        else
+          await localParticipant.setScreenShareEnabled(!localParticipant.isScreenShareEnabled, {
+            contentHint: 'detail',
+          });
         const enabled =
           source === Track.Source.Camera
             ? localParticipant.isCameraEnabled

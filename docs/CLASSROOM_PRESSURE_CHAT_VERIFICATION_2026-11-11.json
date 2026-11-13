@@ -1,0 +1,248 @@
+{
+  "verifiedAt": "2026-11-11T11:59:39.381Z",
+  "previewUrl": "http://localhost:5174/#classroom/eb803738-7a0e-4e49-b250-06acd34e71fb",
+  "backend": {
+    "engine": "MySQL 8.4.13",
+    "tests": 112,
+    "passed": 109,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/pressure-chat-mysql-final-recovered.log",
+    "skips": [
+      "Real Linux/Docker converter",
+      "Dedicated MySQL dump/restore fixture",
+      "Real S3 provider"
+    ]
+  },
+  "additionalChecks": {
+    "pgMem": {
+      "passed": 5,
+      "failed": 0,
+      "log": ".local/pressure-chat-pgmem-final.log",
+      "concurrentTransactions": "Real MySQL only; pg-mem does not implement row-lock isolation."
+    },
+    "durableBoardBatch": {
+      "passed": 9,
+      "failed": 0,
+      "log": ".local/pressure-chat-batch-native.log",
+      "overlapsFullSuite": true
+    }
+  },
+  "browser": {
+    "uniqueScenarios": 9,
+    "passed": 9,
+    "failed": 0,
+    "batches": [
+      {
+        "name": "pressure-chat-final",
+        "stats": {
+          "startTime": "2026-11-11T11:46:21.546Z",
+          "duration": 24410.5,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/pressure-chat.spec.ts",
+            "title": "normal pen stays constant; pressure pen stores real stylus samples, broadcasts before release and supports whole-stroke undo",
+            "status": "passed"
+          },
+          {
+            "file": "e2e/pressure-chat.spec.ts",
+            "title": "chat preserves drafts through rate limits and lost responses, coalesces reads and requires an image grant",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "pressure-chat-annotations",
+        "stats": {
+          "startTime": "2026-11-11T11:51:08.902Z",
+          "duration": 30994.829,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/annotation-regressions.spec.ts",
+            "title": "pen and marker keep their styles; student presenter gets real fullscreen and screen sharing; locks revoke capture and survive reopening",
+            "status": "passed"
+          },
+          {
+            "file": "e2e/annotation-regressions.spec.ts",
+            "title": "PDF pages, searchable original text, vector export, images, formulas, stamps, measurements and page management persist for both browsers",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "pressure-chat-tools-settings",
+        "stats": {
+          "startTime": "2026-11-11T11:52:02.350Z",
+          "duration": 23329.309,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/tools-settings.spec.ts",
+            "title": "precise pen/text controls and sized eraser persist; settings are a separate page without disconnecting media; sounds obey saved controls",
+            "status": "passed"
+          },
+          {
+            "file": "e2e/tools-settings.spec.ts",
+            "title": "PDF can be placed on the current board preserving ink, or replace the displayed board for everyone",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "pressure-chat-moderation",
+        "stats": {
+          "startTime": "2026-11-11T11:55:25.734Z",
+          "duration": 25067.117,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/classroom-types-and-access.spec.ts",
+            "title": "owner configures type and enrollment, students only see assigned classes, teachers teach, text formats and all four layouts fit",
+            "status": "passed"
+          }
+        ]
+      },
+      {
+        "name": "pressure-chat-images-compact",
+        "stats": {
+          "startTime": "2026-11-11T11:57:42.656Z",
+          "duration": 43831.977000000006,
+          "expected": 2,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        },
+        "scenarios": [
+          {
+            "file": "e2e/classroom-compact.spec.ts",
+            "title": "compact chat leaves room for messages, keeps formatting usable and fits all four layouts",
+            "status": "passed"
+          },
+          {
+            "file": "e2e/classroom-images-pages-login.spec.ts",
+            "title": "provided login design, six-character password, image grants, participant locks, signal and blank board pages work in real browsers",
+            "status": "passed"
+          }
+        ]
+      }
+    ]
+  },
+  "pressure": {
+    "normalConstantPressure": true,
+    "stylusSamplesStored": true,
+    "liveBeforePointerUp": true,
+    "nativeWholeStrokeUndoRedo": true,
+    "preferencesSurviveReload": true,
+    "independentStyles": true,
+    "sensitivityRange": [0.25, 3],
+    "pointerEndTimerRaceFixed": true,
+    "queuedSamplesBatchedDurably": true,
+    "liveDispatchMinimumIntervalMs": 240,
+    "physicalPenTested": false,
+    "input": "Chromium CDP pen events routed through native PointerEvent and Excalidraw handlers"
+  },
+  "chat": {
+    "readSingleFlight": true,
+    "coalescedBurstReads": true,
+    "retryAfterRespected": true,
+    "blindMutationRetry": false,
+    "idempotentSend": true,
+    "duplicateConcurrentNativeRequests": 5,
+    "draftsPreservedAfterNetworkFailure": true,
+    "newDraftPreservedDuringSubmission": true,
+    "categoriesIsolatedWithStorageBlocked": true,
+    "imageDefaultDenied": true,
+    "adminGrantAndRevoke": true,
+    "uploadAndPublishCheckFreshPermissions": true,
+    "imageTemporaryFailureRetry": true,
+    "richTextEditDeleteVerified": true
+  },
+  "budgetsPerMinutePerUserPerApiInstance": {
+    "general": 600,
+    "chatRead": 900,
+    "chatSend": 180,
+    "chatEdit": 180,
+    "chatDelete": 180,
+    "chatClear": 20,
+    "chatCategoriesRead": 300,
+    "chatImageUpload": 30,
+    "boardImageUpload": 120,
+    "annotationImageUpload": 60,
+    "resourceUpload": 10,
+    "fileStatus": 600,
+    "fileContent": 300,
+    "boardRead": 900,
+    "boardUpdate": 360
+  },
+  "receiptRetention": {
+    "hours": 24,
+    "cleanup": "On the next identified send for that user/class; no periodic global sweeper.",
+    "replayAfterClearDoesNotResurrect": true
+  },
+  "migration": {
+    "migrationsThrough": 21,
+    "backup": ".local/runtime/chat-pressure-before-migration-1794336710238.json",
+    "existingRecordsPreserved": {
+      "users": 2,
+      "rooms": 5,
+      "messages": 5,
+      "documents": 11,
+      "geogebra": 1,
+      "boards": 6,
+      "workspace": 1,
+      "permissions": 0
+    }
+  },
+  "persistentPreview": {
+    "classroomId": "eb803738-7a0e-4e49-b250-06acd34e71fb",
+    "persianPressureControl": true,
+    "separateSettingsPressureControl": true,
+    "mobileToolsInsideCanvas": true,
+    "mobileNoOverflow": true,
+    "existingMessagesPreserved": 5,
+    "existingDocumentsPreserved": 3,
+    "personalPreferencesUnchanged": true,
+    "browserErrors": []
+  },
+  "builds": {
+    "typecheck": "passed",
+    "web": "passed",
+    "server": "passed",
+    "webBundleSizeWarningsRemain": true
+  },
+  "workspace": {
+    "allNewFilesCachesTempOnDrive": "E",
+    "newInstallations": 0
+  },
+  "screenshots": [
+    "docs/screenshots/pressure-pen-live-2026-11-11.png",
+    "docs/screenshots/pressure-pen-desktop-fa-2026-11-11.png",
+    "docs/screenshots/pressure-pen-mobile-fa-2026-11-11.png",
+    "docs/screenshots/reliable-chat-images-2026-11-11.png",
+    "docs/screenshots/chat-images-locked-mobile-2026-11-11.png"
+  ],
+  "knownOutstandingLimits": [
+    "800-user media acceptance has not passed.",
+    "Real Redis unavailable; previous official-client/fallback tests used a RESP fixture.",
+    "Full PDF Annotator parity remains incomplete; see the previous annotation report.",
+    "Physical pressure-sensitive hardware has not been tested."
+  ]
+}

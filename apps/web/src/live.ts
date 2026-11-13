@@ -2,35 +2,29 @@ import { useEffect, useRef, useState } from 'react';
 import { playClassroomSound, type SoundCue } from './classroom-sounds';
 
 export type ConnectionState = 'connecting' | 'connected' | 'reconnecting' | 'offline' | 'denied';
+export type LiveEvent = { type: string; [key: string]: unknown };
 type Listener = {
   status: (value: ConnectionState) => void;
-  change: (types: ReadonlySet<string>) => void;
+  change: (types: ReadonlySet<string>, events: readonly LiveEvent[]) => void;
 };
-// Share one transport per classroom. Invalidations never contain private payloads.
+// Share one transport per classroom.
 const channels = new Map<string, ReturnType<typeof channel>>();
 function channel(roomId: string) {
   const listeners = new Set<Listener>();
   let socket: WebSocket | undefined;
   let state: ConnectionState = navigator.onLine ? 'connecting' : 'offline';
   let retry: ReturnType<typeof setTimeout> | undefined;
-  let debounce: ReturnType<typeof setTimeout> | undefined;
   let attempt = 0;
   let lastMessage = Date.now();
   let stopped = false;
-  const pending = new Set<string>();
   const status = (value: ConnectionState) => {
     state = value;
     for (const listener of listeners) listener.status(value);
   };
-  const change = (type = 'reconcile') => {
-    pending.add(type);
-    if (debounce) return;
-    debounce = setTimeout(() => {
-      debounce = undefined;
-      const types = new Set(pending);
-      pending.clear();
-      for (const listener of listeners) listener.change(types);
-    }, 75);
+  const change = (type = 'reconcile', event?: LiveEvent) => {
+    const types = new Set([type]);
+    const events = [event ?? { type }];
+    for (const listener of listeners) listener.change(types, events);
   };
   const disconnect = () => {
     if (!socket) return;
@@ -52,7 +46,7 @@ function channel(roomId: string) {
       `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}/api/v1/classrooms/${roomId}/live`,
     );
     socket.onmessage = (event) => {
-      let message: { type?: string };
+      let message: LiveEvent;
       try {
         message = JSON.parse(event.data);
       } catch {
@@ -69,7 +63,7 @@ function channel(roomId: string) {
           selection_changed: 'notice',
         };
         if (message.type && cue[message.type]) playClassroomSound(cue[message.type]);
-        change(message.type ?? 'changed');
+        change(message.type ?? 'changed', message);
       }
     };
     socket.onclose = (event) => {
@@ -124,7 +118,6 @@ function channel(roomId: string) {
         if (listeners.size) return;
         stopped = true;
         clearTimeout(retry);
-        clearTimeout(debounce);
         clearInterval(watchdog);
         disconnect();
         window.removeEventListener('online', online);
@@ -138,7 +131,7 @@ function channel(roomId: string) {
 
 export function useClassroomConnection(
   roomId: string,
-  onChange: () => void,
+  onChange: (events?: readonly LiveEvent[]) => void,
   topics?: readonly string[],
   includeGeneral = true,
 ) {
@@ -156,7 +149,7 @@ export function useClassroomConnection(
     }
     return current.subscribe({
       status: setState,
-      change: (types) => {
+      change: (types, events) => {
         if (
           types.has('reconcile') ||
           (includeGeneral && types.has('changed')) ||
@@ -173,7 +166,7 @@ export function useClassroomConnection(
                 ].includes(type),
               ))
         )
-          callback.current();
+          callback.current(events);
       },
     });
   }, [roomId]);
@@ -182,7 +175,7 @@ export function useClassroomConnection(
 
 export function useClassroomEvents(
   roomId: string,
-  onChange: () => void,
+  onChange: (events?: readonly LiveEvent[]) => void,
   topics?: readonly string[],
 ) {
   return useClassroomConnection(roomId, onChange, topics) === 'connected';

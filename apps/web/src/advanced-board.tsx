@@ -205,8 +205,7 @@ export default function AdvancedBoard({
       cancelAnimationFrame(settle);
     };
   }, [api, backgroundReady, document.background_file_id, following, presenter.view?.active]);
-  const viewport = () => {
-    const state = editorRef.current?.getAppState();
+  const viewport = (state = editorRef.current?.getAppState()) => {
     if (!state) return { centerX: 0, centerY: 0, zoom: 1 };
     return {
       centerX: state.width / (2 * state.zoom.value) - state.scrollX,
@@ -328,7 +327,7 @@ export default function AdvancedBoard({
         }, nextLiveFlush.current - Date.now());
       return;
     }
-    if (pointerActive.current) nextLiveFlush.current = Date.now() + 240;
+    if (pointerActive.current) nextLiveFlush.current = Date.now() + 30;
     running.current = true;
     try {
       while (replica.pending.length && mounted.current && replica.canEdit) {
@@ -350,7 +349,7 @@ export default function AdvancedBoard({
         timer.current = setTimeout(() => {
           timer.current = undefined;
           void flush();
-        }, 240);
+        }, 30);
     }
   }
   async function sync() {
@@ -403,7 +402,61 @@ export default function AdvancedBoard({
       for (const resolve of syncWaiters.current.splice(0)) resolve();
     }
   }
-  useClassroomEvents(roomId, () => void sync(), ['board_changed', 'locks_changed']);
+  useClassroomEvents(
+    roomId,
+    (events) => {
+      const ev = events?.find((e) => e.type === 'board_changed');
+      if (
+        events?.length === 1 &&
+        ev &&
+        ev.documentId === document.id &&
+        typeof ev.generation === 'string' &&
+        typeof ev.revision === 'number' &&
+        ev.generation === replica.generation
+      ) {
+        if (ev.revision <= replica.revision) return;
+        if (ev.revision === replica.revision + 1 && typeof ev.update === 'string') {
+          if (
+            replica.receive({
+              generation: ev.generation,
+              revision: ev.revision,
+              canEdit: editable,
+              updates: [{ revision: ev.revision, update: ev.update }],
+            })
+          )
+            editorRef.current?.history.clear();
+          const knownFiles = new Set(Object.keys(editorRef.current?.getFiles() ?? {}));
+          const needsImages = replica
+            .scene()
+            .some(
+              (el) =>
+                el.type === 'image' &&
+                !el.isDeleted &&
+                typeof el.fileId === 'string' &&
+                !knownFiles.has(el.fileId),
+            );
+          if (needsImages) {
+            void loadBoardImages(
+              roomId,
+              document,
+              replica.scene(),
+              imageAbort.current.signal,
+              knownFiles,
+            ).then((files) => {
+              if (!mounted.current) return;
+              if (files.length) editorRef.current?.addFiles(files as never);
+              refreshScene();
+            });
+          } else {
+            refreshScene();
+          }
+          return;
+        }
+      }
+      void sync();
+    },
+    ['board_changed', 'locks_changed'],
+  );
   useEffect(() => {
     if (!api) return;
     onSynchronize?.(async () => {
@@ -789,7 +842,7 @@ export default function AdvancedBoard({
                 : next;
             });
             setDisplayedZoom(Math.round(appState.zoom.value * 100));
-            if (loaded && !replacement) presenter.move(viewport());
+            if (loaded && !replacement) presenter.move(viewport(appState));
             if (!loaded || !editable) return;
             try {
               const latest = new Map(replica.scene().map((element) => [element.id, element]));
@@ -807,7 +860,7 @@ export default function AdvancedBoard({
                   timer.current = setTimeout(() => {
                     timer.current = undefined;
                     void flush();
-                  }, 240);
+                  }, 30);
               }
               if (
                 backgroundReady &&

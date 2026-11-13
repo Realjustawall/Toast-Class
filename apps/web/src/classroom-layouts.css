@@ -1298,7 +1298,7 @@
     grid-row: 2/4;
   }
   .classroom-shell[data-theme='modular-skyroom'][data-hide-chat='true'][data-hide-people='true'] {
-    grid-template-columns: 0 minmax(0, 1fr) 280px;
+    grid-template-columns: 0 minmax(0, 1fr) var(--preferred-media-width, 240px);
   }
 }
 

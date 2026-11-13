@@ -1,0 +1,114 @@
+{
+  "recordedAt": "2026-11-09T13:47:53.641Z",
+  "feature": "Full-width Public chat category and self-hosted GeoGebra Classic integration",
+  "runtime": {
+    "version": "5.4.934.0",
+    "sha256": "bb55da6967d949949204c20b598bd5c6dc2116100b1908efd9461ffa7f6ce1d0",
+    "source": "https://github.com/geogebra/geogebra",
+    "archive": "https://download.geogebra.org/installers/5.4/geogebra-math-apps-bundle-5-4-934-0.zip",
+    "license": "https://www.geogebra.org/license"
+  },
+  "browser": {
+    "passed": 4,
+    "failed": 0,
+    "entries": [
+      {
+        "name": "Runtime",
+        "report": ".local/geogebra-runtime-results.json",
+        "log": ".local/geogebra-runtime.log",
+        "stats": {
+          "startTime": "2026-11-09T13:27:32.907Z",
+          "duration": 24652.369,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "Classroom",
+        "report": ".local/geogebra-classroom-results.json",
+        "log": ".local/geogebra-classroom.log",
+        "stats": {
+          "startTime": "2026-11-09T13:45:01.542Z",
+          "duration": 21105.327999999998,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "Chat categories",
+        "report": ".local/geogebra-chat-regression-results.json",
+        "log": ".local/geogebra-chat-regression.log",
+        "stats": {
+          "startTime": "2026-11-09T13:46:17.609Z",
+          "duration": 10043.777,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      },
+      {
+        "name": "Compact layout",
+        "report": ".local/geogebra-compact-results.json",
+        "log": ".local/geogebra-compact-regression.log",
+        "stats": {
+          "startTime": "2026-11-09T13:46:33.011Z",
+          "duration": 25943.351,
+          "expected": 1,
+          "skipped": 0,
+          "unexpected": 0,
+          "flaky": 0
+        }
+      }
+    ]
+  },
+  "backend": {
+    "tests": 98,
+    "passed": 95,
+    "failed": 0,
+    "skipped": 3,
+    "log": ".local/geogebra-backend-all.log"
+  },
+  "checks": {
+    "typecheck": ".local/geogebra-typecheck.log",
+    "serverBuild": ".local/geogebra-build-server.log",
+    "webBuild": ".local/geogebra-build-web.log",
+    "status": "passed"
+  },
+  "exports": [
+    {
+      "format": "GGB",
+      "evidence": ".local/runtime/geogebra-lesson.ggb"
+    },
+    {
+      "format": "PNG",
+      "evidence": ".local/runtime/geogebra-lesson.png"
+    },
+    {
+      "format": "SVG",
+      "evidence": ".local/runtime/geogebra-lesson.svg"
+    },
+    {
+      "format": "PDF",
+      "evidence": ".local/runtime/geogebra-lesson.pdf"
+    }
+  ],
+  "userPreview": {
+    "publicFillsAvailableWidth": true,
+    "geoGebraVersion": "5.4.934.0",
+    "persistentWorksheet": true,
+    "persianUI": true,
+    "separateStaticOrigin": true,
+    "desktopAndMobile": true
+  },
+  "limits": [
+    "No new capacity run.",
+    "Commercial bundle use requires the applicable GeoGebra agreement.",
+    "Snapshots synchronize saved states; concurrent version conflicts are surfaced rather than silently overwritten.",
+    "Production/offline DNS, TLS and separate static origin configuration were documented, not deployed in this Windows preview."
+  ]
+}

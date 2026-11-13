@@ -1,0 +1,27 @@
+# Collaborative whiteboard
+
+New boards default to the advanced Excalidraw editor. The document form also offers the existing basic editor; old boards keep their original format. Notes remain independent documents. No data conversion or replacement of old boards occurs.
+
+## Current implementation
+
+The advanced editor supplies freehand drawing, geometric shapes, arrows, lines, text, frames, selection, transformations, grouping, local undo/redo, colors and canvas navigation. This is the embedded MIT-licensed open-source editor, not a hosted service. Images, embedded web content and clipboard imports are currently disabled at the integration boundary; they are not claimed as completed features. The main menu excludes cloud saving and paid upgrades.
+
+Each document has a Yjs map of validated elements, a server-selected generation, a revision and idempotent update receipts. The browser stages and validates edits before applying them, writes the pending receipt to its account/document outbox before sending, and retains it through refresh. Receipt IDs are reused when acknowledging an uncertain delivery. Storage failures prevent committing a local edit to the replica. After a generation change, clients without pending edits load the restored board and clear editor undo history. Clients with pending edits stop editing and retain their old outbox through refresh. They can download raw recovery data before explicitly discarding pending changes and joining the restored board. The recovery JSON is not a promised one-click import format.
+
+Teachers can save named versions, inspect a timestamped history, preview a selected version and confirm restoration for everyone. Restoration first saves a protective version of the current board, changes causal generation and records an audit atomically. Concurrent changed content causes a conflict rather than an unnoticed overwrite. Identical retry IDs do not repeat the restoration. Only teachers/owners can access historical content; students retain current-board access only. Automatic checkpoints are created on edits reaching a revision divisible by25 (restore operations also advance revision) with explicit bounds/retention described in [the API contract](ADVANCED_BOARDS.md).
+
+WebSocket invalidation triggers a fresh authorized read; it contains no private board payload. Missed deltas fall back to the complete server snapshot. The server validates merged CRDT state, rejects unknown roots, malformed JSON/unsafe links/unsupported objects, causal gaps and size limits, and serializes edits with document permission changes. Tenant and teacher-only permissions are enforced by the server. Editing the same object concurrently resolves through the CRDT map's deterministic winner; this is not character-level merging of one text object's content.
+
+Participants have independent viewports. Use **Fit to content** after changing screen size or navigating away from content. SVG and PNG export use the actual current editor scene, including received changes; they do not reconstruct an unrelated preview. SVG export embeds required font subsets where supported by the upstream editor. Mixed Persian/English text is supported by the editor/browser text stack; broad browser typography and accessibility review remain open.
+
+## Offline assets
+
+`prepare-offline-assets.mjs` copies installed Excalidraw fonts into the generated same-origin `/excalidraw/fonts/` directory. The application sets `EXCALIDRAW_ASSET_PATH` before importing the lazy editor. Editor code, locales, workers and fonts are bundled or served locally. Font/license/source distribution review remains a release gate. Dependencies must be installed or images transferred before disconnecting a clean machine.
+
+Upstream integration references: [self-hosting fonts](https://plus.excalidraw.com/docs/sdk/excalidraw/installation), [open-source SDK](https://plus.excalidraw.com/docs/sdk). The installed package types and version0.18.1 determine the integration API; newer online documentation is not assumed to describe a different installed version.
+
+## Verification and limitations
+
+`tests/board-replica.test.ts` covers independent concurrent edits, retained receipts after refresh, duplicate delivery, read-only state, stale generations and invalid/storage-failed edits. `tests/boards.test.ts` exercises real server permissions, persistence and hostile CRDT rejection; it runs against native MySQL as well as the memory fixture. `tests/e2e/advanced-board.spec.ts` uses two independent browser contexts and the real editor. It verifies persisted geometry and Persian text, exports from the receiving browser, interrupted delivery and refresh, live teacher-only permissions, local font loading with external HTTP requests blocked, and responsive RTL.
+
+The master feature matrix remains **IN_PROGRESS**: remote cursors/presence, teacher viewport following, per-object server authorization/locking, multiple-board management beyond existing documents, image and board imports, clipboard support, tables/polygons/connectors/sticky-note workflows, PDF export, history retention controls/tenant quotas and large-board performance are not complete. Excalidraw's visual object lock is an editing affordance, not a server permission boundary. Local undo/redo is the editor's history; cross-user undo semantics still need dedicated tests. Bundle v5 includes the editor but predates history; history requires native MySQL migration007 and newly built API/web images. Older applied migrations must not be changed.

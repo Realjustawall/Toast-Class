@@ -21,6 +21,9 @@ type AdminClassroom = {
   name: string;
   theme: ClassroomTheme;
   permissions: ClassroomPermissions;
+  guestEntryEnabled?: boolean;
+  guestMaxCapacity?: number;
+  guestCount?: number;
   created_at: string;
 };
 type Overview = {
@@ -78,6 +81,8 @@ export default function Admin({
   const [newRoomPerms, setNewRoomPerms] = useState<ClassroomPermissions>(
     DEFAULT_CLASSROOM_PERMISSIONS,
   );
+  const [newRoomGuestEnabled, setNewRoomGuestEnabled] = useState(false);
+  const [newRoomGuestCapacity, setNewRoomGuestCapacity] = useState(20);
   const [enrollment, setEnrollment] = useState<Enrollment>({
     enrollmentMode: 'assigned',
     memberIds: [],
@@ -170,10 +175,28 @@ export default function Admin({
         name: editingRoom.name,
         theme: editingRoom.theme,
         permissions: editingRoom.permissions,
+        guestEntryEnabled: editingRoom.guestEntryEnabled ?? false,
+        guestMaxCapacity: editingRoom.guestMaxCapacity ?? 20,
         ...enrollment,
       });
       setEditingRoom(null);
       setNotice(t('adminClassroomSettingsSaved'));
+      setRefresh((v) => v + 1);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function clearRoomGuests(roomId: string) {
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      await request('/classrooms/' + roomId + '/guests/clear', {});
+      setEditingRoom((prev) => (prev && prev.id === roomId ? { ...prev, guestCount: 0 } : prev));
+      setNotice(t('guestsClearedNotice'));
       setRefresh((v) => v + 1);
     } catch (e) {
       setError((e as Error).message);
@@ -193,9 +216,13 @@ export default function Admin({
         name: newRoomName,
         theme: newRoomTheme,
         permissions: newRoomPerms,
+        guestEntryEnabled: newRoomGuestEnabled,
+        guestMaxCapacity: newRoomGuestCapacity,
         ...enrollment,
       });
       setNewRoomName('');
+      setNewRoomGuestEnabled(false);
+      setNewRoomGuestCapacity(20);
       setCreatingRoom(false);
       setNotice(t('adminClassroomCreated'));
       setRefresh((v) => v + 1);
@@ -430,6 +457,26 @@ export default function Admin({
                 />
                 <h4>{t('classroomSecurityPermissions')}</h4>
                 <ClassroomPermissionsEditor permissions={newRoomPerms} onChange={setNewRoomPerms} />
+                <div className="platform-form-grid">
+                  <label className="platform-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={newRoomGuestEnabled}
+                      onChange={(e) => setNewRoomGuestEnabled(e.target.checked)}
+                    />
+                    {t('guestEntryEnabledLabel')}
+                  </label>
+                  <label>
+                    {t('guestMaxCapacityLabel')}
+                    <input
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={newRoomGuestCapacity}
+                      onChange={(e) => setNewRoomGuestCapacity(Number(e.target.value))}
+                    />
+                  </label>
+                </div>
                 <ClassroomEnrollment
                   key="create"
                   orgId={id}
@@ -482,6 +529,76 @@ export default function Admin({
                   permissions={editingRoom.permissions}
                   onChange={(permissions) => setEditingRoom({ ...editingRoom, permissions })}
                 />
+                <div className="platform-form-grid">
+                  <label className="platform-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={Boolean(editingRoom.guestEntryEnabled)}
+                      onChange={(e) =>
+                        setEditingRoom({ ...editingRoom, guestEntryEnabled: e.target.checked })
+                      }
+                    />
+                    {t('guestEntryEnabledLabel')}
+                  </label>
+                  <label>
+                    {t('guestMaxCapacityLabel')}
+                    <input
+                      type="number"
+                      min={1}
+                      max={500}
+                      value={editingRoom.guestMaxCapacity ?? 20}
+                      onChange={(e) =>
+                        setEditingRoom({
+                          ...editingRoom,
+                          guestMaxCapacity: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </label>
+                  {editingRoom.guestEntryEnabled && (
+                    <label className="platform-full-row">
+                      {t('guestInviteLink')}
+                      <div className="actions">
+                        <input
+                          readOnly
+                          dir="ltr"
+                          value={`${window.location.origin}/#guest/${editingRoom.id}`}
+                          onFocus={(e) => e.currentTarget.select()}
+                        />
+                        <button
+                          type="button"
+                          className="quiet"
+                          onClick={() => {
+                            void navigator.clipboard?.writeText(
+                              `${window.location.origin}/#guest/${editingRoom.id}`,
+                            );
+                            setNotice(t('guestLinkCopied'));
+                          }}
+                        >
+                          {t('copy')}
+                        </button>
+                      </div>
+                    </label>
+                  )}
+                  {(editingRoom.guestEntryEnabled || (editingRoom.guestCount ?? 0) > 0) && (
+                    <div className="platform-full-row actions">
+                      <span className="theme-chip">
+                        {t('guestCountBadge', {
+                          current: editingRoom.guestCount ?? 0,
+                          max: editingRoom.guestMaxCapacity ?? 20,
+                        })}
+                      </span>
+                      <button
+                        type="button"
+                        className="quiet"
+                        disabled={busy || (editingRoom.guestCount ?? 0) === 0}
+                        onClick={() => void clearRoomGuests(editingRoom.id)}
+                      >
+                        {t('clearGuestsBtn')}
+                      </button>
+                    </div>
+                  )}
+                </div>
                 <IndividualUserPermissionsManager roomId={editingRoom.id} />
                 <ClassroomEnrollment
                   key={editingRoom.id}
@@ -527,6 +644,14 @@ export default function Admin({
                           ? t('permMicAllowed')
                           : t('permMicMuted')}
                       </span>
+                      {room.guestEntryEnabled && (
+                        <span className="theme-chip">
+                          {t('guestCountBadge', {
+                            current: room.guestCount ?? 0,
+                            max: room.guestMaxCapacity ?? 20,
+                          })}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div className="admin-room-actions">

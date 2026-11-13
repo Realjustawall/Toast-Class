@@ -1,0 +1,259 @@
+{
+  "recordedAt": "2026-11-09T12:00:40.328Z",
+  "scope": "Latest BBB interaction and media corrections. Sequential isolated MySQL fixtures; real local SFU; synthetic publisher devices. This is not a fresh capacity certification.",
+  "browser": {
+    "files": 25,
+    "passed": 26,
+    "failed": 0,
+    "skipped": 1,
+    "entries": [
+      {
+        "file": "tests/e2e/account.spec.ts",
+        "log": ".local/bbb-check-account.spec.ts.log",
+        "sha256": "1eb34da27933545a7231f73bd80237e90c3d28f01c6cff178b50344eefffe993",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/admin.spec.ts",
+        "log": ".local/bbb-check-admin.spec.ts.log",
+        "sha256": "80e576735d0246b315e09423b6a7d35c0895a06631a177a6614d078a6bcd3736",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/advanced-board.spec.ts",
+        "log": ".local/bbb-check-advanced-board.spec.ts.log",
+        "sha256": "aae8391f20bb3e15db58ee705121710353e3058355a1b10e173d9f92d85ed541",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/background-processing.spec.ts",
+        "log": ".local/bbb-check-background-processing.spec.ts.log",
+        "sha256": "258473a70ede4af19ca65dc317f26d01f9d47f8ecee413b4b03fb6ef13c15ba4",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/board-presenter.spec.ts",
+        "log": ".local/bbb-final-board-presenter.log",
+        "sha256": "7eaeb711a7743134b0eaae0750b18a7b6604b0ef20cc963ab5b82b1e5f16cf39",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/breakouts.spec.ts",
+        "log": ".local/bbb-check-breakouts.spec.ts.log",
+        "sha256": "e25c9978aeefb8f37e3122ed7a97fba402785932e396afa274caf3cbeb855603",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/classroom-layout.spec.ts",
+        "log": ".local/bbb-check-classroom-layout.spec.ts.log",
+        "sha256": "a956cd344a76f539ee75821f681ab274d087ff53a51c3b6f6e5c0fdb7d132550",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/classroom-panel-sizing.spec.ts",
+        "log": ".local/bbb-check-classroom-panel-sizing.spec.ts.log",
+        "sha256": "5ede27df7aa710588be0e0c8b14b0a631ae8001cec11e2dcb8697cc29910b09d",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/classroom-types-and-access.spec.ts",
+        "log": ".local/bbb-rich-responsive-final.log",
+        "sha256": "02dd7e1e9fba4af8e6c53dd5647706975c80f8c3b9f77e4c6aafb2ea78648086",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/connection-polish.spec.ts",
+        "log": ".local/bbb-check-connection-polish.spec.ts.log",
+        "sha256": "28ce90bce86a036b36d340dfd761158cc4b677f16389297c5d64742ff3a0e37e",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/dev-filesystem-security.spec.ts",
+        "log": ".local/bbb-check-dev-filesystem-security.spec.ts.log",
+        "sha256": "4727328b8d386f4c141e8fe40a3a96f6d8f695447a7cc4c26a38018696bfeafc",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/files.spec.ts",
+        "log": ".local/bbb-check-files.spec.ts.log",
+        "sha256": "b634b36c579e01c94d5d123a9a94ae2743a033d286916bd33a5a293db3c5379d",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/loading.spec.ts",
+        "log": ".local/bbb-check-loading.spec.ts.log",
+        "sha256": "8adb7efbe193e4e82afc72d375d76d966e5a3a4120a7b986377f76341a042d72",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/media-loading.spec.ts",
+        "log": ".local/bbb-check-media-loading.spec.ts.log",
+        "sha256": "4ae6b010c9460a56a87a46359c0a36a09efd16dfc099ce7974019b9ad1b8b838",
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/presentations.spec.ts",
+        "log": ".local/bbb-check-presentations.spec.ts.log",
+        "sha256": "f06779f7cc02b69e345c39257b165528b0f56b52bd560ada535c107266a2b91a",
+        "passed": 0,
+        "failed": 0,
+        "skipped": 1,
+        "note": "Actual isolated Linux converter image and worker are required; unavailable in this native Windows run."
+      },
+      {
+        "file": "tests/e2e/registration.spec.ts",
+        "log": ".local/bbb-final-registration.log",
+        "sha256": "05d210ea88d1680d18cae1c5a9dcda11f9a30ee6d910b114992cba2dd522f850",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/speaking-indicator.spec.ts",
+        "log": ".local/bbb-final-speaking.log",
+        "sha256": "a576ee15e41d302c3064cbfda78e9596043ea4de187bf61f7e32a0bda694c9a6",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/teaching.spec.ts",
+        "log": ".local/bbb-confirm-teaching.log",
+        "sha256": "8c1fca7ea570e77071c14d13bfa37a9307839b03e3600e65745e617bed0cbcc1",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/e2e/workspace.spec.ts",
+        "log": ".local/bbb-check-workspace.spec.ts.log",
+        "sha256": "ac9ad5e138a55fb3e28788a8b5cb7a0ed63d4d0c03edb6debb0f0f26f4cdb766",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/media/classroom-ui.spec.ts",
+        "log": ".local/bbb-final-media-classroom-ui.log",
+        "sha256": "be4e3ea0d2701ae438b6f550c7751429b81e3155460c84f3d9efd4df0f1f07e4",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/media/breakouts.spec.ts",
+        "log": ".local/bbb-final-media-breakouts.log",
+        "sha256": "4978c3b629b0c578452c7b9b4476e724c3434903a53afd43b8cd699b02e82bc3",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/media/rtp.spec.ts",
+        "log": ".local/bbb-confirm-rtp.log",
+        "sha256": "730d9c8582e3795561071ffa86ffe3a548ad1f9a29f73289447164f5c8c80406",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/media/devices.spec.ts",
+        "log": ".local/bbb-final-media-devices.log",
+        "sha256": "6243809bad0b9703f49c527c070fd4a9bac9930707abb5de80c7106fb3be1624",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/media/browser-fixture.spec.ts",
+        "log": ".local/bbb-final-media-browser-fixture.log",
+        "sha256": "194bda14dd5c01a1af4f62131b11f2d68825d4693099b26f6356bbbfd2c858cd",
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      {
+        "file": "tests/media/listen-only.spec.ts",
+        "log": ".local/bbb-final-listeners.log",
+        "sha256": "eba2171115d28a255464d6fbdc5633f9e46b67fb2aebf528c57f8ce4eca1e65f",
+        "passed": 2,
+        "failed": 0,
+        "skipped": 0
+      }
+    ]
+  },
+  "backend": {
+    "log": ".local/bbb-backend-all.log",
+    "total": 94,
+    "passed": 91,
+    "failed": 0,
+    "skipped": 3
+  },
+  "richTextAndIdentityUnits": {
+    "log": ".local/bbb-rich-unit-complete.log",
+    "total": 2,
+    "passed": 2,
+    "failed": 0,
+    "skipped": 0
+  },
+  "checks": [
+    {
+      "name": "TypeScript",
+      "log": ".local/bbb-final-typecheck.log",
+      "status": "passed"
+    },
+    {
+      "name": "Server build",
+      "log": ".local/bbb-final-build-server.log",
+      "status": "passed"
+    },
+    {
+      "name": "Web build",
+      "log": ".local/bbb-final-build-web.log",
+      "status": "passed",
+      "note": "Build retains warnings for chunks above 500 kB."
+    }
+  ],
+  "actualUserClass": {
+    "classroomAvailable": true,
+    "microphone": true,
+    "cameraFrames": true,
+    "cameraRatio": 1.77765625,
+    "visualBold": true,
+    "languageInSettings": true,
+    "overlay": false
+  },
+  "limits": [
+    "Publisher devices are synthetic; physical device and Internet deployment reliability require environment-specific validation.",
+    "Previous capacity evidence remains unchanged: 200 synthetic RTP participants succeeded; 800 real media participants did not pass.",
+    "Some earlier failed attempts are retained in .local; each browser entry points to its final corrected run."
+  ]
+}
