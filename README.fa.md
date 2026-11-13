@@ -1,8 +1,29 @@
-# کلاس آنلاین TOASTER
+<div align="center">
+
+<img src="docs/screenshots/toaster-banner.svg" alt="TOASTER Classroom Banner" width="100%" />
+
+<br />
+
+[![TOASTER checks](https://github.com/Realjustawall/Toast-Class/actions/workflows/checks.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/checks.yml)
+[![TOASTER native MySQL](https://github.com/Realjustawall/Toast-Class/actions/workflows/mysql.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/mysql.yml)
+[![TOASTER isolated document conversion](https://github.com/Realjustawall/Toast-Class/actions/workflows/conversion.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/conversion.yml)
+[![Production installer](https://github.com/Realjustawall/Toast-Class/actions/workflows/installer.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/installer.yml)
+
+![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-339933?logo=nodedotjs&logoColor=white)
+![MySQL 8.4](https://img.shields.io/badge/MySQL-8.4-4479A1?logo=mysql&logoColor=white)
+![LiveKit](https://img.shields.io/badge/Media-LiveKit-6366F1)
+![Playwright E2E](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)
+![License MIT](https://img.shields.io/badge/License-MIT-blue)
 
 **[English](README.md) | [فارسی](README.fa.md)**
 
-سامانهٔ جامع و خودمیزبان (Self-Hosted) کلاس آنلاین با پشتیبانی کامل از زبان **فارسی (راست‌به‌چپ) و انگلیسی (چپ‌به‌راست)**، مجهز به دیتابیس **MySQL**، صوت و تصویر **LiveKit**، تخته هوشمند و حاشیه‌نویسی **PDF**، **تخته تعاملی ایزوله HTML/CSS/JS**، **GeoGebra**، یادداشت اشتراکی، چت عمومی و خصوصی با مدیریت دسترسی، و اسکن امنیتی فایل‌های آپلودی.
+[قابلیت‌ها](#قابلیتهای-کلیدی) • [تصاویر پیش‌نمایش](#تصاویر-پیشنمایش-فارسی-و-انگلیسی) • [نصب روی سرور](#راهنمای-نصب-و-راهاندازی-روی-سرور-لینوکس) • [محیط توسعه](#راهاندازی-محیط-توسعه-development) • [تست‌ها](#اجرای-تستها-و-بررسی-کیفیت-کد) • [امنیت](#نکات-امنیتی-و-لایسنس)
+
+</div>
+
+---
+
+سامانهٔ جامع و خودمیزبان (Self-Hosted) کلاس آنلاین با پشتیبانی کامل از زبان **فارسی (راست‌به‌چپ)** و **انگلیسی (چپ‌به‌چپ)**، مجهز به دیتابیس **MySQL**، صوت و تصویر **LiveKit**، تخته هوشمند و حاشیه‌نویسی **PDF**، **تخته تعاملی ایزوله HTML/CSS/JS**، **GeoGebra**، یادداشت اشتراکی، چت عمومی و خصوصی با مدیریت دسترسی، و اسکن امنیتی فایل‌های آپلودی.
 
 ---
 
@@ -32,13 +53,14 @@
 
 ## راهنمای نصب و راه‌اندازی روی سرور (لینوکس)
 
-### پیش‌نیازها
-
-- سرور لینوکس با **Node.js نسخه ۲۴ به بالا**، **Docker Engine** و **Docker Compose 2.24+**
-- تنظیم دو رکورد DNS از نوع `A` به IP عمومی سرور:
-  - `class.example.com` (دامنهٔ اصلی کلاس)
-  - `math.class.example.com` (دامنهٔ ایزوله GeoGebra و تخته‌های تعاملی)
-- باز کردن پورت‌های مورد نیاز طبق [راهنمای نصب (INSTALL.md)](docs/INSTALL.md)
+> [!IMPORTANT]
+> **پیش‌نیازهای سرور و دامنه**
+>
+> - سرور لینوکس با **Node.js نسخه ۲۴ به بالا**، **Docker Engine** و **Docker Compose 2.24+**
+> - تنظیم دو رکورد DNS از نوع `A` به IP عمومی سرور:
+>   - `class.example.com` (دامنهٔ اصلی کلاس)
+>   - `math.class.example.com` (دامنهٔ ایزوله GeoGebra و تخته‌های تعاملی)
+> - باز کردن پورت‌های مورد نیاز طبق [راهنمای نصب (INSTALL.md)](docs/INSTALL.md)
 
 ### ۱. دریافت سورس و اجرای نصب‌کننده
 
@@ -50,7 +72,8 @@ sh install.sh install --directory /opt/toaster/instance \
   --email admin@example.com
 ```
 
-> **نکته:** اگر گزینه‌ها را وارد نکنید، نصب‌کننده به صورت تعاملی از شما سوال می‌پرسد.  
+> [!TIP]
+> اگر گزینه‌ها را وارد نکنید، نصب‌کننده به صورت تعاملی از شما سوال می‌پرسد.  
 > اسکریپت نصب به صورت خودکار رمزهای دیتابیس و LiveKit را می‌سازد، کاربر مدیر اولیه را ایجاد می‌کند، آنتی‌ویروس آپلود (ClamAV) را راه‌اندازی می‌کند و گواهی HTTPS خودکار را با Caddy فعال می‌سازد. ثبت‌نام عمومی در ابتدا بسته است و رمز عبور باید بین ۶ تا ۱۲۸ کاراکتر باشد (می‌توانید از `--password-file` یا رمز تصادفی تولیدشده استفاده کنید).
 
 ### ۲. فعال‌سازی تبدیل اسناد آفیس (اختیاری)
@@ -102,15 +125,21 @@ npm run migrate:mysql
 npm run dev
 ```
 
-### ۳. اعطای دسترسی مدیر پلتفرم (اختیاری)
+<details>
+<summary>اختیاری: اعطای دسترسی مدیر پلتفرم</summary>
 
 ```sh
 npm run admin:grant -- user@example.com
 ```
 
+</details>
+
 ---
 
 ## اجرای تست‌ها و بررسی کیفیت کد
+
+<details>
+<summary>اجرای کامل تست‌های واحد، E2E و ممیزی امنیتی</summary>
 
 ```sh
 npm run typecheck
@@ -129,7 +158,10 @@ npm run test:e2e
 TEST_DATABASE_ENGINE=mysql TEST_MYSQL_ADMIN_URL="mysql://root:password@127.0.0.1:3306/toaster_admin_test" npm test
 ```
 
-> توجه: مقدار `TEST_MYSQL_ADMIN_URL` باید به یک دیتابیس اختصاصی با پسوند `_test` اشاره کند تا هر تست دیتابیس ایزوله خود را بسازد و پاک کند.
+> [!NOTE]
+> مقدار `TEST_MYSQL_ADMIN_URL` باید به یک دیتابیس اختصاصی با پسوند `_test` اشاره کند تا هر تست دیتابیس ایزوله خود را بسازد و پاک کند.
+
+</details>
 
 ---
 
@@ -145,5 +177,7 @@ node scripts/pack-release.mjs
 
 ## نکات امنیتی و لایسنس
 
-- **محدودیت‌ها و مرزهای امنیتی:** برابری کامل با BigBlueButton یا PDF Annotator و ظرفیت ۸۰۰ کاربر هم‌زمان رسانه‌ای تایید نشده است. پیش از استفاده در محیط تولید حتماً [docs/SECURITY.md](docs/SECURITY.md) را مطالعه کنید.
-- **لایسنس:** کد اصلی پروژه تحت مجوز [MIT](LICENSE) منتشر شده است و شرایط لایسنس ابزارهای جانبی (از جمله GeoGebra در استفادهٔ تجاری) در [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md) درج شده است.
+> [!WARNING]
+> برابری کامل با BigBlueButton یا PDF Annotator و ظرفیت ۸۰۰ کاربر هم‌زمان رسانه‌ای تایید نشده است. پیش از استفاده در محیط تولید حتماً [docs/SECURITY.md](docs/SECURITY.md) را مطالعه کنید.
+
+کد اصلی پروژه تحت مجوز [MIT](LICENSE) منتشر شده است و شرایط لایسنس ابزارهای جانبی (از جمله GeoGebra در استفادهٔ تجاری) در [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md) درج شده است.

@@ -1,8 +1,29 @@
-# TOASTER Classroom
+<div align="center">
+
+<img src="docs/screenshots/toaster-banner.svg" alt="TOASTER Classroom Banner" width="100%" />
+
+<br />
+
+[![TOASTER checks](https://github.com/Realjustawall/Toast-Class/actions/workflows/checks.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/checks.yml)
+[![TOASTER native MySQL](https://github.com/Realjustawall/Toast-Class/actions/workflows/mysql.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/mysql.yml)
+[![TOASTER isolated document conversion](https://github.com/Realjustawall/Toast-Class/actions/workflows/conversion.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/conversion.yml)
+[![Production installer](https://github.com/Realjustawall/Toast-Class/actions/workflows/installer.yml/badge.svg)](https://github.com/Realjustawall/Toast-Class/actions/workflows/installer.yml)
+
+![Node.js 24+](https://img.shields.io/badge/Node.js-24%2B-339933?logo=nodedotjs&logoColor=white)
+![MySQL 8.4](https://img.shields.io/badge/MySQL-8.4-4479A1?logo=mysql&logoColor=white)
+![LiveKit](https://img.shields.io/badge/Media-LiveKit-6366F1)
+![Playwright E2E](https://img.shields.io/badge/E2E-Playwright-2EAD33?logo=playwright&logoColor=white)
+![License MIT](https://img.shields.io/badge/License-MIT-blue)
 
 **[English](README.md) | [فارسی](README.fa.md)**
 
-A self-hosted, bilingual (English LTR / Persian RTL) online classroom platform built with **MySQL**, **LiveKit** audio/video, synchronized **Excalidraw & PDF annotation boards**, **Sandboxed Interactive HTML/CSS/JS Boards**, **GeoGebra**, shared notes, moderated public/private chat, breakout rooms, and automated upload scanning.
+[Features](#key-features) • [Bilingual Previews](#preview-english--persian) • [Production Install](#production-installation-linux) • [Local Development](#local-development-setup) • [Testing](#testing--verification) • [Security](#security--licensing)
+
+</div>
+
+---
+
+A self-hosted, bilingual (**English LTR** / **Persian RTL**) online classroom platform built with **MySQL**, **LiveKit** audio/video, synchronized **Excalidraw & PDF annotation boards**, **Sandboxed Interactive HTML/CSS/JS Boards**, **GeoGebra**, shared notes, moderated public/private chat, breakout rooms, and automated upload scanning.
 
 ---
 
@@ -32,15 +53,16 @@ A self-hosted, bilingual (English LTR / Persian RTL) online classroom platform b
 
 ## Production Installation (Linux)
 
-### Requirements
+> [!IMPORTANT]
+> **Server & DNS Prerequisites**
+>
+> - Linux server with **Node.js 24+**, **Docker Engine**, and **Docker Compose 2.24+**
+> - Two DNS `A` records pointing directly to your server's public IPv4:
+>   - `class.example.com` (main classroom application)
+>   - `math.class.example.com` (isolated GeoGebra / sandboxed origin)
+> - Open firewall ports per [docs/INSTALL.md](docs/INSTALL.md)
 
-- Linux server with **Node.js 24+**, **Docker Engine**, and **Docker Compose 2.24+**
-- Two DNS A records pointing directly to your server's public IPv4:
-  - `class.example.com` (main application)
-  - `math.class.example.com` (isolated GeoGebra / sandboxed origin)
-- Open firewall ports per [INSTALL.md](docs/INSTALL.md)
-
-### 1. Clone and Install
+### 1. Clone and Run the Installer
 
 ```sh
 git clone https://github.com/Realjustawall/Toast-Class.git /opt/toaster/source
@@ -50,7 +72,8 @@ sh install.sh install --directory /opt/toaster/instance \
   --email admin@example.com
 ```
 
-> **Tip:** Omit the CLI flags to run the interactive installer prompts.  
+> [!TIP]
+> Omit the CLI flags to run the interactive installer prompts.  
 > The installer generates isolated database and LiveKit credentials, creates an initial administrator account, configures upload scanning (ClamAV), and sets up automatic HTTPS via Caddy. Public registration starts closed. Passwords require 6–128 characters (pass `--password-file` or use the generated random password).
 
 ### 2. Optional Document Conversion (LibreOffice)
@@ -102,17 +125,21 @@ npm run migrate:mysql
 npm run dev
 ```
 
-### 3. Grant Platform Admin (Optional)
+<details>
+<summary>Optional: Grant Platform Admin Role</summary>
 
 ```sh
 npm run admin:grant -- user@example.com
 ```
 
+</details>
+
 ---
 
 ## Testing & Verification
 
-Run the full verification suite locally:
+<details>
+<summary>Run the full local verification & E2E suite</summary>
 
 ```sh
 npm run typecheck
@@ -131,7 +158,10 @@ To run the MySQL test suite:
 TEST_DATABASE_ENGINE=mysql TEST_MYSQL_ADMIN_URL="mysql://root:password@127.0.0.1:3306/toaster_admin_test" npm test
 ```
 
-> Note: `TEST_MYSQL_ADMIN_URL` must point to a dedicated administration database ending in `_test`. Each test creates and cleans up its own isolated database. Production images contain no test accounts or preview data.
+> [!NOTE]
+> `TEST_MYSQL_ADMIN_URL` must point to a dedicated administration database ending in `_test`. Each test creates and cleans up its own isolated database. Production images contain no test accounts or preview data.
+
+</details>
 
 ---
 
@@ -147,5 +177,7 @@ node scripts/pack-release.mjs
 
 ## Security & Licensing
 
-- **Security boundaries:** Full BigBlueButton / PDF Annotator parity and 800 simultaneous media users are not certified. Review [docs/SECURITY.md](docs/SECURITY.md) before production deployment.
-- **Licensing:** Original code is licensed under [MIT](LICENSE). Third-party component licenses (including GeoGebra commercial terms) are documented in [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md).
+> [!WARNING]
+> Full BigBlueButton / PDF Annotator parity and 800 simultaneous media users are not certified. Review [docs/SECURITY.md](docs/SECURITY.md) before production deployment.
+
+Original code is licensed under [MIT](LICENSE). Third-party component licenses (including GeoGebra commercial terms) are documented in [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md).
