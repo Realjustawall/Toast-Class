@@ -65,6 +65,14 @@ export class PresentationWorker {
       }
       await this.service.complete(job, output.pageCount);
     } catch (error) {
+      console.error(
+        JSON.stringify({
+          level: 'error',
+          event: 'presentation_worker.job_failed',
+          jobId: job.id,
+          error: error instanceof Error ? error.message : String(error),
+        }),
+      );
       await this.service.failed(
         job,
         error instanceof ConversionError ? error.code : 'document_processing_failed',

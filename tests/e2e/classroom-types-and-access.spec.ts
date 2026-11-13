@@ -136,7 +136,10 @@ test('owner configures type and enrollment, students only see assigned classes, 
     await expect(teacherPage.locator('.messages article')).toHaveCount(0);
     await teacherPage.getByRole('button', { name: 'Shared lesson', exact: true }).click();
     const notes = teacherPage.getByRole('textbox', { name: 'Shared notes', exact: true });
-    await expect(notes).toBeEditable();
+    await expect(
+      teacherPage.locator('.document-editor').getByRole('button', { name: 'Bold', exact: true }),
+    ).toBeEnabled();
+    await expect(notes).toHaveAttribute('contenteditable', 'true');
     await notes.fill('Shared lesson');
     await selectEditorText(notes, 0, 6);
     await teacherPage
