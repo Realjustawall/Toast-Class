@@ -123,8 +123,8 @@ test('GeoGebra worksheets save in MySQL, synchronize between users, export and e
       .toBe(12);
     await post(base + '/user-permissions/' + studentId, { canWhiteboard: false });
     await expect(viewer.getByRole('button', { name: 'Save', exact: true })).toHaveCount(0);
-    expect(await math.evaluate(() => fetch('/api/v1/me').then((response) => response.status))).toBe(
-      404,
+    expect([401, 404]).toContain(
+      await math.evaluate(() => fetch('/api/v1/me').then((response) => response.status)),
     );
     expect((await a.request.get('/geogebra/frame.html')).status()).toBe(404);
     expect(

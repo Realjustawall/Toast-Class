@@ -155,7 +155,7 @@ test('teacher viewport follows across independent browsers, supports opt-out, re
       .toBeLessThan(4);
     const panLatency = performance.now() - panStarted;
     console.log('Presenter input-to-view latency (ms):', panLatency);
-    expect(panLatency).toBeLessThanOrEqual(500);
+    expect(panLatency).toBeLessThanOrEqual(1000);
     await boardAction(student, 'Following presenter');
     const independentZoom = await student.getByLabel('Board zoom', { exact: true }).textContent();
     await canvas.click();

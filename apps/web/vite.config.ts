@@ -1,6 +1,39 @@
 import { defineConfig } from 'vite';
+import type { Connect } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { localExcalidrawFonts } from './offline-excalidraw';
+
+const isolatedAssetsMiddleware: Connect.NextHandleFunction = (req, res, next) => {
+  let path: string;
+  try {
+    path = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
+  } catch {
+    res.statusCode = 400;
+    res.end('Invalid URL');
+    return;
+  }
+  const mathAsset = path.startsWith('/vendor/geogebra/') || path.startsWith('/geogebra/');
+  if (
+    path.startsWith('/@fs/') &&
+    /(?:^|\/)(?:\.env(?:\.|$)|\.git(?:\/|$)|\.local(?:\/|$)|\.aws(?:\/|$))/i.test(path)
+  ) {
+    res.statusCode = 403;
+    res.end('Forbidden');
+    return;
+  }
+  const mathHost = req.headers.host?.split(':')[0] === 'geogebra.localhost';
+  if ((mathHost && !mathAsset) || (!mathHost && mathAsset)) {
+    res.statusCode = 404;
+    res.end('Not found');
+    return;
+  }
+  if (mathAsset) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+  next();
+};
+
 export default defineConfig({
   plugins: [
     {
@@ -11,36 +44,10 @@ export default defineConfig({
     {
       name: 'isolated-geogebra-assets',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          let path: string;
-          try {
-            path = decodeURIComponent(new URL(req.url ?? '/', 'http://localhost').pathname);
-          } catch {
-            res.statusCode = 400;
-            res.end('Invalid URL');
-            return;
-          }
-          const mathAsset = path.startsWith('/vendor/geogebra/') || path.startsWith('/geogebra/');
-          if (
-            path.startsWith('/@fs/') &&
-            /(?:^|\/)(?:\.env(?:\.|$)|\.git(?:\/|$)|\.local(?:\/|$)|\.aws(?:\/|$))/i.test(path)
-          ) {
-            res.statusCode = 403;
-            res.end('Forbidden');
-            return;
-          }
-          const mathHost = req.headers.host?.split(':')[0] === 'geogebra.localhost';
-          if ((mathHost && !mathAsset) || (!mathHost && mathAsset)) {
-            res.statusCode = 404;
-            res.end('Not found');
-            return;
-          }
-          if (mathAsset) {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-          }
-          next();
-        });
+        server.middlewares.use(isolatedAssetsMiddleware);
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use(isolatedAssetsMiddleware);
       },
     },
   ],

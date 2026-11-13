@@ -538,7 +538,8 @@ test('PDF pages, searchable original text, vector export, images, formulas, stam
         return docs.some((doc: { page_rotation?: number }) => doc.page_rotation === 90);
       })
       .toBe(true);
-    await a.keyboard.press('Escape');
+    await manager.getByRole('button', { name: 'Close panel', exact: true }).click();
+    await expect(manager).toBeHidden();
     await expect(
       b.getByRole('combobox', { name: 'Whiteboard pages', exact: true }).locator('option'),
     ).toHaveCount(3);
@@ -564,19 +565,17 @@ test('PDF pages, searchable original text, vector export, images, formulas, stam
     expect(exported.getPageCount()).toBe(3);
     expect(exported.getPages().some((page) => page.getRotation().angle === 90)).toBe(true);
     await writeFile('.local/runtime/annotated-vector.pdf', await readFile(path));
-    const exportedText = await a.evaluate(
-      async (data) => {
-        const url = '/src/pdf-text-search.ts';
-        const { pdfBytesText } = await import(url);
-        return (
-          await pdfBytesText(
-            Uint8Array.from(atob(data), (c) => c.charCodeAt(0)),
-            AbortSignal.timeout(10000),
-          )
-        ).join('\n');
-      },
-      Buffer.from(await readFile(path)).toString('base64'),
-    );
+    const { getDocument } = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const task = getDocument({ data: new Uint8Array(await readFile(path)) });
+    const pdfDoc = await task.promise;
+    const exportedPages: string[] = [];
+    for (let pageNumber = 1; pageNumber <= pdfDoc.numPages; pageNumber++) {
+      const page = await pdfDoc.getPage(pageNumber);
+      const text = await page.getTextContent();
+      exportedPages.push(text.items.map((item) => ('str' in item ? item.str : '')).join(' '));
+    }
+    await task.destroy();
+    const exportedText = exportedPages.join('\n');
     expect(exportedText).toContain('first vector lesson');
     expect(exportedText).toContain('second searchable theorem');
     await a.setViewportSize({ width: 390, height: 844 });

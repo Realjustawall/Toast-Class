@@ -59,6 +59,7 @@ test('all four classrooms support readable text, keyboard and drag resizing, pan
       expect(box.width).toBeGreaterThan(1300);
       await page.keyboard.press('Escape');
       await expect(page.locator('.classroom-shell')).toHaveAttribute('data-expanded-panel', 'none');
+      await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(false);
     }
     await page.locator('.application-settings-trigger').first().click();
     const preferences = page.locator('.application-settings-page');

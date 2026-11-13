@@ -40,7 +40,7 @@ test('platform administrator closes registration while existing users can still 
     expect(denied.status()).toBe(403);
     await guest.getByLabel('Email', { exact: true }).fill('platform-admin@browser.test');
     await guest.getByLabel('Password', { exact: true }).fill('admin123');
-    await guest.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await guest.locator('form').getByRole('button', { name: 'Sign in', exact: true }).click();
     await expect(guest.getByRole('button', { name: 'My account', exact: true })).toBeVisible();
     await setAppLanguage(page, 'fa');
     await page.screenshot({
