@@ -17,7 +17,7 @@
 
 **[English](README.md) | [فارسی](README.fa.md)**
 
-[Features](#key-features) • [Bilingual Previews](#preview-english--persian) • [Production Install](#production-installation-linux) • [Local Development](#local-development-setup) • [Testing](#testing--verification) • [Security](#security--licensing)
+[Features](#key-features) • [Bilingual Previews](#preview-english--persian) • [Install & SSL](#production-installation--ssl-setup-linux) • [Local Dev](#local-development-setup) • [Testing](#testing--verification) • [License](#license--attribution)
 
 </div>
 
@@ -43,15 +43,15 @@ A self-hosted, bilingual (**English LTR** / **Persian RTL**) online classroom pl
 
 - **Live Audio, Video & Moderation:** Self-hosted LiveKit SFU with server-enforced microphone, camera, screen-sharing permissions, presenter delegation, and per-user/room-wide locks.
 - **Synchronized Boards & PDF Annotation:** Normal and pressure-sensitive ink pens, multipage boards, PDF import/annotation/export, board history snapshots/restore, and per-file download policies.
-- **Sandboxed Interactive HTML/CSS/JS Boards:** Teachers can upload single `.html` files or `.zip` web bundles to launch an isolated interactive board (similar to GeoGebra). Executed inside a strictly sandboxed iframe (`allow-scripts` only, no `allow-same-origin`, strict CSP, no network/storage/parent DOM access, and server-side archive/MIME validation).
+- **Sandboxed Interactive HTML/CSS/JS Boards:** Teachers can upload single `.html` files or `.zip` web bundles to launch an isolated interactive board. Executed inside a strictly sandboxed iframe (`allow-scripts` only, no `allow-same-origin`, strict CSP, no network/storage/parent DOM access, and server-side archive/MIME validation).
 - **Self-Hosted GeoGebra:** Runs on an isolated origin (`math.class.example.com`) with pinned, hash-verified assets during build.
 - **Moderated Public & Private Chat:** Independent moderator switches, persistent history, message formatting, sender edit/delete, unread counts, and student image upload locks.
 - **Teaching Tools:** Shared notes, polls, hand-raise queue, timers, attendance tracking, breakout rooms, and platform administration.
-- **Bilingual UI (EN / FA):** Full English (LTR) and Persian (RTL) interface with desktop and mobile responsive layouts (`classic-bbb`, `immersive-glass`, `modular-skyroom`, `studio-hybrid`).
+- **Bilingual UI (EN / FA):** Full English (LTR) and Persian (RTL) interface with responsive desktop and mobile layouts (`classic`, `immersive-glass`, `modular-skyroom`, `studio-hybrid`).
 
 ---
 
-## Production Installation (Linux)
+## Production Installation & SSL Setup (Linux)
 
 > [!IMPORTANT]
 > **Server & DNS Prerequisites**
@@ -60,7 +60,7 @@ A self-hosted, bilingual (**English LTR** / **Persian RTL**) online classroom pl
 > - Two DNS `A` records pointing directly to your server's public IPv4:
 >   - `class.example.com` (main classroom application)
 >   - `math.class.example.com` (isolated GeoGebra / sandboxed origin)
-> - Open firewall ports per [docs/INSTALL.md](docs/INSTALL.md)
+> - Open TCP ports `80` and `443` (for HTTPS/SSL & LiveKit TCP/TURN) plus UDP media ports per [docs/INSTALL.md](docs/INSTALL.md)
 
 ### 1. Clone and Run the Installer
 
@@ -74,9 +74,16 @@ sh install.sh install --directory /opt/toaster/instance \
 
 > [!TIP]
 > Omit the CLI flags to run the interactive installer prompts.  
-> The installer generates isolated database and LiveKit credentials, creates an initial administrator account, configures upload scanning (ClamAV), and sets up automatic HTTPS via Caddy. Public registration starts closed. Passwords require 6–128 characters (pass `--password-file` or use the generated random password).
+> The installer generates isolated database and LiveKit credentials, creates an initial administrator account, configures upload scanning (ClamAV), and automatically provisions **SSL/TLS certificates**. Public registration starts closed. Passwords require 6–128 characters (pass `--password-file` or use the generated random password).
 
-### 2. Optional Document Conversion (LibreOffice)
+### 2. Automatic SSL / HTTPS Setup (Caddy)
+
+- **Automatic TLS Certificates:** During `install.sh install`, **Caddy** automatically obtains and renews Let's Encrypt / ZeroSSL certificates for both `class.example.com` and `math.class.example.com`, and redirects all HTTP (`:80`) traffic to HTTPS (`:443`).
+- **DNS Requirement:** Ensure both domains resolve directly to `YOUR_SERVER_PUBLIC_IPV4` (disable orange-cloud/CDN proxying during certificate issuance and for LiveKit WebRTC media).
+- **Email (`--email`):** Used for TLS certificate expiration and ACME registration notices.
+- **Verify SSL & Services:** Run `sh install.sh doctor --directory /opt/toaster/instance` to validate Caddy configuration, TLS readiness, database connectivity, and media signaling.
+
+### 3. Optional Document Conversion (LibreOffice)
 
 Office document conversion (`.docx`, `.pptx`, etc. to PDF/images) runs in a locked-down converter container and is **optional**:
 
@@ -86,7 +93,7 @@ sh install.sh install --directory /opt/toaster/instance \
   --email admin@example.com --documents
 ```
 
-### 3. Manage & Diagnose
+### 4. Manage & Diagnose
 
 Existing secrets and databases are preserved when starting or updating:
 
@@ -95,7 +102,7 @@ sh install.sh start --directory /opt/toaster/instance
 sh install.sh doctor --directory /opt/toaster/instance
 ```
 
-See the [full installation guide](docs/INSTALL.md) for custom domains, Redis, backups, and upgrades.
+See [docs/INSTALL.md](docs/INSTALL.md) for custom domains, Redis, backups, and upgrades.
 
 ---
 
@@ -175,9 +182,10 @@ node scripts/pack-release.mjs
 
 ---
 
-## Security & Licensing
+## License & Attribution
 
-> [!WARNING]
-> Full BigBlueButton / PDF Annotator parity and 800 simultaneous media users are not certified. Review [docs/SECURITY.md](docs/SECURITY.md) before production deployment.
+> [!NOTE]
+> Review [docs/SECURITY.md](docs/SECURITY.md) for security boundaries and deployment hardening before production use.
 
-Original code is licensed under [MIT](LICENSE). Third-party component licenses (including GeoGebra commercial terms) are documented in [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md).
+This project is open-source and free to use, modify, and distribute **with attribution** under the **[MIT License](LICENSE)** (copyright notice and license terms must be preserved).  
+Third-party component licenses and source attributions (including GeoGebra commercial terms) are documented in **[docs/ATTRIBUTION.md](docs/ATTRIBUTION.md)**.
