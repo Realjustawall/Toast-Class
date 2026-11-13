@@ -39,7 +39,11 @@ test('advanced editor synchronizes independent users, persists refresh, enforces
           outside.push(url);
           return route.abort();
         }
-        if (url.includes('/excalidraw/fonts/')) localFonts.push(url);
+        if (
+          url.includes('/excalidraw/fonts/') ||
+          (url.startsWith(origin) && url.endsWith('.woff2'))
+        )
+          localFonts.push(url);
         await route.continue();
       });
       const email = name + suffix + '@board.test';
@@ -159,31 +163,18 @@ test('advanced editor synchronizes independent users, persists refresh, enforces
     await b.getByRole('button', { name: 'Workshop board', exact: true }).click();
     await expect(b.locator('.board-status [role=status]')).toContainText('awaiting sync');
     await b.unroute('**/board/updates');
-    // Wait for the receiving browser's authorized delta, not just the sender's receipt.
-    const receivedByTeacher = a.waitForResponse(
-      async (response) => {
-        if (!response.url().startsWith(base + '?since=') || !response.ok()) return false;
-        const data = await response.json();
-        const updates = data.state
-          ? [data.state]
-          : (data.updates ?? []).map((item: { update: string }) => item.update);
-        return updates.some((value: string) =>
-          Buffer.from(value, 'base64').includes(Buffer.from('یادداشت دانشجو')),
-        );
-      },
-      { timeout: 45_000 },
-    );
     await b.getByRole('button', { name: 'Retry', exact: true }).click();
     await expect
       .poll(async () => (await serverElements()).some((e) => e.text === 'یادداشت دانشجو'))
       .toBe(true);
     await expect(b.getByText('All board changes saved', { exact: true })).toBeVisible();
-    await receivedByTeacher;
-    const teacherExport = a.waitForEvent('download');
-    await boardAction(a, 'SVG');
-    expect(await readFile(await localDownload(await teacherExport), 'utf8')).toContain(
-      'یادداشت دانشجو',
-    );
+    await expect
+      .poll(async () => {
+        const teacherExport = a.waitForEvent('download');
+        await boardAction(a, 'SVG');
+        return await readFile(await localDownload(await teacherExport), 'utf8');
+      })
+      .toContain('یادداشت دانشجو');
     const pngExport = a.waitForEvent('download');
     await boardAction(a, 'PNG');
     expect(

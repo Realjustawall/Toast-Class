@@ -52,8 +52,14 @@ test('real converter and two-user presentation: pages, independent viewing, relo
     teacher.on('dialog', (dialog) => void dialog.accept());
     await teacher.goto('/#classroom/' + room.id);
     await learner.goto('/#classroom/' + room.id);
-    await teacher.getByRole('button', { name: 'Apps', exact: true }).click();
-    await teacher.getByRole('menuitem', { name: 'Files', exact: true }).click();
+    if (!(await teacher.getByLabel('Choose a file', { exact: true }).isVisible())) {
+      const appsButton = teacher.getByRole('button', { name: 'Apps', exact: true });
+      if ((await appsButton.getAttribute('aria-pressed')) === 'true') {
+        await appsButton.click();
+      }
+      await appsButton.click();
+      await teacher.getByRole('menuitem', { name: 'Files', exact: true }).click();
+    }
     const original = testPdf(2);
     await teacher
       .getByLabel('Choose a file', { exact: true })
@@ -124,8 +130,14 @@ test('real converter and two-user presentation: pages, independent viewing, relo
     await expect(
       learner.getByRole('heading', { name: 'نمای مشترک درس شما', exact: true }),
     ).toBeVisible();
-    await teacher.getByRole('button', { name: 'Apps', exact: true }).click();
-    await teacher.getByRole('menuitem', { name: 'Files', exact: true }).click();
+    if (!(await teacher.getByLabel('Choose a file', { exact: true }).isVisible())) {
+      const appsButton = teacher.getByRole('button', { name: 'Apps', exact: true });
+      if ((await appsButton.getAttribute('aria-pressed')) === 'true') {
+        await appsButton.click();
+      }
+      await appsButton.click();
+      await teacher.getByRole('menuitem', { name: 'Files', exact: true }).click();
+    }
     await teacher.getByLabel('Choose a file', { exact: true }).setInputFiles({
       name: 'Workshop.docx',
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
