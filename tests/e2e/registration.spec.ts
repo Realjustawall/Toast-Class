@@ -52,7 +52,9 @@ test('platform administrator closes registration while existing users can still 
       page.getByRole('status').filter({ hasText: 'ثبت‌نام حساب جدید باز است.' }),
     ).toBeVisible();
     await guest.getByRole('button', { name: 'Sign out', exact: true }).click();
-    await expect(guest.getByRole('button', { name: 'Create account', exact: true })).toBeVisible();
+    await expect(
+      guest.locator('form').getByRole('button', { name: 'Create account', exact: true }),
+    ).toBeVisible();
   } finally {
     await visitor.close();
   }

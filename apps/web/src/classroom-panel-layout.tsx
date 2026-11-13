@@ -120,8 +120,7 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
     const escape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         void (async () => {
-          if (nativePanel.current && document.fullscreenElement)
-            await document.exitFullscreen().catch(() => {});
+          if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
           nativePanel.current = null;
           setExpanded(null);
         })();

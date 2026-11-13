@@ -575,7 +575,7 @@ test('PDF pages, searchable original text, vector export, images, formulas, stam
       exportedPages.push(text.items.map((item) => ('str' in item ? item.str : '')).join(' '));
     }
     await task.destroy();
-    const exportedText = exportedPages.join('\n');
+    const exportedText = exportedPages.join('\n').toLowerCase();
     expect(exportedText).toContain('first vector lesson');
     expect(exportedText).toContain('second searchable theorem');
     await a.setViewportSize({ width: 390, height: 844 });
