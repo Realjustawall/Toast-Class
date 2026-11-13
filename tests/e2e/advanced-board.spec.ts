@@ -252,6 +252,10 @@ test('advanced editor synchronizes independent users, persists refresh, enforces
     expect(restoredSvg).not.toContain('Unsent after baseline');
     await a.screenshot({ path: 'test-results/board-history.png', fullPage: true });
   } finally {
+    await Promise.all([
+      teacher.unrouteAll({ behavior: 'ignoreErrors' }),
+      student.unrouteAll({ behavior: 'ignoreErrors' }),
+    ]);
     await teacher.close();
     await student.close();
   }

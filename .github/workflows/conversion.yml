@@ -52,7 +52,7 @@ jobs:
       - run: |
           sudo groupadd -f -g 65532 toaster-converter
           sudo usermod -aG 65532 runner
-          sudo -E -u runner env "PATH=$PATH" npm run test:e2e
+          sg toaster-converter -c "npm run test:e2e"
       - if: always()
         run: docker stop toaster-test-media || true
       - uses: actions/upload-artifact@v7.0.2
