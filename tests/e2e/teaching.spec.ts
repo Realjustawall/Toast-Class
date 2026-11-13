@@ -63,16 +63,16 @@ test('two independent users synchronize polls, hand queue, notes and board', asy
       await p.getByRole('button', { name: 'Apps', exact: true }).click();
       await p.getByRole('menuitem', { name: 'Activities', exact: true }).click();
     }
-    await expect(teacherPage.locator('.classroom-stage').getByRole('listitem')).toContainText(
-      'Learner',
-    );
+    await expect(
+      teacherPage.locator('.classroom-app-activities').getByRole('listitem'),
+    ).toContainText('Learner');
     await teacherPage.getByRole('button', { name: 'Lower hand Learner', exact: true }).click();
     await expect(studentPage.getByText('No hands raised.')).toBeVisible();
     await teacherPage.getByLabel('Question', { exact: true }).fill('Which topic next?');
     await teacherPage.getByLabel('Options (one per line)').fill('Concurrency\nNetworking');
     await teacherPage.getByRole('button', { name: 'Launch poll', exact: true }).click();
     await studentPage.getByRole('button', { name: 'Concurrency', exact: true }).click();
-    await expect(teacherPage.locator('.poll')).toContainText('1 responses');
+    await expect(teacherPage.locator('.poll-options button').first()).toContainText('1');
     await teacherPage.getByRole('button', { name: 'Publish results', exact: true }).click();
     await expect(studentPage.locator('.poll-options button').first()).toContainText('1');
     await teacherPage.getByRole('button', { name: 'Documents', exact: true }).click();

@@ -5,12 +5,15 @@ test('real UI: register, create organization and classroom, switch RTL/LTR and p
 }) => {
   await page.goto('/');
   await setAppLanguage(page, 'en');
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await page
+    .getByRole('navigation', { name: 'Your account' })
+    .getByRole('button', { name: 'Create account', exact: true })
+    .click();
   await page.getByLabel('Name', { exact: true }).fill('Neda Rahimi');
   await page.getByLabel('Email', { exact: true }).fill('neda@example.org');
   await page.getByLabel('Password', { exact: true }).fill('browser-test-password-123');
   await page.getByLabel('Confirm password', { exact: true }).fill('browser-test-password-123');
-  await page.getByRole('button', { name: 'Create account', exact: true }).click();
+  await page.locator('form').getByRole('button', { name: 'Create account', exact: true }).click();
   await expect(
     page.getByRole('heading', { name: 'A little space. A lot to learn.' }),
   ).toBeVisible();

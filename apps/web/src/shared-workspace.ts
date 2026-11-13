@@ -2,9 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { request } from './api';
 import { useClassroomConnection } from './live';
 export type SharedWorkspace = {
-  kind: 'document' | 'geogebra' | 'presentation';
+  kind: 'document' | 'geogebra' | 'presentation' | 'sandbox';
   documentId: string | null;
   geogebraId: string | null;
+  sandboxId: string | null;
   geoPerspective: string;
   revision: number;
   updatedBy: string | null;
@@ -46,7 +47,7 @@ export function useSharedWorkspace(roomId: string) {
   }, [roomId]);
   const select = async (
     data: Pick<SharedWorkspace, 'kind'> &
-      Partial<Pick<SharedWorkspace, 'documentId' | 'geogebraId' | 'geoPerspective'>>,
+      Partial<Pick<SharedWorkspace, 'documentId' | 'geogebraId' | 'sandboxId' | 'geoPerspective'>>,
   ) => {
     setBusy(true);
     setError('');

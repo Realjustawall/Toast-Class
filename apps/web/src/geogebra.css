@@ -125,3 +125,62 @@
     flex-basis: 100%;
   }
 }
+.sandbox-stage,
+.sandbox-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+.sandbox-stage[hidden] {
+  display: none;
+}
+.sandbox-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-bottom: 1px solid #d8e1e9;
+  background: #f8fafc;
+}
+.sandbox-picker,
+.sandbox-upload-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.sandbox-picker select,
+.sandbox-upload-controls input[type='text'] {
+  min-height: 32px;
+  padding: 4px 8px;
+  border: 1px solid #cfd9e3;
+  border-radius: 6px;
+  background: #fff;
+  color: #1c2733;
+}
+.sandbox-isolation-badge {
+  margin-inline-start: auto;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #e7f6ee;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+.sandbox-frame-container {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 240px;
+  background: #fff;
+}
+.sandbox-frame {
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  border: 0;
+  display: block;
+  background: #fff;
+}

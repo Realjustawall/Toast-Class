@@ -20,7 +20,7 @@ type Sizes = {
   mediaWidth: number;
   text: number;
 };
-const defaults: Sizes = { people: 300, chat: 320, mediaHeight: 160, mediaWidth: 240, text: 15 };
+const defaults: Sizes = { people: 280, chat: 280, mediaHeight: 160, mediaWidth: 240, text: 15 };
 const clamp = (n: number, min: number, max: number) =>
   Math.min(Math.max(n, min), Math.max(min, max));
 
@@ -118,7 +118,12 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
   }, [key, sizes]);
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setExpanded(null);
+      if (event.key === 'Escape') {
+        if (nativePanel.current && document.fullscreenElement)
+          void document.exitFullscreen().catch(() => {});
+        nativePanel.current = null;
+        setExpanded(null);
+      }
     };
     const resize = () =>
       setSizes((current) => {

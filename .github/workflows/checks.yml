@@ -18,6 +18,7 @@ jobs:
           --health-retries 10
     env:
       TEST_DATABASE_URL: postgres://toaster:ephemeral-ci-only@localhost:5432/toaster_test
+      TEST_PLATFORM_ADMIN_SEED: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,7 +29,21 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npx playwright install --with-deps chromium
+      - run: npx tsx scripts/prepare-media-ci.ts
+      - run: >-
+          docker run -d --name toaster-test-media --network host
+          --mount type=bind,source=${{ github.workspace }}/.local/livekit-ci.yaml,target=/etc/livekit.yaml,readonly
+          livekit/livekit-server:v1.13.11 --config /etc/livekit.yaml
+      - name: Wait for signaling liveness
+        run: |
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:7880/ > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          exit 1
       - run: npm run test:e2e
+      - if: always()
+        run: docker stop toaster-test-media || true
       - run: npm run build
       - run: npm audit --audit-level=high
       - uses: actions/upload-artifact@v4

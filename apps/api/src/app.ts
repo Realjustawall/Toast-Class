@@ -12,6 +12,7 @@ import { registerClassroomDownloads } from './classroom-downloads.js';
 import { registerPrivateChat, assertPublicChat } from './private-chat.js';
 import { registerChatCategories } from './chat-categories.js';
 import { registerGeoGebra } from './geogebra.js';
+import { registerSandbox } from './sandbox.js';
 import { OptionalCache } from './optional-cache.js';
 import { roomLockPolicy } from './classroom-lock-policy.js';
 import { registerClassroomLocks } from './classroom-locks.js';
@@ -1586,6 +1587,7 @@ export async function buildApp(pool: DatabasePool, config: Config) {
   await registerAnnotationPages(app, { pool, origin: config.origin, user, roomAccess, membership });
   await registerChatCategories(app, { pool, origin: config.origin, user, roomAccess, membership });
   await registerGeoGebra(app, { pool, origin: config.origin, user, roomAccess, membership });
+  await registerSandbox(app, { pool, origin: config.origin, user, roomAccess, membership });
   await registerClassroomWorkspace(
     app,
     { pool, origin: config.origin, user, roomAccess, membership },

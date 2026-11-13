@@ -161,6 +161,7 @@ export function useClassroomConnection(
                   'chat_categories_changed',
                   'private_chat_changed',
                   'geogebra_changed',
+                  'sandbox_changed',
                   'document_changed',
                   'board_changed',
                 ].includes(type),

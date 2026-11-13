@@ -17,6 +17,7 @@ export async function readClassroomWorkspace(c: Pick<DatabasePool, 'query'>, id:
       kind: row.kind,
       documentId: row.document_id,
       geogebraId: row.geogebra_id,
+      sandboxId: row.sandbox_id ?? null,
       geoPerspective: row.geo_perspective,
       revision: Number(row.revision),
       updatedBy: row.updated_by,
@@ -31,6 +32,7 @@ export async function readClassroomWorkspace(c: Pick<DatabasePool, 'query'>, id:
     kind: 'document',
     documentId: document?.id ?? null,
     geogebraId: null,
+    sandboxId: null,
     geoPerspective: '1',
     revision: 0,
     updatedBy: null,
@@ -52,9 +54,10 @@ export async function registerClassroomWorkspace(
       room = await ctx.roomAccess(z.uuid().parse(req.params.id), u.id);
     const data = z
       .object({
-        kind: z.enum(['document', 'geogebra', 'presentation']),
+        kind: z.enum(['document', 'geogebra', 'presentation', 'sandbox']),
         documentId: z.uuid().nullable().optional(),
         geogebraId: z.uuid().nullable().optional(),
+        sandboxId: z.uuid().nullable().optional(),
         geoPerspective: z.enum(['1', '2', '3', '4', '5', '6']).optional(),
         expectedRevision: z.number().int().min(0),
       })
@@ -70,7 +73,8 @@ export async function registerClassroomWorkspace(
       if (current.revision !== data.expectedRevision)
         fail(409, 'Shared workspace changed; refresh before switching');
       if (data.kind === 'document') {
-        if (!data.documentId || data.geogebraId) fail(400, 'Choose a classroom document');
+        if (!data.documentId || data.geogebraId || data.sandboxId)
+          fail(400, 'Choose a classroom document');
         if (
           !(
             await c.query(
@@ -82,7 +86,7 @@ export async function registerClassroomWorkspace(
           fail(404, 'Document not found');
       } else if (data.kind === 'geogebra') {
         await assertPlatformFeature(c, 'geoEnabled');
-        if (data.documentId) fail(400, 'Invalid shared workspace');
+        if (data.documentId || data.sandboxId) fail(400, 'Invalid shared workspace');
         if (
           data.geogebraId &&
           !(
@@ -93,14 +97,28 @@ export async function registerClassroomWorkspace(
           ).rows.length
         )
           fail(404, 'Worksheet not found');
+      } else if (data.kind === 'sandbox') {
+        if (data.documentId || data.geogebraId) fail(400, 'Invalid shared workspace');
+        if (
+          data.sandboxId &&
+          !(
+            await c.query('SELECT id FROM sandbox_boards WHERE id=$1 AND classroom_id=$2', [
+              data.sandboxId,
+              room.id,
+            ])
+          ).rows.length
+        )
+          fail(404, 'Sandbox board not found');
       } else {
         if (!presentationsEnabled) fail(403, 'Presentation conversion is unavailable');
-        if (data.documentId || data.geogebraId) fail(400, 'Invalid shared workspace');
+        if (data.documentId || data.geogebraId || data.sandboxId)
+          fail(400, 'Invalid shared workspace');
       }
       const next = {
         kind: data.kind,
         documentId: data.kind === 'document' ? data.documentId! : null,
         geogebraId: data.kind === 'geogebra' ? (data.geogebraId ?? null) : null,
+        sandboxId: data.kind === 'sandbox' ? (data.sandboxId ?? null) : null,
         geoPerspective: data.geoPerspective ?? current.geoPerspective,
         revision: current.revision + 1,
         updatedBy: u.id,
@@ -108,14 +126,15 @@ export async function registerClassroomWorkspace(
       await c.query(
         sqlDialect(
           c,
-          'INSERT INTO classroom_workspace(classroom_id,kind,document_id,geogebra_id,geo_perspective,revision,updated_by) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(classroom_id) DO UPDATE SET kind=EXCLUDED.kind,document_id=EXCLUDED.document_id,geogebra_id=EXCLUDED.geogebra_id,geo_perspective=EXCLUDED.geo_perspective,revision=EXCLUDED.revision,updated_by=EXCLUDED.updated_by,updated_at=CURRENT_TIMESTAMP(3)',
-          'INSERT INTO classroom_workspace(classroom_id,kind,document_id,geogebra_id,geo_perspective,revision,updated_by) VALUES($1,$2,$3,$4,$5,$6,$7) AS incoming ON DUPLICATE KEY UPDATE kind=incoming.kind,document_id=incoming.document_id,geogebra_id=incoming.geogebra_id,geo_perspective=incoming.geo_perspective,revision=incoming.revision,updated_by=incoming.updated_by,updated_at=CURRENT_TIMESTAMP(3)',
+          'INSERT INTO classroom_workspace(classroom_id,kind,document_id,geogebra_id,sandbox_id,geo_perspective,revision,updated_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT(classroom_id) DO UPDATE SET kind=EXCLUDED.kind,document_id=EXCLUDED.document_id,geogebra_id=EXCLUDED.geogebra_id,sandbox_id=EXCLUDED.sandbox_id,geo_perspective=EXCLUDED.geo_perspective,revision=EXCLUDED.revision,updated_by=EXCLUDED.updated_by,updated_at=CURRENT_TIMESTAMP(3)',
+          'INSERT INTO classroom_workspace(classroom_id,kind,document_id,geogebra_id,sandbox_id,geo_perspective,revision,updated_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8) AS incoming ON DUPLICATE KEY UPDATE kind=incoming.kind,document_id=incoming.document_id,geogebra_id=incoming.geogebra_id,sandbox_id=incoming.sandbox_id,geo_perspective=incoming.geo_perspective,revision=incoming.revision,updated_by=incoming.updated_by,updated_at=CURRENT_TIMESTAMP(3)',
         ),
         [
           room.id,
           next.kind,
           next.documentId,
           next.geogebraId,
+          next.sandboxId,
           next.geoPerspective,
           next.revision,
           u.id,

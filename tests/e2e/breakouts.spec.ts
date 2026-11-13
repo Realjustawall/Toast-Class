@@ -71,6 +71,8 @@ test('self-selected group room, refresh and Persian mobile management', async ({
     await setAppLanguage(teacher, 'fa');
     await teacher.setViewportSize({ width: 390, height: 844 });
     await expect(teacher.locator('html')).toHaveAttribute('dir', 'rtl');
+    await teacher.getByRole('button', { name: 'فعالیت‌ها', exact: true }).click();
+    await teacher.getByRole('menuitem', { name: 'اتاق‌های گروهی', exact: true }).click();
     await expect(
       teacher.getByRole('heading', { name: 'کار گروهی در حال انجام', exact: true }),
     ).toBeVisible();

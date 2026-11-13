@@ -60,17 +60,24 @@ test('all four classrooms support readable text, keyboard and drag resizing, pan
       await page.keyboard.press('Escape');
       await expect(page.locator('.classroom-shell')).toHaveAttribute('data-expanded-panel', 'none');
     }
-    const preferences = page.locator('.classroom-layout-preferences');
-    await preferences.locator('summary').click();
+    await page.locator('.application-settings-trigger').first().click();
+    const preferences = page.locator('.application-settings-page');
+    const savedPreferences = page.waitForResponse(
+      (r) =>
+        r.url().includes('/preferences') &&
+        r.request().method() === 'POST' &&
+        (r.request().postData() ?? '').includes('"text":20'),
+    );
     await preferences
       .getByRole('combobox', { name: 'Classroom text size', exact: true })
       .selectOption('20');
+    await savedPreferences;
     expect(
       await page
         .locator('.classroom-meeting-name h1')
         .evaluate((e) => parseFloat(getComputedStyle(e).fontSize)),
     ).toBeGreaterThanOrEqual(20);
-    await preferences.locator('summary').click();
+    await page.keyboard.press('Escape');
     await page.reload();
     await expect(page.locator('.classroom-shell')).toHaveAttribute('data-theme', theme);
     expect(
@@ -88,5 +95,13 @@ test('all four classrooms support readable text, keyboard and drag resizing, pan
     expect(mobile.x + mobile.width).toBeLessThanOrEqual(391);
     await page.keyboard.press('Escape');
     await expect(page.locator('iframe,.classroom-loading')).toHaveCount(0);
+    const resetLang = page.waitForResponse(
+      (r) =>
+        r.url().includes('/preferences') &&
+        r.request().method() === 'POST' &&
+        (r.request().postData() ?? '').includes('"language":"en"'),
+    );
+    await setAppLanguage(page, 'en');
+    await resetLang;
   }
 });

@@ -112,6 +112,10 @@ export async function testDatabase(): Promise<{
           "DEFAULT 'resource' CONSTRAINT files_purpose_check CHECK(purpose IN",
         )
         .replace(
+          "DEFAULT 'document' CHECK(kind IN",
+          "DEFAULT 'document' CONSTRAINT classroom_workspace_kind_check CHECK(kind IN",
+        )
+        .replace(
           /CHECK\(delete_reason IN \(([^)]+)\)\)/g,
           'CHECK(delete_reason IS NULL OR delete_reason IN ($1))',
         ),

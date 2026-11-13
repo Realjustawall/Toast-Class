@@ -15,6 +15,7 @@ const Presentations = lazy(() => import('./presentations'));
 const Files = lazy(() => import('./files'));
 const AdvancedBoard = lazy(() => import('./advanced-board'));
 const GeoGebraWorkspace = lazy(() => import('./geogebra-workspace'));
+const SandboxWorkspace = lazy(() => import('./sandbox-workspace'));
 import Breakouts, { BreakoutStatus } from './breakouts';
 import {
   DEFAULT_CLASSROOM_PERMISSIONS,
@@ -50,11 +51,12 @@ type Poll = {
   myChoice: number | null;
 };
 type ClassroomAppKey =
-  'activities' | 'files' | 'geogebra' | 'breakouts' | 'attendance' | 'announcements';
+  'activities' | 'files' | 'geogebra' | 'sandbox' | 'breakouts' | 'attendance' | 'announcements';
 const classroomAppTitles: Record<ClassroomAppKey, string> = {
   activities: 'activities',
   files: 'fileLibrary',
   geogebra: 'geoTitle',
+  sandbox: 'sandboxTitle',
   breakouts: 'breakoutRooms',
   attendance: 'attendance',
   announcements: 'classroomAnnouncements',
@@ -259,6 +261,7 @@ export default function Teaching({
   const [manageDocuments, setManageDocuments] = useState(false),
     [settingsOpen, setSettingsOpen] = useState(false);
   const [geogebraOpened, setGeogebraOpened] = useState(false);
+  const [sandboxOpened, setSandboxOpened] = useState(false);
   const [controlsTarget, setControlsTarget] = useState<HTMLDivElement | null>(null),
     [screenSharing, setScreenSharing] = useState(false);
   const shell = useRef<HTMLDivElement>(null),
@@ -368,6 +371,7 @@ export default function Teaching({
     | 'presentations'
     | 'gallery'
     | 'geogebra'
+    | 'sandbox'
   >(room.theme === 'immersive-glass' ? 'gallery' : 'documents');
   const shared = useSharedWorkspace(room.id);
   const appliedWorkspace = useRef(-1);
@@ -378,6 +382,9 @@ export default function Teaching({
     if (value.kind === 'geogebra') {
       setGeogebraOpened(true);
       setTab('geogebra');
+    } else if (value.kind === 'sandbox') {
+      setSandboxOpened(true);
+      setTab('sandbox');
     } else if (value.kind === 'presentation') setTab('presentations');
     else {
       if (value.documentId) setDocId(value.documentId);
@@ -651,9 +658,10 @@ export default function Teaching({
     }
   }
   async function openShared(
-    kind: 'document' | 'geogebra' | 'presentation',
+    kind: 'document' | 'geogebra' | 'presentation' | 'sandbox',
     documentId = docId,
     geogebraId = shared.workspace?.geogebraId ?? null,
+    sandboxId = shared.workspace?.sandboxId ?? null,
   ) {
     if (!canPresent) return;
     if (kind === 'document' && !documentId) return;
@@ -675,6 +683,7 @@ export default function Teaching({
         kind,
         ...(kind === 'document' ? { documentId } : {}),
         ...(kind === 'geogebra' ? { geogebraId } : {}),
+        ...(kind === 'sandbox' ? { sandboxId } : {}),
       });
     } catch (e) {
       setError((e as Error).message);
@@ -1592,6 +1601,7 @@ export default function Teaching({
                 ...(options.geoEnabled
                   ? [{ key: 'geogebra', icon: 'shape', label: 'geoTitle' }]
                   : []),
+                { key: 'sandbox', icon: 'board', label: 'sandboxTitle' },
                 ...(!room.parent
                   ? [{ key: 'breakouts', icon: 'people', label: 'breakoutRooms' }]
                   : []),
@@ -1604,7 +1614,10 @@ export default function Teaching({
               <button
                 role="menuitem"
                 key={item.key}
-                disabled={item.key === 'geogebra' && (!canPresent || shared.busy)}
+                disabled={
+                  (item.key === 'geogebra' || item.key === 'sandbox') &&
+                  (!canPresent || shared.busy)
+                }
                 onClick={() => setAppsPage(item.key as ClassroomAppKey)}
               >
                 <ClassIcon name={item.icon as 'apps'} size={18} />
@@ -1663,6 +1676,18 @@ export default function Teaching({
                   canSelect={canPresent}
                   onSelect={async (id) => {
                     await openShared('geogebra', undefined, id);
+                  }}
+                />
+              </Suspense>
+            )}
+            {appsPage === 'sandbox' && (
+              <Suspense fallback={<p role="status">{t('sandboxLoading')}</p>}>
+                <SandboxWorkspace
+                  roomId={room.id}
+                  selectedId={shared.workspace?.sandboxId ?? null}
+                  canSelect={canPresent}
+                  onSelect={async (id) => {
+                    await openShared('sandbox', undefined, undefined, id);
                   }}
                 />
               </Suspense>
@@ -1753,6 +1778,7 @@ export default function Teaching({
                           <span>{hand.name}</span>
                           {manager && (
                             <button
+                              aria-label={t('lowerHand') + ' ' + hand.name}
                               disabled={busy}
                               onClick={() =>
                                 void action('/hand', { raised: false, userId: hand.user_id })
@@ -1982,6 +2008,14 @@ export default function Teaching({
                 <span>GeoGebra</span>
               </button>
             )}
+            <button
+              disabled={!canPresent || shared.busy}
+              aria-pressed={shared.workspace?.kind === 'sandbox'}
+              onClick={() => void openShared('sandbox')}
+            >
+              <ClassIcon name="board" />
+              <span>{t('sandboxTab')}</span>
+            </button>
             {presentations?.enabled && (
               <button
                 disabled={!canPresent || shared.busy}
@@ -2065,7 +2099,21 @@ export default function Teaching({
             </Suspense>
           </div>
         )}
-        {tab === 'geogebra' ? null : tab === 'gallery' ? (
+        {sandboxOpened && (
+          <div className="sandbox-stage" hidden={tab !== 'sandbox'}>
+            <Suspense fallback={<p role="status">{t('sandboxLoading')}</p>}>
+              <SandboxWorkspace
+                roomId={room.id}
+                selectedId={shared.workspace?.sandboxId ?? null}
+                canSelect={canPresent}
+                onSelect={async (id) => {
+                  await openShared('sandbox', undefined, undefined, id);
+                }}
+              />
+            </Suspense>
+          </div>
+        )}
+        {tab === 'geogebra' || tab === 'sandbox' ? null : tab === 'gallery' ? (
           <div className="classroom-gallery-target" ref={setGalleryTarget}>
             {!media && (
               <div className="media-gallery-tiles">
