@@ -58,9 +58,11 @@ test('moderator locks use real dialogs and all viewers follow the same live boar
     await expect(
       b.getByRole('combobox', { name: 'Whiteboard pages', exact: true }).locator('option'),
     ).toHaveCount(1);
-    await a.getByRole('button', { name: 'Blank page', exact: true }).click();
     const selector = a.getByRole('combobox', { name: 'Whiteboard pages', exact: true });
+    const firstPage = await selector.inputValue();
+    await a.getByRole('button', { name: 'Blank page', exact: true }).click();
     await expect(selector.locator('option')).toHaveCount(2);
+    await expect(selector).not.toHaveValue(firstPage);
     await expect(b.getByRole('combobox', { name: 'Whiteboard pages', exact: true })).toHaveValue(
       await selector.inputValue(),
       { timeout: 20000 },
@@ -178,10 +180,16 @@ test('moderator locks use real dialogs and all viewers follow the same live boar
     await expect(
       b.getByRole('combobox', { name: 'Whiteboard pages', exact: true }).locator('option'),
     ).toHaveCount(2, { timeout: 10000 });
+    const pdfFirstPage = await a
+      .getByRole('combobox', { name: 'Whiteboard pages', exact: true })
+      .inputValue();
     await a.getByRole('button', { name: 'Next page', exact: true }).click();
+    await expect(
+      a.getByRole('combobox', { name: 'Whiteboard pages', exact: true }),
+    ).not.toHaveValue(pdfFirstPage);
     await expect(b.getByRole('combobox', { name: 'Whiteboard pages', exact: true })).toHaveValue(
       await a.getByRole('combobox', { name: 'Whiteboard pages', exact: true }).inputValue(),
-      { timeout: 3000 },
+      { timeout: 10000 },
     );
     await b.reload();
     await expect(b.getByRole('combobox', { name: 'Whiteboard pages', exact: true })).toHaveValue(

@@ -150,7 +150,14 @@ export async function validateConvertedOutput(directory: string) {
       }
     }
     return { pageCount: manifest.pageCount, assets };
-  } catch {
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        level: 'error',
+        event: 'conversion.output_validation_failed',
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
     throw new ConversionError('output_integrity_failed');
   }
 }

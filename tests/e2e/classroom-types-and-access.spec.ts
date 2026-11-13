@@ -302,6 +302,9 @@ test('owner configures type and enrollment, students only see assigned classes, 
               sections[n].top,
               'Notes controls must not overlap at any viewport',
             ).toBeGreaterThanOrEqual(sections[n - 1].bottom - 1);
+          await notesEditor.evaluate((editor) => {
+            editor.scrollTop = 0;
+          });
           const preview = notesEditor.locator('header button[aria-pressed]');
           await openDocumentMenu(ownerPage);
           await preview.click();
