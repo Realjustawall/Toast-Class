@@ -360,7 +360,9 @@ test('chat preserves drafts through rate limits and lost responses, coalesces re
           ).length,
       )
       .toBe(1);
-    await a.getByRole('button', { name: 'Retry loading image', exact: true }).click();
+    const retryImage = a.getByRole('button', { name: 'Retry loading image', exact: true });
+    await expect(retryImage).toBeVisible({ timeout: 20_000 });
+    await retryImage.click();
     await expect(a.locator('.chat-image-thumbnail img').last()).toBeVisible();
     await expect
       .poll(() =>

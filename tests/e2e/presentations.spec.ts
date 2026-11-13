@@ -124,7 +124,8 @@ test('real converter and two-user presentation: pages, independent viewing, relo
     await expect(
       learner.getByRole('heading', { name: 'نمای مشترک درس شما', exact: true }),
     ).toBeVisible();
-    await teacher.getByRole('button', { name: 'Files', exact: true }).click();
+    await teacher.getByRole('button', { name: 'Apps', exact: true }).click();
+    await teacher.getByRole('menuitem', { name: 'Files', exact: true }).click();
     await teacher.getByLabel('Choose a file', { exact: true }).setInputFiles({
       name: 'Workshop.docx',
       mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

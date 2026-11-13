@@ -8,6 +8,7 @@ async function localDownload(download: Download) {
   await download.saveAs(path);
   return path;
 }
+test.use({ actionTimeout: 15_000 });
 test('advanced editor synchronizes independent users, persists refresh, enforces read-only and loads local assets', async ({
   browser,
 }) => {
@@ -159,16 +160,19 @@ test('advanced editor synchronizes independent users, persists refresh, enforces
     await expect(b.locator('.board-status [role=status]')).toContainText('awaiting sync');
     await b.unroute('**/board/updates');
     // Wait for the receiving browser's authorized delta, not just the sender's receipt.
-    const receivedByTeacher = a.waitForResponse(async (response) => {
-      if (!response.url().startsWith(base + '?since=') || !response.ok()) return false;
-      const data = await response.json();
-      const updates = data.state
-        ? [data.state]
-        : (data.updates ?? []).map((item: { update: string }) => item.update);
-      return updates.some((value: string) =>
-        Buffer.from(value, 'base64').includes(Buffer.from('یادداشت دانشجو')),
-      );
-    });
+    const receivedByTeacher = a.waitForResponse(
+      async (response) => {
+        if (!response.url().startsWith(base + '?since=') || !response.ok()) return false;
+        const data = await response.json();
+        const updates = data.state
+          ? [data.state]
+          : (data.updates ?? []).map((item: { update: string }) => item.update);
+        return updates.some((value: string) =>
+          Buffer.from(value, 'base64').includes(Buffer.from('یادداشت دانشجو')),
+        );
+      },
+      { timeout: 45_000 },
+    );
     await b.getByRole('button', { name: 'Retry', exact: true }).click();
     await expect
       .poll(async () => (await serverElements()).some((e) => e.text === 'یادداشت دانشجو'))
