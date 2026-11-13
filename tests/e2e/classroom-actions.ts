@@ -1,4 +1,4 @@
-import type { Page, Locator } from '@playwright/test';
+import { expect, type Page, type Locator } from '@playwright/test';
 
 export async function setAppLanguage(page: Page, language: 'en' | 'fa') {
   await page.locator('.application-settings-trigger').first().click();
@@ -41,10 +41,8 @@ export async function openDocumentMenu(page: Page) {
   const menu = page.locator('.document-editor header .overflow-menu').first();
   if ((await menu.count()) && !(await menu.getAttribute('open').then((value) => value !== null))) {
     const summary = menu.locator('summary');
-    await summary.evaluate((element) =>
-      element.scrollIntoView({ block: 'center', inline: 'nearest' }),
-    );
-    await summary.click();
+    await expect(summary).toBeVisible();
+    await summary.click({ force: true });
   }
 }
 export async function boardAction(page: Page, name: string) {
