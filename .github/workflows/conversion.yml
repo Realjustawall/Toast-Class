@@ -49,7 +49,10 @@ jobs:
             sleep 1
           done
           exit 1
-      - run: sudo -E env "PATH=$PATH" PLAYWRIGHT_BROWSERS_PATH=/home/runner/.cache/ms-playwright npm run test:e2e
+      - run: |
+          sudo groupadd -f -g 65532 toaster-converter
+          sudo usermod -aG 65532 runner
+          sudo -E -u runner env "PATH=$PATH" npm run test:e2e
       - if: always()
         run: docker stop toaster-test-media || true
       - uses: actions/upload-artifact@v7.0.2
