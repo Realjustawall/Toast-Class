@@ -77,8 +77,10 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
   }, [theme]);
   const [expanded, setExpanded] = useState<LayoutPanel | null>(null);
   const nativePanel = useRef<LayoutPanel | null>(null);
+  const expandedTarget = useRef<LayoutPanel | null>(null);
   const toggleExpanded = async (panel: LayoutPanel) => {
     if (expanded === panel) {
+      expandedTarget.current = null;
       if (nativePanel.current && document.fullscreenElement)
         await document.exitFullscreen().catch(() => {});
       nativePanel.current = null;
@@ -88,10 +90,16 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
     const element = document.querySelector<HTMLElement>(
       '.classroom-shell [data-layout-panel="' + panel + '"]',
     );
+    expandedTarget.current = panel;
     setExpanded(panel);
     if (element?.requestFullscreen) {
       try {
         await element.requestFullscreen();
+        if (expandedTarget.current !== panel) {
+          if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
+          nativePanel.current = null;
+          return;
+        }
         nativePanel.current = panel;
       } catch {
         nativePanel.current = null;
@@ -102,6 +110,7 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
     const changed = () => {
       if (nativePanel.current && !document.fullscreenElement) {
         nativePanel.current = null;
+        expandedTarget.current = null;
         setExpanded(null);
       }
     };
@@ -119,6 +128,7 @@ export function useClassroomPanelLayout(theme: ClassroomTheme, rtl: boolean) {
   useEffect(() => {
     const escape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
+        expandedTarget.current = null;
         void (async () => {
           if (document.fullscreenElement) await document.exitFullscreen().catch(() => {});
           nativePanel.current = null;

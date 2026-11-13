@@ -68,11 +68,17 @@ test('the official local GeoGebra runtime draws, computes CAS and exposes its fu
     )
     .toBe(true);
   const math = page.frames().find((frame) => frame.url().includes('/geogebra/frame.html'))!;
-  await math.evaluate(() => {
-    const api = (window as any).__ggbApi;
-    api.evalCommand('A=(1,2)\nB=(4,6)\ns=Segment(A,B)\nf(x)=sin(x)');
-  });
-  await expect.poll(() => math.evaluate(() => (window as any).__ggbApi.getValue('s'))).toBe(5);
+  await expect
+    .poll(
+      () =>
+        math.evaluate(() => {
+          const api = (window as any).__ggbApi;
+          if (!api.exists?.('s')) api.evalCommand('A=(1,2)\nB=(4,6)\ns=Segment(A,B)\nf(x)=sin(x)');
+          return api.getValue('s');
+        }),
+      { timeout: 30000 },
+    )
+    .toBe(5);
   await expect
     .poll(() => math.evaluate(() => (window as any).__ggbApi.evalCommandCAS('Factor(x^2-1)')), {
       timeout: 30000,
