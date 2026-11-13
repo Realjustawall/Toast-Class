@@ -242,10 +242,23 @@ test('teaching state, authorization, CRDT persistence and websocket delivery', a
         });
         assert.equal((await get(base + '/teaching', owner)).json().participants.length, 2);
         try {
-          const received = once(ws, 'message');
+          const received = new Promise<{ type: string }>((resolve, reject) => {
+            const timer = setTimeout(
+              () => reject(new Error('Timed out waiting for WS signal')),
+              5000,
+            );
+            const onMsg = (raw: unknown) => {
+              const msg = JSON.parse(String(raw)) as { type: string };
+              if (msg.type === 'heartbeat') return;
+              clearTimeout(timer);
+              ws.off('message', onMsg);
+              resolve(msg);
+            };
+            ws.on('message', onMsg);
+          });
           await post(base + '/hand', { raised: true }, owner);
-          const [data] = await received;
-          assert.ok(['ready', 'changed', 'users_changed'].includes(JSON.parse(String(data)).type));
+          const msg = await received;
+          assert.ok(['ready', 'changed', 'users_changed'].includes(msg.type));
         } finally {
           ws.terminate();
           duplicate.terminate();

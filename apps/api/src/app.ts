@@ -897,6 +897,7 @@ export async function buildApp(pool: DatabasePool, config: Config) {
           .update(JSON.stringify([data.body, data.categoryId ?? null, data.imageFileId ?? null]))
           .digest('hex');
         if (data.clientMessageId) {
+          await c.query('SELECT id FROM users WHERE id=$1 FOR UPDATE', [u.id]);
           await c.query(
             'DELETE FROM chat_send_receipts WHERE classroom_id=$1 AND user_id=$2 AND created_at<$3',
             [room.id, u.id, new Date(Date.now() - 86400000)],
